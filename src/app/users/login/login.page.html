@@ -1,65 +1,33 @@
-<ion-header>
-  <ion-toolbar color="secondary">
-    <ion-title>¡Ingresa!</ion-title>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Iniciar Sesión</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div>
-    <ion-card><!--Logo-->
-      <div class="flex-center">
-        <ion-avatar slot="start" style="background-color: #8b4513">
-          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
-        </ion-avatar>
-      </div>
-      <ion-card-header class="ion-text-center" style="
-            border-top: 0.5px solid #0000003d;
-            margin: 10px;
-            padding-bottom: 10px;
-          ">
-        <ion-card-title color="primary">Inicio de Sesión</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
-        <form (ngSubmit)="Logearse()">
-          <!-- Email -->
-          <ion-item>
-            <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
-            <ion-input label="Cuenta" type="email" [(ngModel)]="email" labelPlacement="stacked"
-              placeholder="Ingresar Cuenta" name="email" required #emailCtrl="ngModel"></ion-input>
-          </ion-item>
-          <div class="ion-text-center" *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
-            El email es obligatorio y debe tener un formato válido.
+<ion-content color="primary" padding>
+  <form #form="ngForm" (ngSubmit)="login(form)">
+    <ion-grid>
+      <ion-row color="primary" justify-content-center>
+        <ion-col align-self-center size-md="6" size-lg="5" size-xs="12">
+          <div text-center>
+            <h3>Login</h3>
           </div>
-
-          <!-- Contraseña -->
-          <ion-item>
-            <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
-            <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
-              placeholder="Ingresar Contraseña" name="password" required #passwordCtrl="ngModel">
-              <ion-input-password-toggle slot="end"></ion-input-password-toggle></ion-input>
-          </ion-item>
-          <div class="ion-text-center" *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
-            La contraseña es obligatoria.
-          </div><br>
-
-          <!-- Mensaje de error general -->
-          <div  class="ion-text-center" *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
+          <div padding>
+            <ion-item>
+              <ion-input name="email" type="email" placeholder="your@email.com" ngModel required></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input name="password" type="password" placeholder="Password" ngModel required></ion-input>
+            </ion-item>
           </div>
-
-          <ion-button type="submit" fill="solid" expand="full">
-            Entrar
-          </ion-button>
-        </form>
-
-        <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px">
-          <p>¿Olvido la contraseña?</p>
-        </ion-button>
-        <ion-button (click)="irRegister()" fill="clear" expand="full">
-          ¿No tienes cuenta? ¡Registrate!
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-  </div>
+          <div padding>
+            <ion-button size="large" type="submit" [disabled]="form.invalid" expand="block">Login</ion-button>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>

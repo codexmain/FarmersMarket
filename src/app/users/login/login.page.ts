@@ -1,13 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  AlertController,
-  ModalController,
-  MenuController,
-} from '@ionic/angular';
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { Router, NavigationExtras } from '@angular/router';
-import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
-import { DataBaseService } from 'src/app/services/data-base.service';
 
 @Component({
   selector: 'app-login',
@@ -15,127 +6,11 @@ import { DataBaseService } from 'src/app/services/data-base.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  email: string = '';
-  password: string = '';
-  intentoLogin: number = 0;
-  isCooldown: boolean = false;
-  errorMessage: string = '';
 
-  constructor(
-    private router: Router,
-    private alertController: AlertController,
-    private modalController: ModalController,
-    private menu: MenuController,
-    private dataBase: DataBaseService,
-    private nativeStorage: NativeStorage
-  ) {}
+  constructor() { }
 
-  ngOnInit() {}
-
-  async Logearse() {
-    this.errorMessage = '';
-
-    // Validar campos vacíos
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Por favor, completa todos los campos.';
-      return;
-    }
-
-    // Verificar cooldown
-    if (this.isCooldown) {
-      this.errorMessage = 'Demasiados intentos fallidos. Por favor, espera 20 segundos.';
-      return;
-    }
-
-    try {
-      const usuario = await this.dataBase.login(this.email, this.password);
-
-      // Verificar si el usuario fue encontrado
-      if (usuario) {
-        if (usuario.estado_cuenta !== 'activa') {
-          this.errorMessage = 'Tu cuenta no está activa.';
-          return;
-        }
-
-        // Validar que el email no esté vacío ni contenga solo espacios
-        if (!this.email.trim()) {
-          this.errorMessage = 'El email no puede estar vacío o solo contener espacios.';
-          return;
-        }
-
-        // Actualizar email en NativeStorage
-        await this.actualizarEmail();
-
-        const navigationExtras: NavigationExtras = {
-          state: { ...usuario },
-        };
-
-        // Redirigir según el tipo de usuario
-        switch (usuario.tipo_usuario_id) {
-          case 1:
-            this.router.navigate(['/productos'], navigationExtras);
-            break;
-          case 2:
-            this.router.navigate(['/vendedor-page'], navigationExtras);
-            break;
-          case 3:
-            this.router.navigate(['/admin-page'], navigationExtras);
-            break;
-          default:
-            this.errorMessage = 'Tipo de usuario no reconocido.';
-        }
-      } else {
-        this.intentoLogin++;
-        // Manejo de intentos fallidos
-        if (this.intentoLogin >= 3) {
-          this.isCooldown = true;
-          setTimeout(() => {
-            this.isCooldown = false;
-            this.intentoLogin = 0;
-          }, 10000); // 10 segundos de cooldown
-          this.errorMessage = 'Demasiados intentos fallidos. Por favor, espera 20 segundos.';
-        } else {
-          this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
-        }
-      }
-    } catch (error) {
-      console.error('Error en el inicio de sesión:', JSON.stringify(error));
-      this.errorMessage = 'Hubo un problema al iniciar sesión.';
-    }
+  ngOnInit() {
   }
 
-  async actualizarEmail() {
-    try {
-      // Eliminar el email anterior
-      await this.nativeStorage.remove('userEmail')
-        .then(() => console.log('Email anterior eliminado de NativeStorage.'))
-        .catch(error => console.error('Error al eliminar el email:', error));
-
-      // Guardar el nuevo email
-      await this.nativeStorage.setItem('userEmail', this.email);
-      console.log('Email actualizado en NativeStorage:', this.email);
-    } catch (error) {
-      console.error('Error al actualizar el email:', error);
-    }
-  }
-
-  async presentModal() {
-    const modal = await this.modalController.create({
-      component: RecuperarPasswordPage,
-      componentProps: { emails: [] },
-    });
-    return await modal.present();
-  }
-
-  ionViewWillEnter() {
-    this.menu.enable(false);
-  }
-
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
-
-  irRegister() {
-    this.router.navigate(['/register']);
-  }
 }
+
