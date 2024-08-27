@@ -17,11 +17,11 @@ const routes: Routes = [
   },
   {
     path: 'inicio',
-    loadChildren: () => import('./inicio/inicio.module').then( m => m.InicioPageModule)
+    loadChildren: () => import('./cliente/inicio/inicio.module').then( m => m.InicioPageModule)
   },
   {
     path: 'productos',
-    loadChildren: () => import('./productos/productos.module').then( m => m.ProductosPageModule)
+    loadChildren: () => import('./cliente/productos/productos.module').then( m => m.ProductosPageModule)
   },
   {
     path: 'recuperar-password',
@@ -40,9 +40,22 @@ const routes: Routes = [
     loadChildren: () => import('./administracion/clients/clients.module').then( m => m.ClientsPageModule)
   },
   {
+    path: 'compras',
+    loadChildren: () => import('./cliente/compras/compras.module').then( m => m.ComprasPageModule)
+  },
+  {
+    path: 'carrito',
+    loadChildren: () => import('./cliente/carrito/carrito.module').then( m => m.CarritoPageModule)
+  },
+  {
+    path: 'cuenta',
+    loadChildren: () => import('./cliente/cuenta/cuenta.module').then( m => m.CuentaPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
+
 
 ];
 
