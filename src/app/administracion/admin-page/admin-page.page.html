@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">Administración</ion-title>
+  </ion-toolbar>
+  
+</ion-header>
+<ion-card>
+  <ion-card-header>
+    <ion-card-title class="ion-text-center">Modulo de Administracion de CuTuCo</ion-card-title>
+    <ion-card-subtitle>Bienvenido "NOMBRE DE USUARIO"</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    Acá podras realizar diferentes acciones, principalmente para gestionar los usuarios de la aplicación.
+  </ion-card-content>
+</ion-card>
+
+<ion-content [fullscreen]="false">
+
+  <br/> 
+  <ion-item >   
+    <ion-label class="ion-text-center"> Menú</ion-label>
+  </ion-item>
+  <br/>
+  <br/>
+  <div class="button-container">
+    <ion-button id="modal-sellers"  shape="round" class="fixed-size">Vendedores</ion-button>
+
+  </div>
+  <br/>
+  <br/> 
+  <div class="button-container">
+  <ion-button shape="round" class="fixed-size">Clientes</ion-button>
+  </div>
+  <br/>
+  <br/>    
+  <div class="button-container">
+  <ion-button shape="round" class="fixed-size" color="danger">Cerrar Sesión</ion-button>
+  </div>
+</ion-content>
