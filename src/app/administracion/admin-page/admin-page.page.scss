@@ -1,8 +1,8 @@
 .button-container {
     display: flex;
-    justify-content: center; 
-    width: 100%; /* Ajusta según sea necesario */
+    justify-content: space-around; /* Ajusta según sea necesario */
   }
+  
 
 
 .fixed-size {
@@ -15,8 +15,5 @@
   white-space: nowrap; /* Evita que el texto se desborde */
 } //esto es para ajustar el texto que esta adentro del boton
 
-ion-avatar {
-  width: 130px; 
-  height: 130px; 
-}
+
 
