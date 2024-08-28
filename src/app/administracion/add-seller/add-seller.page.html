@@ -1,0 +1,90 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">Formulario Vendedores</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
+    <ion-buttons slot="end">
+      <ion-button (click)="agregar()" [strong]="true">Agregar</ion-button>
+    </ion-buttons>  
+  
+  </ion-toolbar>
+  
+</ion-header>
+
+<ion-content [fullscreen]="false">
+  <br/>
+  <br/>
+  <ion-item> Foto de perfil/Logo empresa:  
+    <ion-button  >
+      <ion-icon name="add-outline" >  </ion-icon>                        
+    </ion-button>         
+  </ion-item>  
+
+  <ion-item>
+    <ion-input type="text" label="Primer Nombre" labelPlacement="stacked" placeholder="Ingrese el Primer Nombre del Dueño"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="text" label="Segundo Nombre" labelPlacement="stacked" placeholder="Ingrese el Segundo Nombre del Dueño (Opcional)"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="text" label="Apellido Paterno" labelPlacement="stacked" placeholder="Ingrese el Apellido Paterno del Dueño"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="text" label="Apelido Materno" labelPlacement="stacked" placeholder="Ingrese el Apellido Materno del Dueño (Opcional)"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input type="text" label="Empresa" labelPlacement="stacked" placeholder="Ingrese el Nombre de la Empresa"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-select label="Estado Usuario" labelPlacement="stacked">
+      <ion-select-option value="active">Cuenta Activa</ion-select-option>
+      <ion-select-option value="disabled">Cuenta Deshabilitada</ion-select-option>
+      <ion-select-option value="delete">Cuenta Eliminada</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="email" label="Correo" labelPlacement="stacked" placeholder="Ingrese el correo de la Empresa"></ion-input>
+  </ion-item>
+<br/>
+
+
+  <ion-item>
+      <ion-select label="Region " label-placement="stacked" (ionChange)="onRegionChange($event)">
+        <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
+        <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
+        <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
+        <ion-select-option value="atacama">Región de Atacama</ion-select-option>
+        <ion-select-option value="coquimbo">Región de Coquimbo</ion-select-option>
+        <ion-select-option value="valparaiso">Región de Valparaíso</ion-select-option>
+        <ion-select-option value="metropolitana">Región Metropolitana de Santiago</ion-select-option>
+        <ion-select-option value="ohiggins">Región del Libertador General Bernardo O'Higgins</ion-select-option>
+        <ion-select-option value="maule">Región del Maule</ion-select-option>
+        <ion-select-option value="nuble">Región de Ñuble</ion-select-option>
+        <ion-select-option value="biobio">Región del Biobío</ion-select-option>
+        <ion-select-option value="araucania">Región de La Araucanía</ion-select-option>
+        <ion-select-option value="rios">Región de Los Ríos</ion-select-option>
+        <ion-select-option value="lagos">Región de Los Lagos</ion-select-option>
+        <ion-select-option value="aysen">Región de Aysén</ion-select-option>
+        <ion-select-option value="magallanes">Región de Magallanes y de la Antártica Chilena</ion-select-option>
+    </ion-select>
+  </ion-item>
+  
+  <ion-item>
+    <ion-select label="Comuna" label-placement="stacked" [disabled]="!selectedRegion">
+      <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-input type="text" label="Direccion" labelPlacement="stacked" placeholder="Ingrese la dirección de la Empresa"></ion-input>
+  </ion-item>
+
+  <br/>
+</ion-content>
+

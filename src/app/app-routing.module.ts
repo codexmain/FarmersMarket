@@ -52,9 +52,19 @@ const routes: Routes = [
     loadChildren: () => import('./cliente/cuenta/cuenta.module').then( m => m.CuentaPageModule)
   },
   {
+    path: 'add-client',
+    loadChildren: () => import('./administracion/add-client/add-client.module').then( m => m.AddClientPageModule)
+  },
+  {
+    path: 'add-seller',
+    loadChildren: () => import('./administracion/add-seller/add-seller.module').then( m => m.AddSellerPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
+
+
 
 
 ];
