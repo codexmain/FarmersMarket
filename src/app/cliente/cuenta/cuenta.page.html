@@ -4,7 +4,25 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Mi cuenta</ion-title>
+    <ion-icon name="notifications" slot="end"></ion-icon>
+    <ion-badge id="notifications-badge-msg" color="danger">2</ion-badge>
+      <ion-icon name="cart" slot="end"></ion-icon>
+      <ion-badge id="notifications-badge" color="danger">5</ion-badge>
+        <img slot="end" src="../assets/farmer.png" />
   </ion-toolbar>
 </ion-header>
 
-
+<ion-content>
+  <div class="top">
+    <div class="image">
+      <img src="../assets/farmer.png" />
+      </div>
+      <div class="desc">
+      <h3>Farmer</h3>
+      <p>FarmerAcorreo.cl</p>
+      </div>
+      <div class="edit">
+      <ion-button color="danger">Edit</ion-button>
+      </div>
+    </div>
+</ion-content>
