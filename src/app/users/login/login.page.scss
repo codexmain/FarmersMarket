@@ -1,3 +1,15 @@
 ion-content {
     --background: #608537;
 }
+.upper {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 180px; 
+}
+
+ion-avatar {
+    width: 200px; 
+    height: 200px; 
+    margin-top: 20px;
+}
