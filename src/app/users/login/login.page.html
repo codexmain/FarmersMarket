@@ -17,24 +17,20 @@
             </ion-card-header>
 
             <ion-card-content>
-                <ion-item>
+                <form (ngSubmit)="Logearse()">
+                  <ion-item>
                     <ion-icon name="person"></ion-icon>
-                    <ion-input label="Email" type="text" labelPlacement="floating"
-                        placeholder="Ingresa tu Email"></ion-input>
+                    <ion-input label="Email" type="text" labelPlacement="floating" placeholder="Ingresa tu Email"></ion-input>
                 </ion-item>
                 <ion-item>
                     <ion-icon name="key-outline"></ion-icon>
-                    <ion-input label="Password" type="password" labelPlacement="floating"
-                        placeholder="Ingresa tu Contraseña"></ion-input>
+                    <ion-input label="Password" type="password" labelPlacement="floating" placeholder="Ingresa tu Contraseña"></ion-input>
                 </ion-item>
                 <ion-button fill="clear" expand="full">
-                    <h3>¿Olvido la contraseña?</h3>
-                </ion-button>
-                <ion-button type="submit" fill="solid" expand="full">
-                    Entrar
+                  <h3>¿Olvido la contraseña?</h3>
                 </ion-button>
                 <ion-button fill="clear" expand="full">
-                    ¿No tienes cuenta? ¡Registrate!
+                  ¿No tienes cuenta? ¡Registrate!
                 </ion-button>
             </ion-card-content>
         </ion-card>
