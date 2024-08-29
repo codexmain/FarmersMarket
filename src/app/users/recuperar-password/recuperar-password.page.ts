@@ -22,9 +22,7 @@ export class RecuperarPasswordPage implements OnInit {
     this.menu.enable(true);
   }
 
-  dismiss() {
-    this.modalController.dismiss();
-  }
+
 
   enviar(){}
 
@@ -78,6 +76,10 @@ export class RecuperarPasswordPage implements OnInit {
     
     
   ngOnInit() {
+  }
+
+  dismiss() {
+    this.modalController.dismiss();
   }
 
 }

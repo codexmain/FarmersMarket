@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { IonicModule, AlertController, ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
+
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,7 @@ export class LoginPage implements OnInit {
   isCooldown: boolean = false; // esto es para dar un tiempo de espera despues de fallar los intentos determinados
 
 
-  constructor(private router: Router, private alertController: AlertController, ) { }
+  constructor(private router: Router, private alertController: AlertController, private modalController: ModalController) { }
 
 
 
@@ -196,6 +198,14 @@ export class LoginPage implements OnInit {
 
     await alert.present();
   }
+
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: RecuperarPasswordPage,
+    });
+
+    return await modal.present();}
 
   
 
