@@ -20,12 +20,17 @@
                 <form (ngSubmit)="Logearse()">
                   <ion-item>
                     <ion-icon name="person"></ion-icon>
-                    <ion-input label="Email" type="text" labelPlacement="floating" placeholder="Ingresa tu Email"></ion-input>
+                    <ion-input label="Email" type="email" [(ngModel)]="email" labelPlacement="floating" placeholder="Ingresa tu Email" name="email"></ion-input>
                 </ion-item>
                 <ion-item>
                     <ion-icon name="key-outline"></ion-icon>
-                    <ion-input label="Password" type="password" labelPlacement="floating" placeholder="Ingresa tu Contraseña"></ion-input>
+                    <ion-input label="Password" type="password" [(ngModel)]="password" labelPlacement="floating" placeholder="Ingresa tu Contraseña" name="password"></ion-input>
                 </ion-item>
+                <ion-button type="submit" fill="solid" expand="full">
+                    Entrar
+                </ion-button>
+                </form>
+
                 <ion-button fill="clear" expand="full">
                   <h3>¿Olvido la contraseña?</h3>
                 </ion-button>
