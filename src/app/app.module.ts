@@ -6,6 +6,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+//import { RecuperarPasswordPage } from './users/recuperar-password/recuperar-password.page';
 
 @NgModule({
   declarations: [AppComponent],
