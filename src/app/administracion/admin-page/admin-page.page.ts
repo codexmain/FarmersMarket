@@ -61,5 +61,16 @@ export class AdminPagePage implements OnInit {  //! es obligatoria, ? es opciona
     this.router.navigate(['/clients'], navigationExtras);
   }
 
+  navigateToSellers()  { //transferencia de array de correos a la parte de clientes
+    let navigationExtras: NavigationExtras = {
+      state: {
+        emails: this.emails
+      }
+    };
+    this.router.navigate(['/sellers'], navigationExtras);
+  }
+
+
+
 
 }

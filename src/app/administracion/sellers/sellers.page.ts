@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, MenuController, InfiniteScrollCustomEvent} from '@ionic/angular';
 import { AddSellerPage } from '../add-seller/add-seller.page'
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-sellers',
@@ -8,8 +9,14 @@ import { AddSellerPage } from '../add-seller/add-seller.page'
   styleUrls: ['./sellers.page.scss'],
 })
 export class SellersPage implements OnInit {
+  emails: string[] = []; 
 
-  constructor(private modalController: ModalController, private menu: MenuController) {}
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state) {  //recibir de admin page el array de correos
+      this.emails = navigation.extras.state['emails'];
+    }
+  }
 
   items: string[] = [];
 
@@ -39,7 +46,7 @@ export class SellersPage implements OnInit {
 
 
   ngOnInit() {
-    this.generateItems();
+    console.log(this.emails);
   }
 
 
@@ -56,18 +63,14 @@ export class SellersPage implements OnInit {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);}
 
-    dismiss() {
-    this.modalController.dismiss();
-  }
-
-  async presentModal() {
-    const modal = await this.modalController.create({
-      component: AddSellerPage
-    });
-
-    return await modal.present();}  
-
-
-
+    async presentModal() {
+      const modal = await this.modalController.create({
+        component: AddSellerPage,
+        componentProps: { emails: this.emails }
+      });
+  
+      return await modal.present();}
 
 }
+
+
