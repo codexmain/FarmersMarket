@@ -11,6 +11,7 @@ interface RegionesComunas { //permite hacer la dependencia de comuna / region, p
   styleUrls: ['./add-seller.page.scss'],
 })
 export class AddSellerPage implements OnInit {
+  emails: string[] = [];
 
   constructor(private modalController: ModalController) { }
 
@@ -50,6 +51,7 @@ export class AddSellerPage implements OnInit {
   agregar(){}
 
   ngOnInit() {
+    console.log(this.emails);
   }
 
 }
