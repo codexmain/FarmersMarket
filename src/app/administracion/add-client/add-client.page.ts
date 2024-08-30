@@ -48,13 +48,7 @@ export class AddClientPage implements OnInit {
   ngOnInit() {
   }
 
-  ionViewWillEnter() {
-    this.menu.enable(false);
-  }
 
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
 
   dismiss() {
     this.modalController.dismiss();

@@ -3,10 +3,10 @@
     <ion-title class="ion-text-center"><ion-searchbar placeholder="Buscar Cliente"></ion-searchbar></ion-title>
 
     <ion-buttons slot="start">
-      <ion-button (click)="salir()">Cancelar</ion-button>
+      <ion-button [routerDirection]="'back'" [routerLink]="'/admin-page'">Cancelar</ion-button>
     </ion-buttons>    
-    <ion-button slot="end">
-      <ion-icon name="add-outline" (click)="crear()">  </ion-icon>                        
+    <ion-button slot="end" (click)="presentModal()">
+      <ion-icon name="add-outline">  </ion-icon>
     </ion-button>    
   
   </ion-toolbar>
