@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, AlertController, ModalController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { AlertController, ModalController, MenuController } from '@ionic/angular';
+import { Router, NavigationExtras } from '@angular/router';
 import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
 
 
@@ -16,7 +16,8 @@ export class LoginPage implements OnInit {
   isCooldown: boolean = false; // esto es para dar un tiempo de espera despues de fallar los intentos determinados
 
 
-  constructor(private router: Router, private alertController: AlertController, private modalController: ModalController) { }
+
+  constructor(private router: Router, private alertController: AlertController, private modalController: ModalController, private menu: MenuController) { }
 
 
 
@@ -108,8 +109,8 @@ export class LoginPage implements OnInit {
       sNombre: 'Morris',
       aPaterno: 'Cofre',
       aMaterno: null,
-      correo: '',
-      password: '',
+      correo: 'cochambre230@gmail.com',
+      password: 'deofk!Q@fd',
       empresa: 'The 830 Farmer',
       estadoUsuario: 'active',
       tipoUsuario: 2,
@@ -136,8 +137,12 @@ export class LoginPage implements OnInit {
 
     },
 
+    
+
 
   ];
+
+
   ngOnInit() {
   }
 
@@ -161,15 +166,33 @@ export class LoginPage implements OnInit {
       }
 
       this.intentoLogin = 0; // Reiniciar intentos en caso de éxito
+      let navigationextras: NavigationExtras = {
+        state: {
+          perfil: user.pfp,
+          fstName: user.pNombre,
+          sndName: user.sNombre,
+          fstSurname: user.aPaterno,
+          sndSurname: user.aMaterno,
+          mail: user.correo,
+          pwd: user.password,
+          company: user.empresa,
+          uStatus: user.estadoUsuario,
+          userType: user.tipoUsuario,
+          reg: user.region,
+          com: user.comuna,
+          loc: user.direccion
+        }
+      };
       switch (user.tipoUsuario) {
         case 1:
-          this.router.navigate(['/inicio']);
+      
+          this.router.navigate(['/inicio'], navigationextras);
           break;
         case 2:
-          this.router.navigate(['/nose-page']); //esta este pendiente pq este lo tas haciendo tú nacho
+          this.router.navigate(['/nose-page'], navigationextras); //esta este pendiente pq este lo tas haciendo tú nacho
           break;
         case 3:
-          this.router.navigate(['/admin-page']);
+          this.router.navigate(['/admin-page'], navigationextras);
           break;
         default:
           await this.showAlert('Error', 'Tipo de usuario no reconocido.');
@@ -207,9 +230,14 @@ export class LoginPage implements OnInit {
 
     return await modal.present();}
 
+
+    ionViewWillEnter() {
+      this.menu.enable(false);
+    }
   
-
-
+    ionViewWillLeave() {
+      this.menu.enable(true);
+    }
 
 }
 
