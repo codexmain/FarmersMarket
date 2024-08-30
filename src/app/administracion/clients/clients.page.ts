@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, MenuController, InfiniteScrollCustomEvent} from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
+import { AddClientPage } from '../add-client/add-client.page';
 
 @Component({
   selector: 'app-clients',
@@ -8,7 +9,7 @@ import { ModalController, MenuController, InfiniteScrollCustomEvent} from '@ioni
 })
 export class ClientsPage implements OnInit {
 
-  constructor(private modalController: ModalController, private menu: MenuController) {}
+  constructor(private modalController: ModalController) {}
 
   items: string[] = [];
 
@@ -41,14 +42,6 @@ export class ClientsPage implements OnInit {
     this.generateItems();
   }
 
-  ionViewWillEnter() {
-    this.menu.enable(false);
-  }
-
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
-
   private generateItems() {
     const count = this.items.length + 1;
     for (let i = 0; i < 50; i++) {
@@ -62,15 +55,15 @@ export class ClientsPage implements OnInit {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);}
 
-  salir() {
-    this.modalController.dismiss();
-  }
+    async presentModal() {
+      const modal = await this.modalController.create({
+        component: AddClientPage
+      });
+  
+      return await modal.present();}
 
-  crear(){}
 
-  eliminar(){}
 
-  editar(){}
 
 
 

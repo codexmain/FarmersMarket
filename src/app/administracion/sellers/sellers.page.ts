@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, MenuController, InfiniteScrollCustomEvent} from '@ionic/angular';
+import { AddSellerPage } from '../add-seller/add-seller.page'
 
 @Component({
   selector: 'app-sellers',
@@ -41,13 +42,6 @@ export class SellersPage implements OnInit {
     this.generateItems();
   }
 
-  ionViewWillEnter() {
-    this.menu.enable(false);
-  }
-
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
 
   private generateItems() {
     const count = this.items.length + 1;
@@ -62,15 +56,17 @@ export class SellersPage implements OnInit {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);}
 
-  salir() {
+    dismiss() {
     this.modalController.dismiss();
   }
 
-  crear(){}
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: AddSellerPage
+    });
 
-  eliminar(){}
+    return await modal.present();}  
 
-  editar(){}
 
 
 

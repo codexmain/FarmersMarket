@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, MenuController, AlertController  } from '@ionic/angular';
+import { ModalController, AlertController  } from '@ionic/angular';
 @Component({
   selector: 'app-recuperar-password',
   templateUrl: './recuperar-password.page.html',
@@ -9,18 +9,11 @@ import { ModalController, MenuController, AlertController  } from '@ionic/angula
 export class RecuperarPasswordPage implements OnInit {
 
 
-  constructor(private modalController: ModalController, private menu: MenuController, public alertController: AlertController) {}
+  constructor(private modalController: ModalController, public alertController: AlertController) {}
 
 
 
   
-  ionViewWillEnter() {
-    this.menu.enable(false);
-  }
-
-  ionViewWillLeave() {
-    this.menu.enable(true);
-  }
 
 
 

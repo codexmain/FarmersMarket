@@ -24,17 +24,17 @@
   <br/>
   <br/>
   <div class="button-container">
-    <ion-button id="modal-sellers"  shape="round" class="fixed-size">Vendedores</ion-button>
+    <ion-button id="modal-sellers"  shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/sellers'">Vendedores</ion-button>
 
   </div>
   <br/>
   <br/> 
   <div class="button-container">
-  <ion-button shape="round" class="fixed-size">Clientes</ion-button>
+  <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/clients'">Clientes</ion-button>
   </div>
   <br/>
   <br/>    
   <div class="button-container">
-  <ion-button shape="round" class="fixed-size" color="danger">Cerrar Sesión</ion-button>
+  <ion-button shape="round" class="fixed-size" color="danger" [routerDirection]="'back'" [routerLink]="'/login'">Cerrar Sesión</ion-button>
   </div>
 </ion-content>
