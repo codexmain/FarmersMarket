@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
 import { AddClientPage } from '../add-client/add-client.page';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-clients',
@@ -8,8 +9,18 @@ import { AddClientPage } from '../add-client/add-client.page';
   styleUrls: ['./clients.page.scss'],
 })
 export class ClientsPage implements OnInit {
+  emails: string[] = []; 
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state) {  //recibir de admin page el array de correos
+      this.emails = navigation.extras.state['emails'];
+    }
+  }
+  
+
+  
+  
 
   items: string[] = [];
 
@@ -40,6 +51,7 @@ export class ClientsPage implements OnInit {
 
   ngOnInit() {
     this.generateItems();
+    console.log(this.emails);
   }
 
   private generateItems() {
@@ -57,14 +69,10 @@ export class ClientsPage implements OnInit {
 
     async presentModal() {
       const modal = await this.modalController.create({
-        component: AddClientPage
+        component: AddClientPage,
+        componentProps: { emails: this.emails }
       });
   
       return await modal.present();}
-
-
-
-
-
 
 }

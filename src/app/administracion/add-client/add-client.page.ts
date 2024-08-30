@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuController, ModalController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 
 interface RegionesComunas { //permite hacer la dependencia de comuna / region, para que sea interactivo cada vez que se cambie la region, se vean diferentes comunas
   [key: string]: string[];
@@ -13,8 +14,9 @@ interface RegionesComunas { //permite hacer la dependencia de comuna / region, p
 
 
 export class AddClientPage implements OnInit {
+  emails: string[] = [];
 
-  constructor(private modalController: ModalController, private menu: MenuController) { }
+  constructor(private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router) { }
 
   selectedRegion: string = '';
   comunas: string[] = [];
@@ -46,6 +48,7 @@ export class AddClientPage implements OnInit {
 
 
   ngOnInit() {
+    console.log(this.emails);
   }
 
 
