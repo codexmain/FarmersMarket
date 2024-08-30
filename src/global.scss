@@ -43,10 +43,22 @@
     height: 100%;
 }
 
-ion-header{
-    background-color:#cd995a;
+
+ion-header {
+    background-color: #FF9800; /* Cambia este color al que desees */
+    color: white;              /* Cambia el color del texto si es necesario */
+}
+
+ion-toolbar {
+    --background: #FF9800;     /* Cambia el color de fondo del toolbar */
+    --color: white;             /* Cambia el color del texto del toolbar */
 }
 
 ion-content {
-    --background: #608537;
+    --background: #4CAF50;
+}
+
+ion-list{
+    --background: #9a310b;
+
 }
