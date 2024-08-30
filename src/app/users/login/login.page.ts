@@ -166,6 +166,9 @@ export class LoginPage implements OnInit {
       }
 
       this.intentoLogin = 0; // Reiniciar intentos en caso de éxito
+      const emails = this.listaUsers.map((u: any) => u.correo);
+
+        
       let navigationextras: NavigationExtras = {
         state: {
           perfil: user.pfp,
@@ -180,13 +183,15 @@ export class LoginPage implements OnInit {
           userType: user.tipoUsuario,
           reg: user.region,
           com: user.comuna,
-          loc: user.direccion
+          loc: user.direccion,
+          emails: emails
+          
         }
       };
       switch (user.tipoUsuario) {
         case 1:
       
-          this.router.navigate(['/inicio'], navigationextras);
+          this.router.navigate(['/inicio'], navigationextras,);
           break;
         case 2:
           this.router.navigate(['/nose-page'], navigationextras); //esta este pendiente pq este lo tas haciendo tú nacho

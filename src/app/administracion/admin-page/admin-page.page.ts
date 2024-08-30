@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router , NavigationExtras} from '@angular/router';
 @Component({
   selector: 'app-admin-page',
   templateUrl: './admin-page.page.html',
@@ -20,6 +20,7 @@ export class AdminPagePage implements OnInit {  //! es obligatoria, ? es opciona
   region!: string;
   comuna!: string;
   direccion!: string;
+  emails: string[] = []; //recibimiento de todos los email para validaciones, desde el login  
 
 
 
@@ -40,6 +41,7 @@ export class AdminPagePage implements OnInit {  //! es obligatoria, ? es opciona
         this.region = this.router.getCurrentNavigation()?.extras?.state?.['reg'];
         this.comuna = this.router.getCurrentNavigation()?.extras?.state?.['com'];
         this.direccion = this.router.getCurrentNavigation()?.extras?.state?.['loc'];
+        this.emails = this.router.getCurrentNavigation()?.extras?.state?.['emails']; //recibir array de correos
       }
     })
 
@@ -47,6 +49,16 @@ export class AdminPagePage implements OnInit {  //! es obligatoria, ? es opciona
 
 
   ngOnInit() {
+    console.log(this.emails);
+  }
+
+  navigateToClients()  { //transferencia de array de correos a la parte de clientes
+    let navigationExtras: NavigationExtras = {
+      state: {
+        emails: this.emails
+      }
+    };
+    this.router.navigate(['/clients'], navigationExtras);
   }
 
 
