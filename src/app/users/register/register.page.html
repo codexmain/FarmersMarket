@@ -5,14 +5,15 @@
 </ion-header>
 
 <ion-content>
-  <div class="upper">
-    <ion-avatar slot="start">
-      <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
-    </ion-avatar>
-  </div>
   <div class="middle">
     <ion-card>
-      <ion-card-header class="ion-text-center">
+      <div class="flex-center">
+        <ion-avatar slot="start" style="background-color: #8B4513">
+          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+        </ion-avatar>
+      </div>
+      <ion-card-header class="ion-text-center"
+        style="border-top: 0.5px solid #0000003d; margin: 10px; padding-bottom: 10px;">
         <ion-card-title color="primary">Crea tu cuenta</ion-card-title>
       </ion-card-header>
 
@@ -35,45 +36,47 @@
           <ion-input label="Password" type="password" labelPlacement="floating"
             placeholder="Crea tu Contraseña"></ion-input>
         </ion-item>
-      
+
         <ion-item>
-          <ion-input type="email" label="*Correo" labelPlacement="stacked" placeholder="Opcional ingrese correo de Empresa"></ion-input>
+          <ion-input type="email" label="*Correo" labelPlacement="stacked"
+            placeholder="Opcional ingrese correo de Empresa"></ion-input>
         </ion-item>
-      <br/>
-      
-      
+        <br/>
+
+
         <ion-item>
-            <ion-select label="Region " label-placement="stacked" (ionChange)="onRegionChange($event)">
-              <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
-              <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
-              <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
-              <ion-select-option value="atacama">Región de Atacama</ion-select-option>
-              <ion-select-option value="coquimbo">Región de Coquimbo</ion-select-option>
-              <ion-select-option value="valparaiso">Región de Valparaíso</ion-select-option>
-              <ion-select-option value="metropolitana">Región Metropolitana de Santiago</ion-select-option>
-              <ion-select-option value="ohiggins">Región del Libertador General Bernardo O'Higgins</ion-select-option>
-              <ion-select-option value="maule">Región del Maule</ion-select-option>
-              <ion-select-option value="nuble">Región de Ñuble</ion-select-option>
-              <ion-select-option value="biobio">Región del Biobío</ion-select-option>
-              <ion-select-option value="araucania">Región de La Araucanía</ion-select-option>
-              <ion-select-option value="rios">Región de Los Ríos</ion-select-option>
-              <ion-select-option value="lagos">Región de Los Lagos</ion-select-option>
-              <ion-select-option value="aysen">Región de Aysén</ion-select-option>
-              <ion-select-option value="magallanes">Región de Magallanes y de la Antártica Chilena</ion-select-option>
+          <ion-select label="Region " label-placement="stacked" (ionChange)="onRegionChange($event)">
+            <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
+            <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
+            <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
+            <ion-select-option value="atacama">Región de Atacama</ion-select-option>
+            <ion-select-option value="coquimbo">Región de Coquimbo</ion-select-option>
+            <ion-select-option value="valparaiso">Región de Valparaíso</ion-select-option>
+            <ion-select-option value="metropolitana">Región Metropolitana de Santiago</ion-select-option>
+            <ion-select-option value="ohiggins">Región del Libertador General Bernardo O'Higgins</ion-select-option>
+            <ion-select-option value="maule">Región del Maule</ion-select-option>
+            <ion-select-option value="nuble">Región de Ñuble</ion-select-option>
+            <ion-select-option value="biobio">Región del Biobío</ion-select-option>
+            <ion-select-option value="araucania">Región de La Araucanía</ion-select-option>
+            <ion-select-option value="rios">Región de Los Ríos</ion-select-option>
+            <ion-select-option value="lagos">Región de Los Lagos</ion-select-option>
+            <ion-select-option value="aysen">Región de Aysén</ion-select-option>
+            <ion-select-option value="magallanes">Región de Magallanes y de la Antártica Chilena</ion-select-option>
           </ion-select>
         </ion-item>
-        
+
         <ion-item>
           <ion-select label="Comuna" label-placement="stacked" [disabled]="!selectedRegion">
             <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
           </ion-select>
         </ion-item>
-      
+
         <ion-item>
-          <ion-input type="text" label="Direccion" labelPlacement="stacked" placeholder="Ingrese la dirección"></ion-input>
+          <ion-input type="text" label="Direccion" labelPlacement="stacked"
+            placeholder="Ingrese la dirección"></ion-input>
         </ion-item>
-      
-        <br/>
+
+        <br />
         <ion-button type="submit" fill="solid" expand="full">
           Registrarse
         </ion-button>

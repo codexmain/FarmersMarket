@@ -72,10 +72,6 @@ const routes: Routes = [
     loadChildren: () => import('./vendedor/proventas/proventas.module').then( m => m.ProventasPageModule)
   }
 
-
-
-
-
 ];
 
 @NgModule({

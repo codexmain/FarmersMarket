@@ -8,7 +8,9 @@
 </ion-header>
 
 <ion-content>
+  <ion-card>
   <ion-list>
+    <ion-searchbar animated="true" placeholder="Buscar Vendedor"></ion-searchbar>
     <ion-item *ngFor="let item of items; let index">
       <ion-avatar slot="start">
         <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
@@ -27,4 +29,5 @@
   <ion-infinite-scroll>
     <ion-infinite-scroll-content loadingText="Please wait..." loadingSpinner="bubbles"></ion-infinite-scroll-content>
   </ion-infinite-scroll>
+</ion-card>
 </ion-content>
