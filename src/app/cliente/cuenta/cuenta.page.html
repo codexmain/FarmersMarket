@@ -25,4 +25,25 @@
       <ion-button color="danger">Edit</ion-button>
       </div>
     </div>
+
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ userData.fstName }} {{ userData.fstSurname }}</ion-card-title>
+          <ion-card-subtitle>{{ userData.mail }}</ion-card-subtitle>
+        </ion-card-header>
+    
+        <ion-card-content>
+          <p><strong>Nombre:</strong> {{ userData.fstName }} {{ userData.sndName }}</p>
+          <p><strong>Apellidos:</strong> {{ userData.fstSurname }} {{ userData.sndSurname }}</p>
+          <p><strong>Correo:</strong> {{ userData.mail }}</p>
+          <p><strong>Empresa:</strong> {{ userData.company }}</p>
+          <p><strong>Estado del Usuario:</strong> {{ userData.uStatus }}</p>
+          <p><strong>Tipo de Usuario:</strong> {{ userData.userType }}</p>
+          <p><strong>Región:</strong> {{ userData.reg }}</p>
+          <p><strong>Comuna:</strong> {{ userData.com }}</p>
+          <p><strong>Dirección:</strong> {{ userData.loc }}</p>
+        </ion-card-content>
+      </ion-card>
+    
 </ion-content>
