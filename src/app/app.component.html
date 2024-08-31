@@ -3,11 +3,19 @@
     <ion-menu contentId="main-content">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Menu Principal</ion-title>
+          <div style="display: flex; align-items: center;">
+            <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+              <img src="../assets/icon/Logo_out.png" alt="avatar" />
+            </ion-avatar>
+            <ion-label class="ion-text-wrap" style="margin-left: 10px;">
+              CultivaTuCompra APP
+            </ion-label>
+          </div>
         </ion-toolbar>
       </ion-header>
-  
+
       <ion-content>
+        <ion-card>
         <ion-list>
           <ion-item [routerDirection]="'root'" [routerLink]="'/inicio'">
             <ion-icon name="home"></ion-icon>
@@ -34,9 +42,10 @@
             <ion-label>Salir de la cuenta</ion-label>
           </ion-item>
         </ion-list>
+      </ion-card>
       </ion-content>
     </ion-menu>
   </ion-menu-toggle>
-  
+
   <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

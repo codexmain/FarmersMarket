@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-    <div class="middle">
+    <div>
         <ion-card>
             <div class="flex-center">
                 <ion-avatar slot="start" style="background-color: #8B4513">
@@ -31,8 +31,8 @@
                 </ion-button>
                 </form>
 
-                <ion-button (click)="presentModal()" fill="clear" expand="full">
-                  <h3>¿Olvido la contraseña?</h3>
+                <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px;">
+                  <p>¿Olvido la contraseña?</p>
                 </ion-button>
                 <ion-button fill="clear" expand="full" [routerLink]="'/register'">
                   ¿No tienes cuenta? ¡Registrate!
