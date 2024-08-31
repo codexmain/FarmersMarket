@@ -176,7 +176,7 @@ export class AddClientPage implements OnInit {
     this.presentAlert('Éxito', 'Su ha agregado el cliente exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
     this.router.navigate(['/clients']);
-  }
+  } 
 
 
 }
