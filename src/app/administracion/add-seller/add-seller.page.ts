@@ -17,6 +17,11 @@ export class AddSellerPage implements OnInit {
 
   selectedRegion: string = '';
   comunas: string[] = [];
+  dominiosPermitidos: any = [
+    {dom: 'gmail.com' },
+    {dom: 'yahoo.com' },
+    {dom: 'yahoo.com' },
+  ];
 
   regionesComunas: RegionesComunas = {
     arica: ['Arica', 'Camarones'],
