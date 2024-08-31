@@ -5,7 +5,9 @@
       <ion-button (click)="dismiss()">Cancelar</ion-button>
     </ion-buttons>    
     <ion-buttons slot="end">
-      <ion-button (click)="agregar()" [strong]="true">Agregar</ion-button>
+      <ion-button type="submit" form="addClientForm" fill="clear" expand="full">
+        Agregar
+      </ion-button>
     </ion-buttons>  
   
   </ion-toolbar>
@@ -13,49 +15,74 @@
 </ion-header>
 
 <ion-content [fullscreen]="false">
-  <br/>
-  <br/>
-  <ion-item> Foto de perfil:  
-    <ion-button  >
-      <ion-icon name="add-outline" >  </ion-icon>                        
-    </ion-button>         
-  </ion-item>  
+  <form id="addClientForm" (ngSubmit)="agregarCli()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
+      El primer nombre es obligatorio y debe tener al menos 2 caracteres.
+    </div>
 
-  <ion-item>
-    <ion-input type="text" label="Primer Nombre" labelPlacement="stacked" placeholder="Ingrese el Primer Nombre"></ion-input>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Apellido Paterno</ion-label>
+      <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2" #aPaternoCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
+      El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
+    </div>
 
-  <ion-item>
-    <ion-input type="text" label="Segundo Nombre" labelPlacement="stacked" placeholder="Ingrese el Segundo Nombre (Opcional)"></ion-input>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Segundo Nombre (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="sNombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
+      El segundo nombre debe tener al menos 2 caracteres y no contener números.
+    </div>
 
-  <ion-item>
-    <ion-input type="text" label="Apellido Paterno" labelPlacement="stacked" placeholder="Ingrese el Apellido Paterno"></ion-input>
-  </ion-item>
-
-  <ion-item>
-    <ion-input type="text" label="Apelido Materno" labelPlacement="stacked" placeholder="Ingrese el Apellido Materno (Opcional)"></ion-input>
-  </ion-item>
-
-  <ion-item>
-    <ion-select label="Estado Usuario" labelPlacement="stacked">
-      <ion-select-option value="active">Cuenta Activa</ion-select-option>
-      <ion-select-option value="disabled">Cuenta Deshabilitada</ion-select-option>
-      <ion-select-option value="delete">Cuenta Eliminada</ion-select-option>
-    </ion-select>
-  </ion-item>
-
-  <ion-item>
-    <ion-input type="email" label="Correo" labelPlacement="stacked" placeholder="Ingrese el correo del Cliente"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input type="password" label="Contraseña" labelPlacement="stacked" placeholder="Ingrese una contraseña para la cuenta"></ion-input>
-  </ion-item>
-<br/>
+    <ion-item>
+      <ion-label position="floating">Apellido Materno (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="aMaterno" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
+      El apellido materno debe tener al menos 2 caracteres y no contener números.
+    </div>
 
 
-  <ion-item>
-      <ion-select label="Region " label-placement="stacked" (ionChange)="onRegionChange($event)">
+
+    <ion-item>
+      <ion-label position="floating">Estado Usuario</ion-label>
+      <ion-select [(ngModel)]="estadoUsuario" name="estadoUsuario" required #estadoUserCtrl="ngModel">
+        <ion-select-option value="active">Cuenta Activa</ion-select-option>
+        <ion-select-option value="disabled">Cuenta Deshabilitada</ion-select-option>
+        <ion-select-option value="delete">Cuenta Eliminada</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoUserCtrl.invalid && (estadoUserCtrl.dirty || estadoUserCtrl.touched)" class="error-message">
+      El estado del Usuario es obligatorio.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
+      El email es obligatorio y debe tener un formato válido.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Password</ion-label>
+      <ion-input type="password" [(ngModel)]="password" name="password" required minlength="10" #passwordCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
+      La contraseña es obligatoria y debe tener al menos 10 caracteres.
+    </div>
+
+    <br/>
+
+    <ion-item>
+      <ion-label>Región</ion-label>
+      <ion-select [(ngModel)]="region" name="region" required #regionCtrl="ngModel" (ionChange)="onRegionChange($event)">
         <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
         <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
         <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
@@ -72,18 +99,29 @@
         <ion-select-option value="lagos">Región de Los Lagos</ion-select-option>
         <ion-select-option value="aysen">Región de Aysén</ion-select-option>
         <ion-select-option value="magallanes">Región de Magallanes y de la Antártica Chilena</ion-select-option>
-    </ion-select>
-  </ion-item>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
+      La región es obligatoria.
+    </div>
   
-  <ion-item>
-    <ion-select label="Comuna" label-placement="stacked" [disabled]="!selectedRegion">
-      <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item>
+      <ion-label>Comuna</ion-label>
+      <ion-select [(ngModel)]="comuna" name="comuna" required #comunaCtrl="ngModel" [disabled]="!selectedRegion">
+        <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
+      La comuna es obligatoria.
+    </div>      
 
   <ion-item>
-    <ion-input type="text" label="Direccion" labelPlacement="stacked" placeholder="Ingrese la dirección del Cliente"></ion-input>
-  </ion-item>
+      <ion-label position="floating">Dirección</ion-label>
+      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">
+      La dirección es obligatoria y debe tener un formato válido.
+    </div>
 
-  <br/>
+  </form>
 </ion-content>

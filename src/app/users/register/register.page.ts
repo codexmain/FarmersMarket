@@ -14,7 +14,7 @@ export class RegisterPage implements OnInit {
 
   constructor(private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController) { 
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras?.state) {  //recibir de admin page el array de correos
+    if (navigation?.extras?.state) {  //recibir de login el array de correos
       this.emails = navigation.extras.state['emails'];
     }
   }
@@ -72,10 +72,6 @@ export class RegisterPage implements OnInit {
     this.menu.enable(true);
   }
 
-
-
- 
-
   ngOnInit() {
     console.log(this.emails);
   }
@@ -92,16 +88,18 @@ export class RegisterPage implements OnInit {
 
   async registrarse() {
   // Validar pNombre
-  if (!this.pNombre) {
-    this.presentAlert('Error', 'El primer nombre es obligatorio.');
+
+  if (!this.pNombre || this.pNombre.length < 2) {
+    this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
     return;
   }
 
   // Validar aPaterno
-  if (!this.aPaterno) {
-    this.presentAlert('Error', 'El apellido paterno es obligatorio.');
+  if (!this.aPaterno || this.aPaterno.length < 2) {
+    this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
     return;
   }
+
 
   // Validar email
   if (!this.email) {
@@ -109,29 +107,17 @@ export class RegisterPage implements OnInit {
     return;
   }
 
-  // Validar contraseña
-  if (!this.password) {
-    this.presentAlert('Error', 'La contraseña es obligatoria.');
-    return;
-  }
+    // Validar región
+    if (!this.region) {
+      this.presentAlert('Error', 'La región es obligatoria.');
+      return;
+    }
 
-  // Validar región
-  if (!this.region) {
-    this.presentAlert('Error', 'La región es obligatoria.');
-    return;
-  }
-
-  // Validar comuna
-  if (!this.comuna) {
-    this.presentAlert('Error', 'La comuna es obligatoria.');
-    return;
-  }
-
-  // Validar dirección
-  if (!this.direccion) {
-    this.presentAlert('Error', 'La dirección es obligatoria.');
-    return;
-  }
+    // Validar comuna
+    if (!this.comuna) {
+      this.presentAlert('Error', 'La comuna es obligatoria.');
+      return;
+    }
 
     // Validar pNombre, sNombre, aPaterno, aMaterno
     const namePattern = /^[a-zA-Z\s]{2,}$/;
@@ -190,8 +176,9 @@ export class RegisterPage implements OnInit {
   }
 
     // Si todas las validaciones pasan
-    this.presentAlert('Éxito', 'Registro completado exitosamente.');
+    this.presentAlert('Éxito', 'Su cuenta se ha creado exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
+    this.router.navigate(['/login']);
   }
 
   dismiss() {
