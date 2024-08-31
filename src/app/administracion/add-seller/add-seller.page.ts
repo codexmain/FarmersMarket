@@ -122,7 +122,7 @@ export class AddSellerPage implements OnInit {
       this.presentAlert('Error', 'Los nombres y apellidos deben tener al menos 2 caracteres y no contener números.');
       return;
     }
-
+ 
 
 
     // Validar empresa
@@ -169,7 +169,7 @@ export class AddSellerPage implements OnInit {
 
   if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
     this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-    return;
+    return; 
   }
 
     // Si todas las validaciones pasan
@@ -181,5 +181,5 @@ export class AddSellerPage implements OnInit {
   ngOnInit() {
     console.log(this.emails);
   }
-
+ 
 }

@@ -133,7 +133,7 @@ export class RegisterPage implements OnInit {
     if (this.empresa && !empresaPattern.test(this.empresa)) {
       this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
       return;
-    }
+    } 
 
     // Validar email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
