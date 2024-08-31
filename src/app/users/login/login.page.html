@@ -34,7 +34,7 @@
                 <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px;">
                   <p>¿Olvido la contraseña?</p>
                 </ion-button>
-                <ion-button fill="clear" expand="full" [routerLink]="'/register'">
+                <ion-button fill="clear" expand="full" (click)="irRegister()">
                   ¿No tienes cuenta? ¡Registrate!
                 </ion-button>
             </ion-card-content>

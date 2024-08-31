@@ -144,6 +144,7 @@ export class LoginPage implements OnInit {
 
 
   ngOnInit() {
+    
   }
 
   async Logearse() {
@@ -229,8 +230,11 @@ export class LoginPage implements OnInit {
 
 
   async presentModal() {
+    const emails = this.listaUsers.map((u: any) => u.correo);
+    console.log(emails);
     const modal = await this.modalController.create({
       component: RecuperarPasswordPage,
+      componentProps: { emails: emails }
     });
 
     return await modal.present();}
@@ -243,6 +247,19 @@ export class LoginPage implements OnInit {
     ionViewWillLeave() {
       this.menu.enable(true);
     }
+
+
+    irRegister(){
+      const emails = this.listaUsers.map((u: any) => u.correo);
+      
+      let navigationextras = {
+        state: {emails: emails}
+      };
+      this.router.navigate(['/register'], navigationextras);
+
+    }
+
+
 
 }
 
