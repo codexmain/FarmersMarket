@@ -1,13 +1,92 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>usuario</ion-title>
+    <ion-title>Gestion de mi tienda</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">usuario</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-grid>
+    <ion-item>
+      <ion-thumbnail slot="start">
+        <img src="../assets/icon/favicon.png" />
+      </ion-thumbnail>
+      <ion-label>
+        <div>
+          <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="warning" slot="end">
+            <b>Editar</b>
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+        </div>
+        <ion-label class="ion-toolbar">
+          <strong><b>Nombre</b></strong><br>
+          <strong>Correo</strong>
+        </ion-label>
+      </ion-label>
+    </ion-item>
+  </ion-grid>
+
+
+  <ion-card>
+    <ion-list>
+      <ion-searchbar animated="true" placeholder="Buscar en mis Productos"></ion-searchbar>
+  
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="../assets/icon/favicon.png" />
+        </ion-avatar>
+        <ion-label>
+          <strong><b>Producto 1</b></strong><br>
+          <strong><b>Valor:</b> $10.00</strong>
+          <p><b>Descripción del producto 1</b></p>
+        </ion-label>
+        <ion-button expand="block" fill="outline" slot="end">
+          Editar
+        </ion-button>
+      </ion-item>
+  
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="../assets/icon/favicon.png" />
+        </ion-avatar>
+        <ion-label>
+          <strong><b>Producto 2</b></strong><br>
+          <strong><b>Valor:</b> $12.00</strong>
+          <p><b>Descripción del producto 2</b></p>
+        </ion-label>
+        <ion-button expand="block" fill="outline" slot="end">
+          Editar
+        </ion-button>
+      </ion-item>
+  
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="../assets/icon/favicon.png" />
+        </ion-avatar>
+        <ion-label>
+          <strong><b>Producto 3</b></strong><br>
+          <strong><b>Valor:</b> $24.00</strong>
+          <p><b>Descripción del producto 3</b></p>
+        </ion-label>
+        <ion-button expand="block" fill="outline" slot="end">
+          Editar
+        </ion-button>
+      </ion-item>
+  
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="../assets/icon/favicon.png" />
+        </ion-avatar>
+        <ion-label>
+          <strong><b>Producto 4</b></strong><br>
+          <strong><b>Valor:</b> $35.00</strong>
+          <p><b>Descripción del producto 4</b></p>
+        </ion-label>
+        <ion-button expand="block" fill="outline" slot="end">
+          Editar
+        </ion-button>
+      </ion-item>
+  
+    </ion-list>
+  </ion-card>
+
 </ion-content>

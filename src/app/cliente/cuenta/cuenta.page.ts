@@ -19,7 +19,4 @@ export class CuentaPage implements OnInit {
   ngOnInit() {
   }
 
-
-
-
 }
