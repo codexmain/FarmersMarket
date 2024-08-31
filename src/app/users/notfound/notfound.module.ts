@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { NotfoundPageRoutingModule } from './notfound-routing.module';
 
 import { NotfoundPage } from './notfound.page';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    NotfoundPageRoutingModule
+    NotfoundPageRoutingModule,
+    MatProgressSpinnerModule
   ],
   declarations: [NotfoundPage]
 })

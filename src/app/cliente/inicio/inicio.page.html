@@ -9,28 +9,26 @@
     <ion-title>Menu de Socios</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
   <ion-card>
-  <ion-list>
-    <ion-searchbar animated="true" placeholder="Buscar Vendedor"></ion-searchbar>
-    <ion-item *ngFor="let item of items; let index">
-      <ion-avatar slot="start">
-        <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
-      </ion-avatar>
-      <ion-label class="ion-text-wrap">
-        <div class="ion-text-wrap ion-margin-end">{{ item }}</div>
-        <div class="ion-text-end">
-          <ion-button fill="solid">
-            Mostrar Productos
-            <ion-icon name="bag"></ion-icon>
-          </ion-button>
-        </div>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  <ion-infinite-scroll>
-    <ion-infinite-scroll-content loadingText="Please wait..." loadingSpinner="bubbles"></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
-</ion-card>
+    <ion-list>
+      <ion-searchbar animated="true" placeholder="Buscar Vendedor"></ion-searchbar>
+      <ion-item *ngFor="let item of items; let index">
+        <ion-avatar slot="start">
+          <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
+        </ion-avatar>
+        <ion-label class="ion-text-wrap">
+          <div [innerHTML]="item"></div>
+          <div class="ion-text-end">
+            <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" slot="start">Productos
+              <ion-icon name="bag"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-infinite-scroll>
+      <ion-infinite-scroll-content loadingText="Please wait..." loadingSpinner="bubbles"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-card>
 </ion-content>
