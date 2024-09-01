@@ -19,8 +19,6 @@ export class ClientsPage implements OnInit {
   }
   
 
-  
-  
 
   items: string[] = [];
 
@@ -56,7 +54,7 @@ export class ClientsPage implements OnInit {
 
   private generateItems() {
     const count = this.items.length + 1;
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i <= 50; i++) {
       this.items.push(`Cliente ${count + i}`);  //aca se cambia el nombre del como se muestra en el html.
     }
   }

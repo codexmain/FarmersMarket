@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, MenuController, InfiniteScrollCustomEvent} from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
 import { AddSellerPage } from '../add-seller/add-seller.page'
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -46,13 +46,13 @@ export class SellersPage implements OnInit {
 
 
   ngOnInit() {
+    this.generateItems();
     console.log(this.emails);
   }
 
-
   private generateItems() {
     const count = this.items.length + 1;
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i <= 50; i++) {
       this.items.push(`Vendedor ${count + i}`);  //aca se cambia el nombre del como se muestra en el html.
     }
   }
@@ -62,6 +62,7 @@ export class SellersPage implements OnInit {
     setTimeout(() => {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 500);}
+
 
     async presentModal() {
       const modal = await this.modalController.create({
