@@ -2,39 +2,38 @@
   <ion-toolbar>
     <ion-title class="ion-text-center">Administración</ion-title>
   </ion-toolbar>
-  
-</ion-header>
-<ion-card>
-  <ion-card-header>
-    <ion-card-title class="ion-text-center">Modulo de Administracion de CuTuCo</ion-card-title>
-    <ion-card-subtitle>Bienvenido "{{ primerNombre }} {{ aPaterno }}"</ion-card-subtitle>
-  </ion-card-header>
 
-  <ion-card-content>
-    Acá podras realizar diferentes acciones, principalmente para gestionar los usuarios de la aplicación.
-  </ion-card-content>
-</ion-card>
+</ion-header>
 
 <ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title class="ion-text-center">Modulo de Administracion de CuTuCo</ion-card-title>
+      <ion-card-subtitle>Bienvenido "{{ primerNombre }} {{ aPaterno }}"</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Acá podras realizar diferentes acciones, principalmente para gestionar los usuarios de la aplicación.
+    </ion-card-content>
+  </ion-card>
 
-  <br/> 
-  <ion-item >   
-    <ion-label class="ion-text-center"> Menú</ion-label>
-  </ion-item>
-  <br/>
-  <br/>
-  <div class="button-container">
-    <ion-button id="modal-sellers"  shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToSellers()">Vendedores</ion-button>
-
-  </div>
-  <br/>
-  <br/> 
-  <div class="button-container">
-  <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToClients()">Clientes</ion-button>
-  </div>
-  <br/>
-  <br/>    
-  <div class="button-container">
-  <ion-button shape="round" class="fixed-size" color="danger" [routerDirection]="'back'" [routerLink]="'/login'">Cerrar Sesión</ion-button>
+  <ion-card>
+    <ion-item>
+      <ion-label class="ion-text-center"><strong>Opciones de Administración</strong></ion-label>
+    </ion-item>
+    <br>
+    <div class="button-container">
+      <ion-button id="modal-sellers" shape="round" class="fixed-size" [routerDirection]="'forward'"
+        (click)="navigateToSellers()">Vendedores</ion-button>
+    </div>
+    <br>
+    <div class="button-container">
+      <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'"
+        (click)="navigateToClients()">Clientes</ion-button>
+    </div>
+    <br>
+  </ion-card>
+  <div>
+    <ion-button style="width: 80%; margin:10%;" expand="block" color="danger" [routerDirection]="'back'"
+      [routerLink]="'/login'">Cerrar Sesión</ion-button>
   </div>
 </ion-content>
