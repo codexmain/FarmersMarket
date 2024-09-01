@@ -24,7 +24,8 @@
                 </ion-item>
                 <ion-item>
                     <ion-icon name="key-outline"></ion-icon>
-                    <ion-input label="Password" type="password" [(ngModel)]="password" labelPlacement="floating" placeholder="Ingresa tu Contraseña" name="password"></ion-input>
+                    <ion-input label="Password" name="password" type="password" [(ngModel)]="password" labelPlacement="floating" placeholder="Ingresa tu Contraseña">
+                    <ion-input-password-toggle slot="end"></ion-input-password-toggle></ion-input>
                 </ion-item>
                 <ion-button type="submit" fill="solid" expand="full">
                     Entrar

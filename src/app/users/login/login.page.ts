@@ -110,7 +110,7 @@ export class LoginPage implements OnInit {
       aPaterno: 'Cofre',
       aMaterno: null,
       correo: 'cochambre230@gmail.com',
-      password: 'deofk!Q@fd',
+      password: '123456',
       empresa: 'The 830 Farmer',
       estadoUsuario: 'active',
       tipoUsuario: 2,
@@ -195,7 +195,7 @@ export class LoginPage implements OnInit {
           this.router.navigate(['/inicio'], navigationextras,);
           break;
         case 2:
-          this.router.navigate(['/nose-page'], navigationextras); //esta este pendiente pq este lo tas haciendo tú nacho
+          this.router.navigate(['/vendedor-page'], navigationextras);
           break;
         case 3:
           this.router.navigate(['/admin-page'], navigationextras);

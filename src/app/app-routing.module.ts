@@ -68,9 +68,18 @@ const routes: Routes = [
     loadChildren: () => import('./vendedor/proventas/proventas.module').then( m => m.ProventasPageModule)
   },
   {
+    path: 'regventas',
+    loadChildren: () => import('./vendedor/regventas/regventas.module').then( m => m.RegventasPageModule)
+  },
+  {
+    path: 'vendedor-page',
+    loadChildren: () => import('./vendedor/vendedor-page/vendedor-page.module').then( m => m.VendedorPagePageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
+
 
 ];
 

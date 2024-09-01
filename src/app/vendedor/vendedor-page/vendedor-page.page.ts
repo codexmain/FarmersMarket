@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 
 @Component({
-  selector: 'app-usuario',
-  templateUrl: './usuario.page.html',
-  styleUrls: ['./usuario.page.scss'],
+  selector: 'app-vendedor-page',
+  templateUrl: './vendedor-page.page.html',
+  styleUrls: ['./vendedor-page.page.scss'],
 })
-export class UsuarioPage implements OnInit {//! es obligatoria, ? es opcional
+export class VendedorPagePage implements OnInit {//! es obligatoria, ? es opcional
   pfp?: string; //aca se va a ocupar el path de la imagen
   primerNombre!: string;
   segundoNombre?: string;
@@ -46,6 +46,33 @@ export class UsuarioPage implements OnInit {//! es obligatoria, ? es opcional
   }
   ngOnInit() {
     console.log(this.emails);
+  }
+
+  navigateToUsuario() { //transferencia de array de correos a la parte de usuario
+    let navigationExtras: NavigationExtras = {
+      state: {
+        emails: this.emails
+      }
+    };
+    this.router.navigate(['/usuario'], navigationExtras);
+  }
+
+  navigateToProventas() { //transferencia de array de correos a la parte de proventas
+    let navigationExtras: NavigationExtras = {
+      state: {
+        emails: this.emails
+      }
+    };
+    this.router.navigate(['/proventas'], navigationExtras);
+  }
+
+  navigateToRegventas() { //transferencia de array de correos a la parte de regventas
+    let navigationExtras: NavigationExtras = {
+      state: {
+        emails: this.emails
+      }
+    };
+    this.router.navigate(['/regventas'], navigationExtras);
   }
 
 }
