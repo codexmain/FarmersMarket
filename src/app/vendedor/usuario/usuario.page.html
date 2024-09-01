@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
+    </ion-buttons>
     <ion-title>Gestion de mi tienda</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -18,8 +21,8 @@
           </ion-button>
         </div>
         <ion-label class="ion-toolbar">
-          <strong><b>Nombre</b></strong><br>
-          <strong>Correo</strong>
+          <strong><b>{{ primerNombre }} {{ aPaterno }}</b></strong><br>
+          <strong>{{ correo }}</strong>
         </ion-label>
       </ion-label>
     </ion-item>
