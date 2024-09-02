@@ -2,6 +2,7 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
+
     </ion-buttons>
     <ion-title>Gestion de mi tienda</ion-title>
   </ion-toolbar>
@@ -13,17 +14,17 @@
       <ion-thumbnail slot="start">
         <img src="../assets/icon/favicon.png" />
       </ion-thumbnail>
+      <ion-label><Strong>Empresa: {{userData.company}} <br> Correo Asociado: {{userData.mail}} <br> Nombre Vendedor: {{ userData.fstName }} {{ userData.fstSurname }}</Strong></ion-label>
+
       <ion-label>
         <div>
+
           <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="warning" slot="end">
             <b>Editar</b>
             <ion-icon name="create-outline"></ion-icon>
           </ion-button>
         </div>
-        <ion-label class="ion-toolbar">
-          <strong><b>{{ primerNombre }} {{ aPaterno }}</b></strong><br>
-          <strong>{{ correo }}</strong>
-        </ion-label>
+
       </ion-label>
     </ion-item>
   </ion-grid>
