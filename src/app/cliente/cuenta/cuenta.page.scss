@@ -6,3 +6,17 @@ ion-thumbnail {
         border-radius: 10px;
     }
 }
+
+.custom-strong {
+    font-size: 1em;
+    font-weight: bold; 
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .button-container {
+    position: absolute; 
+    top: 0px;         
+    right: 00px;     
+    z-index: 1;  
+  }

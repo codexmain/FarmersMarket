@@ -5,10 +5,15 @@
 
 </ion-header>
 
-<ion-content [fullscreen]="false">
+<ion-content>
   <ion-card>
     <ion-card-header>
-      <ion-card-title class="ion-text-center">Modulo de Administracion de CuTuCo</ion-card-title>
+      <div class="flex-center">
+        <ion-avatar style="background-color: #8B4513; margin: 10px;">
+          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+        </ion-avatar>
+      </div>
+      <ion-card-title class="ion-text-center">Modulo de Administración</ion-card-title>
       <ion-card-subtitle>Bienvenido "{{ primerNombre }} {{ aPaterno }}"</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
@@ -32,8 +37,8 @@
     </div>
     <br>
   </ion-card>
-  <div>
-    <ion-button style="width: 80%; margin:10%;" expand="block" color="danger" [routerDirection]="'back'"
+  <div style="display: flex; justify-content: center;">
+    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'"
       [routerLink]="'/login'">Cerrar Sesión</ion-button>
   </div>
 </ion-content>
