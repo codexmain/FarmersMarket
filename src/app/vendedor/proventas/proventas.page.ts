@@ -18,10 +18,10 @@ export class ProventasPage implements OnInit {
 
   ngOnInit() {
     this.productForm = this.formBuilder.group({
-      titulo: ['', [Validators.required, Validators.minLength(3)]],
-      valor: ['', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]{1,2})?$')]],
-      descripcion: ['', [Validators.required, Validators.minLength(10)]],
-      stock: ['', [Validators.required, Validators.min(0), Validators.max(99)]],
+      titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern('^[a-zA-Z0-9\\s]+$')]],
+      valor: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$'), Validators.min(1), Validators.max(999999)]],
+      descripcion: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(500), Validators.pattern('^[a-zA-Z0-9\\s.,!?]+$')]],
+      stock: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$'), Validators.min(1), Validators.max(99)]],
     });
   }
 
@@ -36,6 +36,17 @@ export class ProventasPage implements OnInit {
       await this.presentAlert('Error', 'Por favor, complete todos los campos correctamente.');
     }
   }
+
+  async agregarProducto() {
+    if (this.productForm.valid) {
+      // Aquí puedes agregar la lógica para agregar el producto a la lista
+      console.log('Producto agregado:', this.productForm.value);
+      await this.presentAlert('Producto Agregado', 'El producto ha sido agregado a la lista.');
+    } else {
+      await this.presentAlert('Error', 'Por favor, complete todos los campos correctamente antes de agregar.');
+    }
+  }
+
   async presentAlert(header: string, message: string) {
     const alert = await this.alertController.create({
       header: header,

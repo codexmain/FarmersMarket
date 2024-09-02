@@ -6,3 +6,10 @@ ion-thumbnail {
         border-radius: 10px;
     }
 }
+
+.button-container {
+    position: absolute; 
+    top: 0px;         
+    right: 00px;     
+    z-index: 1;  
+  }
