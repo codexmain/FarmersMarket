@@ -12,70 +12,18 @@
     <ion-list>
       <ion-searchbar animated="true" placeholder="Buscar Producto Boleta"></ion-searchbar>
 
-      <!-- Producto 1 -->
-      <ion-item>
+      <ion-item *ngFor="let producto of productos">
         <ion-avatar slot="start">
           <img src="../assets/icon/favicon.png" />
         </ion-avatar>
         <ion-label>
-          <strong><b>Producto 1</b></strong><br>
-          <strong><b>Valor:</b> $10.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 1</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 10:00 AM</p>
+          <strong><b>{{ producto.nombre }}</b></strong><br>
+          <strong><b>Valor:</b> {{ producto.valor }}</strong>
+          <p><b>Descripción:</b> {{ producto.descripcion }}</p>
+          <p><b>Fecha:</b> {{ producto.fecha }}</p>
+          <p><b>Hora:</b> {{ producto.hora }}</p>
         </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 2 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 2</b></strong><br>
-          <strong><b>Valor:</b> $12.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 2</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 11:30 AM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 3 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 3</b></strong><br>
-          <strong><b>Valor:</b> $24.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 3</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 1:00 PM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 4 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 4</b></strong><br>
-          <strong><b>Valor:</b> $35.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 4</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 3:30 PM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
+        <ion-button expand="block" fill="outline" slot="end" (click)="mostrarResumen(producto)">
           Resumen
         </ion-button>
       </ion-item>
