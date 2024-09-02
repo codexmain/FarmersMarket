@@ -14,15 +14,15 @@
         <img src="../assets/icon/favicon.png" />
       </ion-thumbnail>
       <ion-label>
-        <div>
-          <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="warning" slot="end">
+        <div class="button-container">
+          <ion-button fill="clear" color="primary">
             <b>Editar</b>
             <ion-icon name="create-outline"></ion-icon>
           </ion-button>
         </div>
         <ion-label class="ion-toolbar">
-          <strong><b>{{ userData.fstName }} {{ userData.fstSurname }}</b></strong><br>
-          <strong>{{ userData.mail }}</strong>
+          <strong class="custom-strong"><p><b>{{ userData.fstName }} {{ userData.fstSurname }}</b><br>
+          {{ userData.mail }}</strong>
         </ion-label>
       </ion-label>
     </ion-item>
