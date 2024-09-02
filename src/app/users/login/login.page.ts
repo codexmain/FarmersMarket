@@ -34,7 +34,7 @@ export class LoginPage implements OnInit {
       estadoUsuario: 'active',
       tipoUsuario: 1,
       region: 'metropolitana',
-      comuna: 'Satiago',
+      comuna: 'Santiago',
       direccion: 'Avenida el Salto 1328'
     },
 
