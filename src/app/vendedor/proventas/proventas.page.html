@@ -21,16 +21,18 @@
               <ion-label>
                 <ion-input formControlName="titulo" type="text" label="Ingresa Titulo" labelPlacement="floating"
                   placeholder="Titulo" name="titulo"></ion-input>
-                <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="success" slot="end">
-                  <ion-icon name="add-outline"></ion-icon>
-                </ion-button>
-                <ion-input formControlName="valor" type="text" label="Ingresa Valor" labelPlacement="floating"
+                <ion-input formControlName="valor" type="number" label="Ingresa Valor" labelPlacement="floating"
                   placeholder="Valor" name="valor"></ion-input>
                 <ion-input formControlName="descripcion" type="text" label="Ingresa Descripcion"
                   labelPlacement="floating" placeholder="Descripcion" name="descripcion"></ion-input>
                 <ion-input formControlName="stock" type="number" label="Ingresa Stock" labelPlacement="floating"
                   placeholder="Stock" name="stock" min="0" max="99"></ion-input>
               </ion-label>
+              <div class="button-container">
+                <ion-button fill="solid" color="success" (click)="agregarProducto()">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-button>
+              </div>
             </ion-item>
 
             <ion-item>
