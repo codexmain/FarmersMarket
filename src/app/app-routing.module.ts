@@ -36,10 +36,6 @@ const routes: Routes = [
     loadChildren: () => import('./administracion/sellers/sellers.module').then( m => m.SellersPageModule)
   },
   {
-    path: 'clients',
-    loadChildren: () => import('./administracion/clients/clients.module').then( m => m.ClientsPageModule)
-  },
-  {
     path: 'compras',
     loadChildren: () => import('./cliente/compras/compras.module').then( m => m.ComprasPageModule)
   },
@@ -50,10 +46,6 @@ const routes: Routes = [
   {
     path: 'cuenta',
     loadChildren: () => import('./cliente/cuenta/cuenta.module').then( m => m.CuentaPageModule)
-  },
-  {
-    path: 'add-client',
-    loadChildren: () => import('./administracion/add-client/add-client.module').then( m => m.AddClientPageModule)
   },
   {
     path: 'add-seller',
