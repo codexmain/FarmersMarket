@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
+import { AddCategoriaPage } from '../add-categoria/add-categoria.page'
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-categorias',
@@ -7,9 +10,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CategoriasPage implements OnInit {
 
-  constructor() { }
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
   }
+
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: AddCategoriaPage
+    });
+
+    return await modal.present();}
 
 }
