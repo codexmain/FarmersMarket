@@ -71,11 +71,37 @@ const routes: Routes = [
     loadChildren: () => import('./administracion/add-usuarios/add-usuarios.module').then( m => m.AddUsuariosPageModule)
   },
   {
-    path: '**',
-    loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
+    path: 'items',
+    loadChildren: () => import('./administracion/items/items.module').then( m => m.ItemsPageModule)
+  },
+  {
+    path: 'add-item',
+    loadChildren: () => import('./administracion/add-item/add-item.module').then( m => m.AddItemPageModule)
+  },
+  {
+    path: 'categorias',
+    loadChildren: () => import('./administracion/categorias/categorias.module').then( m => m.CategoriasPageModule)
+  },
+  {
+    path: 'add-categoria',
+    loadChildren: () => import('./administracion/add-categoria/add-categoria.module').then( m => m.AddCategoriaPageModule)
+  },
+  {
+    path: 'subcategorias',
+    loadChildren: () => import('./administracion/subcategorias/subcategorias.module').then( m => m.SubcategoriasPageModule)
+  },
+  {
+    path: 'add-subcategoria',
+    loadChildren: () => import('./administracion/add-subcategoria/add-subcategoria.module').then( m => m.AddSubcategoriaPageModule)
   },
 
 
+
+
+  {
+    path: '**',
+    loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
+  },
 
 
 ];
