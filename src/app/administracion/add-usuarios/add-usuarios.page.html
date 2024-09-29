@@ -4,7 +4,7 @@
       <ion-button (click)="dismiss()">Cancelar</ion-button>
     </ion-buttons>    
     <ion-buttons slot="end">
-      <ion-button type="submit" form="addSellerForm" fill="clear" expand="full">
+      <ion-button type="submit" form="addUserForm" fill="clear" expand="full">
         Agregar
       </ion-button>
     </ion-buttons>  
@@ -13,8 +13,8 @@
 
 <ion-content [fullscreen]="false">
   <ion-card>
-    <ion-card-header class="ion-text-center" color="primary">Formulario Vendedores</ion-card-header>
-  <form id="addSellerForm" (ngSubmit)="agregarSeller()">
+    <ion-card-header class="ion-text-center" color="primary">Formulario Usuarios</ion-card-header>
+  <form id="addUserForm" (ngSubmit)="agregarUsuario()">
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
       <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
@@ -48,7 +48,7 @@
     </div>
 
     <ion-item>
-      <ion-label position="floating">Empresa </ion-label>
+      <ion-label position="floating">Empresa (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="empresa" name="empresa" required #empresaCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">

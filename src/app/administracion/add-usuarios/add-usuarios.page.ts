@@ -8,11 +8,11 @@ interface RegionesComunas { //permite hacer la dependencia de comuna / region, p
 }
 
 @Component({
-  selector: 'app-add-seller',
-  templateUrl: './add-seller.page.html',
-  styleUrls: ['./add-seller.page.scss'],
+  selector: 'app-add-usuarios',
+  templateUrl: './add-usuarios.page.html',
+  styleUrls: ['./add-usuarios.page.scss'],
 })
-export class AddSellerPage implements OnInit {
+export class AddUsuariosPage implements OnInit {
 
 
   constructor(private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
@@ -75,7 +75,7 @@ export class AddSellerPage implements OnInit {
     await alert.present();
   }
 
-  async agregarSeller() {
+  async agregarUsuario() {
     this.emails = this.navParams.get('emails'); //transferencia de data
   // Validar pNombre
 
@@ -175,7 +175,7 @@ export class AddSellerPage implements OnInit {
     // Si todas las validaciones pasan
     this.presentAlert('Éxito', 'Su ha agregado el cliente exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
-    this.router.navigate(['/sellers']);
+    this.router.navigate(['/usuarios']);
   }
 
   ngOnInit() {
@@ -183,3 +183,4 @@ export class AddSellerPage implements OnInit {
   }
  
 }
+

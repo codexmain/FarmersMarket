@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
-import { AddSellerPage } from '../add-seller/add-seller.page'
+import { AddUsuariosPage } from '../add-usuarios/add-usuarios.page'
 import { ActivatedRoute, Router } from '@angular/router';
 
+
 @Component({
-  selector: 'app-sellers',
-  templateUrl: './sellers.page.html',
-  styleUrls: ['./sellers.page.scss'],
+  selector: 'app-usuarios',
+  templateUrl: './usuarios.page.html',
+  styleUrls: ['./usuarios.page.scss'],
 })
-export class SellersPage implements OnInit {
+export class UsuariosPage implements OnInit {
   emails: string[] = []; 
 
   constructor(private modalController: ModalController, private route: ActivatedRoute, private router: Router) {
@@ -22,18 +23,25 @@ export class SellersPage implements OnInit {
 
   public actionSheetButtons = [
     {
+      text: 'Editar',
+      data: {
+        action: 'update',
+      },
+    },
+    {
+      text: 'Visualizar',
+      data: {
+        action: 'read',
+      },
+    },
+    {
       text: 'Eliminar',
       role: 'destructive',
       data: {
         action: 'delete',
       },
     },
-    {
-      text: 'Editar',
-      data: {
-        action: 'edit',
-      },
-    },
+
     {
       text: 'Cancelar',
       role: 'cancel',
@@ -53,7 +61,7 @@ export class SellersPage implements OnInit {
   private generateItems() {
     const count = this.items.length + 1;
     for (let i = 0; i <= 50; i++) {
-      this.items.push(`Vendedor ${count + i}`);  //aca se cambia el nombre del como se muestra en el html.
+      this.items.push(`Usuario ${count + i}`);  //aca se cambia el nombre del como se muestra en el html.
     }
   }
 
@@ -66,7 +74,7 @@ export class SellersPage implements OnInit {
 
     async presentModal() {
       const modal = await this.modalController.create({
-        component: AddSellerPage,
+        component: AddUsuariosPage,
         componentProps: { emails: this.emails }
       });
   

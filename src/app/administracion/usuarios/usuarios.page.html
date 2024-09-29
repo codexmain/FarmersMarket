@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-button [routerDirection]="'back'" [routerLink]="'/admin-page'">Cancelar</ion-button>
     </ion-buttons>
-    <ion-title>Vendedores</ion-title>  
+    <ion-title>Usuarios</ion-title>  
     <ion-button slot="end" (click)="presentModal()">
       <ion-icon name="add-outline">  </ion-icon>
     </ion-button>  
@@ -12,7 +12,7 @@
 
 
 <ion-content>
-  <ion-grid><ion-searchbar placeholder="Buscar Vendedor"></ion-searchbar></ion-grid>
+  <ion-grid><ion-searchbar placeholder="Buscar Usuario"></ion-searchbar></ion-grid>
   <ion-card>
   <ion-list>
     <ion-item *ngFor="let item of items; let index">
