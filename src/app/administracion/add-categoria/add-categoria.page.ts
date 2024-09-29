@@ -30,7 +30,13 @@ export class AddCategoriaPage implements OnInit {
 
 
   async agregarCategoria(){
-          // Validar contraseña
+  // Validar categoría
+  if (!this.categoryName) {
+    this.presentAlert('Error', 'La empresa es un campo obligatorio.');
+    return;}
+
+
+  // validar formato categoria
 
   const categoryPattern = /^[a-zA-Z0-9\s]{5,50}$/;
   if (this.categoryName && !categoryPattern.test(this.categoryName)) {
