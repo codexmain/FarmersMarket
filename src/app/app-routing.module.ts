@@ -95,13 +95,10 @@ const routes: Routes = [
     loadChildren: () => import('./administracion/add-subcategoria/add-subcategoria.module').then( m => m.AddSubcategoriaPageModule)
   },
 
-
-
-
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
-  },
+  }
 
 
 ];
