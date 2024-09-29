@@ -31,10 +31,7 @@ const routes: Routes = [
     path: 'admin-page',
     loadChildren: () => import('./administracion/admin-page/admin-page.module').then( m => m.AdminPagePageModule)
   },
-  {
-    path: 'sellers',
-    loadChildren: () => import('./administracion/sellers/sellers.module').then( m => m.SellersPageModule)
-  },
+
   {
     path: 'compras',
     loadChildren: () => import('./cliente/compras/compras.module').then( m => m.ComprasPageModule)
@@ -47,10 +44,7 @@ const routes: Routes = [
     path: 'cuenta',
     loadChildren: () => import('./cliente/cuenta/cuenta.module').then( m => m.CuentaPageModule)
   },
-  {
-    path: 'add-seller',
-    loadChildren: () => import('./administracion/add-seller/add-seller.module').then( m => m.AddSellerPageModule)
-  },
+
   {
     path: 'usuario',
     loadChildren: () => import('./vendedor/usuario/usuario.module').then( m => m.UsuarioPageModule)
@@ -68,9 +62,20 @@ const routes: Routes = [
     loadChildren: () => import('./vendedor/vendedor-page/vendedor-page.module').then( m => m.VendedorPagePageModule)
   },
   {
+    path: 'usuarios',
+    loadChildren: () => import('./administracion/usuarios/usuarios.module').then( m => m.UsuariosPageModule)
+  },
+  
+  {
+    path: 'add-usuarios',
+    loadChildren: () => import('./administracion/add-usuarios/add-usuarios.module').then( m => m.AddUsuariosPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
-  }
+  },
+
+
 
 
 ];
