@@ -175,7 +175,7 @@ export class AddUsuariosPage implements OnInit {
     // Si todas las validaciones pasan
     this.presentAlert('Éxito', 'Su ha agregado el cliente exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
-    this.router.navigate(['/usuarios']);
+    this.modalController.dismiss();
   }
 
   ngOnInit() {
