@@ -36,6 +36,20 @@ export class AddItemPage implements OnInit {
     await alert.present();
   }
 
+  //validacion de formato de los precios
+  validarPrecio(precio: number): boolean {
+    const esEntero = Number.isInteger(precio);
+    const esValido = esEntero && precio > 0 && precio <= 9999999;
+    return esValido;
+  }
+
+  //validar el formato del stock
+  validarStock(precio: number): boolean {
+    const esEntero = Number.isInteger(precio);
+    const esValido = esEntero && precio >= 0 && precio <= 99999; //se declara una longitud de cinco, y que sea mayor o igual a cero, puede que el vendedor quisiera crear solamente el producto
+    return esValido;
+  }  
+
   async agregarProducto(){ 
 
     if (!this.seller) {
@@ -65,10 +79,19 @@ export class AddItemPage implements OnInit {
       this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
       return;}    
       
+    if (this.productName.length < 3 || this.productName.length > 40) {
+      this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
+      return;}  
+      
+    if (!this.validarPrecio(this.productPrice)) {
+      this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
+      return;}
     
-
-
+    if (!this.validarStock(this.stock)) {
+      this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual cero y no debe superar las 5 cifras.');
+      return;}    
   }
+
 
 
   async takePhoto() {
