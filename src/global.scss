@@ -45,17 +45,17 @@
 
 
 ion-header {
-    background-color: #FF9800; /* Cambia este color al que desees */
-    color: white;              /* Cambia el color del texto si es necesario */
+    background-color: linear-gradient(90deg, rgba(246,129,4,1) 0%, rgba(196,118,2,1) 100%);
+    color: white;              
 }
 
 ion-toolbar {
-    --background: #FF9800;     /* Cambia el color de fondo del toolbar */
-    --color: white;             /* Cambia el color del texto del toolbar */
+    --background: linear-gradient(90deg, rgba(246,129,4,1) 0%, rgba(196,118,2,1) 100%);   
+    --color: white;           
 }
 
 ion-content {
-    --background: #4CAF50;
+    --background: radial-gradient(circle, rgba(17,158,31,1) 0%, rgba(3,122,77,1) 100%);
 }
 
 ion-list{

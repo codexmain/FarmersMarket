@@ -9,10 +9,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 //import { RecuperarPasswordPage } from './users/recuperar-password/recuperar-password.page';
 
+import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx'; //sql
+
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, SQLite],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync(),SQLite],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, ModalController, MenuController } from '@ionic/angular';
+import {
+  AlertController,
+  ModalController,
+  MenuController,
+} from '@ionic/angular';
 import { Router, NavigationExtras } from '@angular/router';
 import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
-
+import { DataBaseService } from 'src/app/services/data-base.service';
 
 @Component({
   selector: 'app-login',
@@ -10,18 +14,21 @@ import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  email: string='';  //estos vienen de la etiquete [(ngModel)]="email" y [(ngModel)]="password" del HTML
-  password: string='';
-  intentoLogin: number = 0; //esto es para limitar intentos en el inicio de sesion
-  isCooldown: boolean = false; // esto es para dar un tiempo de espera despues de fallar los intentos determinados
+  email: string = '';
+  password: string = '';
+  intentoLogin: number = 0;
+  isCooldown: boolean = false;
 
+  constructor(
+    private router: Router,
+    private alertController: AlertController,
+    private modalController: ModalController,
+    private menu: MenuController,
+    private DataBase: DataBaseService //sql
+  ) {}
 
-
-  constructor(private router: Router, private alertController: AlertController, private modalController: ModalController, private menu: MenuController) { }
-
-
-
-  listaUsers: any = [  //tipo usuario 1 es client, 2 es seller y el 3 admin
+  listaUsers: any = [
+    //tipo usuario 1 es client, 2 es seller y el 3 admin
     {
       pfp: null, //profile picture (pfp), foto de perfil
       pNombre: 'Juan',
@@ -35,7 +42,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 1,
       region: 'metropolitana',
       comuna: 'Santiago',
-      direccion: 'Avenida el Salto 1328'
+      direccion: 'Avenida el Salto 1328',
     },
 
     {
@@ -51,7 +58,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 1,
       region: 'metropolitana',
       comuna: 'Puente Alto',
-      direccion: 'Pasaje puente asalto 132'
+      direccion: 'Pasaje puente asalto 132',
     },
     {
       pfp: null, //profile picture (pfp), foto de perfil
@@ -66,8 +73,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 1,
       region: 'valparaiso',
       comuna: 'Valparaiso',
-      direccion: 'Avenida Principal 740'
-
+      direccion: 'Avenida Principal 740',
     },
     {
       pfp: null, //profile picture (pfp), foto de perfil
@@ -82,8 +88,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 2,
       region: 'valparaiso',
       comuna: 'Valparaíso',
-      direccion: 'Avenida el Chañar 430'
-
+      direccion: 'Avenida el Chañar 430',
     },
 
     {
@@ -99,8 +104,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 2,
       region: 'santiago',
       comuna: 'Puente Alto',
-      direccion: 'Pasaje Aleatorio 379'
-
+      direccion: 'Pasaje Aleatorio 379',
     },
 
     {
@@ -116,8 +120,7 @@ export class LoginPage implements OnInit {
       tipoUsuario: 2,
       region: 'valparaiso',
       comuna: 'Valparaíso',
-      direccion: 'Direccion aleatoria 430'
-
+      direccion: 'Direccion aleatoria 430',
     },
 
     {
@@ -133,19 +136,11 @@ export class LoginPage implements OnInit {
       tipoUsuario: 3,
       region: 'metropolitana',
       comuna: 'Puente Alto',
-      direccion: 'Avenida Direccion random 1429'
-
+      direccion: 'Avenida Direccion random 1429',
     },
-
-    
-
-
   ];
 
-
-  ngOnInit() {
-    
-  }
+  ngOnInit() {}
 
   async Logearse() {
     if (!this.email || !this.password) {
@@ -154,11 +149,16 @@ export class LoginPage implements OnInit {
     }
 
     if (this.isCooldown) {
-      await this.showAlert('Error', 'Demasiados intentos fallidos. Por favor, espera 20 segundos.');
+      await this.showAlert(
+        'Error',
+        'Demasiados intentos fallidos. Por favor, espera 20 segundos.'
+      );
       return;
     }
 
-    const user = this.listaUsers.find((u: any) => u.correo === this.email && u.password === this.password);
+    const user = this.listaUsers.find(
+      (u: any) => u.correo === this.email && u.password === this.password
+    );
 
     if (user) {
       if (user.estadoUsuario !== 'active') {
@@ -169,7 +169,6 @@ export class LoginPage implements OnInit {
       this.intentoLogin = 0; // Reiniciar intentos en caso de éxito
       const emails = this.listaUsers.map((u: any) => u.correo);
 
-        
       let navigationextras: NavigationExtras = {
         state: {
           perfil: user.pfp,
@@ -185,14 +184,12 @@ export class LoginPage implements OnInit {
           reg: user.region,
           com: user.comuna,
           loc: user.direccion,
-          emails: emails
-          
-        }
+          emails: emails,
+        },
       };
       switch (user.tipoUsuario) {
         case 1:
-      
-          this.router.navigate(['/inicio'], navigationextras,);
+          this.router.navigate(['/inicio'], navigationextras);
           break;
         case 2:
           this.router.navigate(['/vendedor-page'], navigationextras);
@@ -211,9 +208,15 @@ export class LoginPage implements OnInit {
           this.isCooldown = false;
           this.intentoLogin = 0;
         }, 20000); // 20 segundos de cooldown
-        await this.showAlert('Error', 'Demasiados intentos fallidos. Por favor, espera 20 segundos.');
+        await this.showAlert(
+          'Error',
+          'Demasiados intentos fallidos. Por favor, espera 20 segundos.'
+        );
       } else {
-        await this.showAlert('Error', 'Correo electrónico o contraseña incorrectos.');
+        await this.showAlert(
+          'Error',
+          'Correo electrónico o contraseña incorrectos.'
+        );
       }
     }
   }
@@ -222,44 +225,45 @@ export class LoginPage implements OnInit {
     const alert = await this.alertController.create({
       header,
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
     });
 
     await alert.present();
   }
-
 
   async presentModal() {
     const emails = this.listaUsers.map((u: any) => u.correo);
     console.log(emails);
     const modal = await this.modalController.create({
       component: RecuperarPasswordPage,
-      componentProps: { emails: emails }
+      componentProps: { emails: emails },
     });
 
-    return await modal.present();}
+    return await modal.present();
+  }
 
+  ionViewWillEnter() {
+    this.menu.enable(false);
+  }
 
-    ionViewWillEnter() {
-      this.menu.enable(false);
-    }
-  
-    ionViewWillLeave() {
-      this.menu.enable(true);
-    }
+  ionViewWillLeave() {
+    this.menu.enable(true);
+  }
 
+  irRegister() {
+    const emails = this.listaUsers.map((u: any) => u.correo);
 
-    irRegister(){
-      const emails = this.listaUsers.map((u: any) => u.correo);
-      
-      let navigationextras = {
-        state: {emails: emails}
-      };
-      this.router.navigate(['/register'], navigationextras);
+    let navigationextras = {
+      state: { emails: emails },
+    };
+    this.router.navigate(['/register'], navigationextras);
+  }
 
-    }
-
-
-
+  Ingresar() {
+    let extras: NavigationExtras = {
+      replaceUrl: true,
+    };
+    localStorage.setItem('userEmail', this.email); // guarda email en local storage
+    this.router.navigate(['productos']);
+  }
 }
-
