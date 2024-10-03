@@ -13,7 +13,7 @@ import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx'; //sq
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, SQLite],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync(),SQLite],
   bootstrap: [AppComponent],
 })
