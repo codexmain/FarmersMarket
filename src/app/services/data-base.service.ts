@@ -16,44 +16,40 @@ export class DataBaseService {
       })
       .then((db: SQLiteObject) => {
 
-         // Crear tabla Tipos_Rol
-         db.executeSql(
-          'CREATE TABLE IF NOT EXISTS Tipos_Rol (id INTEGER PRIMARY KEY AUTOINCREMENT, descripcion TEXT NOT NULL UNIQUE);',
-          []
-        );
+         // Crear tabla Tipos_Ro
 
         // Crear tabla de Regiones
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Regiones (
+          `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
           );`, [])
-          .then(() => console.log('Tabla Regiones creada'))
-          .catch((e) => console.log('Error creando tabla Regiones: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla region creada'))
+          .catch((e) => console.log('Error creando tabla region: ' + JSON.stringify(e)));
 
         // Crear tabla de Comunas
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Comunas (
+          `CREATE TABLE IF NOT EXISTS comuna (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             region_id INTEGER NOT NULL,
-            FOREIGN KEY (region_id) REFERENCES Regiones(id)
+            FOREIGN KEY (region_id) REFERENCES region(id)
           );`, [])
-          .then(() => console.log('Tabla Comunas creada'))
-          .catch((e) => console.log('Error creando tabla Comunas: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla comuna creada'))
+          .catch((e) => console.log('Error creando tabla comuna: ' + JSON.stringify(e)));
 
         // Crear tabla de Tipos de Usuario
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Tipos_Usuario (
+          `CREATE TABLE IF NOT EXISTS tipo_usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             descripcion TEXT NOT NULL UNIQUE
           );`, [])
-          .then(() => console.log('Tabla Tipos_Usuario creada'))
-          .catch((e) => console.log('Error creando tabla Tipos_Usuario: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla tipo_usuario creada'))
+          .catch((e) => console.log('Error creando tabla tipo_usuario: ' + JSON.stringify(e)));
 
         // Crear tabla de Usuarios
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Usuarios (
+          `CREATE TABLE IF NOT EXISTS usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             segundo_nombre TEXT,
@@ -62,54 +58,53 @@ export class DataBaseService {
             email TEXT UNIQUE NOT NULL,
             contrasena TEXT NOT NULL,
             nombre_empresa TEXT,
+            descripcion_corta TEXT, 
             foto_perfil TEXT,
-            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada', 'eliminada')) NOT NULL,
+            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
             fecha_registro TEXT DEFAULT(datetime('now')),
             tipo_usuario_id INTEGER NOT NULL,
-            FOREIGN KEY (tipo_usuario_id) REFERENCES Tipos_Usuario(id)
+            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
           );`, [])
-          .then(() => console.log('Tabla Usuarios creada'))
-          .catch((e) => console.log('Error creando tabla Usuarios: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla usuario creada'))
+          .catch((e) => console.log('Error creando tabla usuario: ' + JSON.stringify(e)));
 
         // Crear tabla de Direcciones
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Direcciones (
-            id INTEGER NOT NULL,
+          `CREATE TABLE direccion(
+            id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
             usuario_id INTEGER NOT NULL,
             comuna_id INTEGER NOT NULL,
-            region_id INTEGER NOT NULL,
             direccion TEXT NOT NULL,
-            FOREIGN KEY (usuario_id) REFERENCES Usuarios(id),
-            FOREIGN KEY (comuna_id) REFERENCES Comunas(id),
-            FOREIGN KEY (region_id) REFERENCES Regiones(id)
-            PRIMARY KEY (id, usuario_id)
+            FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+            FOREIGN KEY (comuna_id) REFERENCES comuna(id),
+            PRIMARY KEY (id, usuario_id)  -- Llave compuesta
           );`, [])
-          .then(() => console.log('Tabla Direcciones creada'))
-          .catch((e) => console.log('Error creando tabla Direcciones: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla direccion creada'))
+          .catch((e) => console.log('Error creando tabla direccion: ' + JSON.stringify(e)));
 
         // Crear tabla de Categorías
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Categorias (
+          `CREATE TABLE IF NOT EXISTS categoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
           );`, [])
-          .then(() => console.log('Tabla Categorias creada'))
-          .catch((e) => console.log('Error creando tabla Categorias: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla categoria creada'))
+          .catch((e) => console.log('Error creando tabla categoria: ' + JSON.stringify(e)));
 
         // Crear tabla de Subcategorías
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Subcategorias (
+          `CREATE TABLE IF NOT EXISTS subcategoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             categoria_id INTEGER NOT NULL,
-            FOREIGN KEY (categoria_id) REFERENCES Categorias(id)
+            FOREIGN KEY (categoria_id) REFERENCES categoria(id)
           );`, [])
-          .then(() => console.log('Tabla Subcategorias creada'))
-          .catch((e) => console.log('Error creando tabla Subcategorias: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla subcategoria creada'))
+          .catch((e) => console.log('Error creando tabla subcategoria: ' + JSON.stringify(e)));
 
         // Crear tabla de Productos
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Productos (
+          `CREATE TABLE IF NOT EXISTS producto (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             proveedor_id INTEGER NOT NULL,
             nombre TEXT NOT NULL,
@@ -120,133 +115,99 @@ export class DataBaseService {
             foto_producto TEXT,
             subcategoria_id INTEGER NOT NULL,
             fecha_agregado TEXT DEFAULT(datetime('now')),
-            FOREIGN KEY (proveedor_id) REFERENCES Usuarios(id),
-            FOREIGN KEY (subcategoria_id) REFERENCES Subcategorias(id)
+            FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
+            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
           );`, [])
-          .then(() => console.log('Tabla Productos creada'))
-          .catch((e) => console.log('Error creando tabla Productos: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla producto creada'))
+          .catch((e) => console.log('Error creando tabla producto: ' + JSON.stringify(e)));
 
         // Crear tabla de Carro de Compras
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Carro_Compras (
+          `CREATE TABLE IF NOT EXISTS carro_compra (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
             fecha_creacion TEXT DEFAULT(datetime('now')),
             total INTEGER DEFAULT 0,
             estado TEXT CHECK(estado IN ('creado', 'pagado', 'cancelado')) NOT NULL DEFAULT 'creado',
-            FOREIGN KEY (usuario_id) REFERENCES Usuarios(id)
+            FOREIGN KEY (usuario_id) REFERENCES usuario(id)
           );`, [])
-          .then(() => console.log('Tabla Carro_Compras creada'))
-          .catch((e) => console.log('Error creando tabla Carro_Compras: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla carro_compra creada'))
+          .catch((e) => console.log('Error creando tabla carro_compra: ' + JSON.stringify(e)));
 
         // Crear tabla de Detalles del Carro de Compras
         db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Detalles_Carro_Compras (
+          `CREATE TABLE IF NOT EXISTS detalle_carro_compra (
             id INTEGER NOT NULL,
             carro_id INTEGER NOT NULL,
             producto_id INTEGER NOT NULL,
             cantidad INTEGER NOT NULL,
             subtotal INTEGER NOT NULL,
-            FOREIGN KEY (carro_id) REFERENCES Carro_Compras(id),
-            FOREIGN KEY (producto_id) REFERENCES Productos(id),
+            FOREIGN KEY (carro_id) REFERENCES carro_compra(id),
+            FOREIGN KEY (producto_id) REFERENCES producto(id),
             PRIMARY KEY (id, carro_id)
           );`, [])
-          .then(() => console.log('Tabla Detalles_Carro_Compras creada'))
-          .catch((e) => console.log('Error creando tabla Detalles_Carro_Compras: ' + JSON.stringify(e)));
+          .then(() => console.log('Tabla detalle_carro_compra creada'))
+          .catch((e) => console.log('Error creando tabla detalle_carro_compra: ' + JSON.stringify(e)));
 
-        // Crear tabla de Categorías
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Categorias (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre TEXT NOT NULL UNIQUE
-          );`, [])
-          .then(() => console.log('Tabla Categorias creada'))
-          .catch((e) => console.log('Error creando tabla Categorias: ' + JSON.stringify(e)));
 
         // Insertar las categorías predefinidas (Buscar otra forma o tener que hacer lo mismo para tener usuarios ya creados)
         db.executeSql(
-          `INSERT OR IGNORE INTO Categorias (nombre) VALUES
-              ('Frutas'),
-              ('Verduras'),
-              ('Granos'),
-              ('Lácteos'),
-              ('Carnes'),
-              ('Hierbas y Especias'),
-              ('Cultivos y Semillas'),
-              ('Sin Categoría');`, [])
+          `INSERT OR IGNORE INTO categoria (id,nombre) VALUES
+            (1,'Sin Categoría'),
+            (2,'Frutas'),
+            (3,'Verduras'),
+            (4,'Granos'),
+            (5,'Lácteos'),
+            (6,'Carnes'),
+            (7,'Hierbas y Especias'),
+            (8,'Cultivos y Semillas');`, [])
           .then(() => console.log('Categorías predefinidas insertadas'))
           .catch((e) => console.log('Error insertando categorías: ' + JSON.stringify(e)));
 
-        // Crear tabla de Subcategorías
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS Subcategorias (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre TEXT NOT NULL,
-              categoria_id INTEGER NOT NULL,
-              FOREIGN KEY (categoria_id) REFERENCES Categorias(id)
-          );`, [])
-          .then(() => console.log('Tabla Subcategorias creada'))
-          .catch((e) => console.log('Error creando tabla Subcategorias: ' + JSON.stringify(e)));
 
         // Insertar las subcategorías predefinidas(Por mientras ver la factibilidad de dejar datos asi en la base para tener usuarios)
         db.executeSql(
-          `INSERT OR IGNORE INTO Subcategorias (nombre, categoria_id) VALUES
-              -- Subcategorías de Frutas
-              ('Manzanas', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-              ('Peras', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-              ('Plátanos', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-              ('Cítricos', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-              ('Berries', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-              ('Otras Frutas', (SELECT id FROM Categorias WHERE nombre='Frutas')),
-
-              -- Subcategorías de Verduras
-              ('Hortalizas de raíz', (SELECT id FROM Categorias WHERE nombre='Verduras')),
-              ('Hortalizas de hoja', (SELECT id FROM Categorias WHERE nombre='Verduras')),
-              ('Germinados, brotes y microgreens', (SELECT id FROM Categorias WHERE nombre='Verduras')),
-              ('Otras Verduras', (SELECT id FROM Categorias WHERE nombre='Verduras')),
-
-              -- Subcategorías de Granos
-              ('Arroz', (SELECT id FROM Categorias WHERE nombre='Granos')),
-              ('Quinoa', (SELECT id FROM Categorias WHERE nombre='Granos')),
-              ('Frijoles', (SELECT id FROM Categorias WHERE nombre='Granos')),
-              ('Lentejas', (SELECT id FROM Categorias WHERE nombre='Granos')),
-              ('Otros Granos', (SELECT id FROM Categorias WHERE nombre='Granos')),
-
-              -- Subcategorías de Lácteos
-              ('Leche', (SELECT id FROM Categorias WHERE nombre='Lácteos')),
-              ('Yogur', (SELECT id FROM Categorias WHERE nombre='Lácteos')),
-              ('Queso', (SELECT id FROM Categorias WHERE nombre='Lácteos')),
-              ('Mantequilla', (SELECT id FROM Categorias WHERE nombre='Lácteos')),
-              ('Otros Lácteos', (SELECT id FROM Categorias WHERE nombre='Lácteos')),
-
-              -- Subcategorías de Carnes
-              ('Pollo', (SELECT id FROM Categorias WHERE nombre='Carnes')),
-              ('Res', (SELECT id FROM Categorias WHERE nombre='Carnes')),
-              ('Cerdo', (SELECT id FROM Categorias WHERE nombre='Carnes')),
-              ('Pescados', (SELECT id FROM Categorias WHERE nombre='Carnes')),
-              ('Otras Carnes', (SELECT id FROM Categorias WHERE nombre='Carnes')),
-
-              -- Subcategorías de Hierbas y Especias
-              ('Albahaca', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Perejil', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Romero', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Canela', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Merken', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Cilantro', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-              ('Otras Hierbas/Especias', (SELECT id FROM Categorias WHERE nombre='Hierbas y Especias')),
-
-              -- Subcategorías de Cultivos y Semillas
-              ('Semillas', (SELECT id FROM Categorias WHERE nombre='Cultivos y Semillas')),
-              ('Tubérculos', (SELECT id FROM Categorias WHERE nombre='Cultivos y Semillas')),
-              ('Semillas Heirlooms', (SELECT id FROM Categorias WHERE nombre='Cultivos y Semillas')),
-              ('Rizomas', (SELECT id FROM Categorias WHERE nombre='Cultivos y Semillas')),
-
-              -- Subcategoría de Sin Categoría
-              ('Sin Subcategoría', (SELECT id FROM Categorias WHERE nombre='Sin Categoría'));`, [])
+          `INSERT OR IGNORE INTO subcategoria (id,nombre,categoria_id) VALUES
+            (1,'Sin Subcategoría',1),
+            (2,'Manzanas',2),
+            (3,'Peras',2),
+            (4,'Plátanos',2),
+            (5,'Cítricos',2),
+            (6,'Berries',2),
+            (7,'Otras Frutas',2),
+            (8,'Hortalizas de raiz',3),
+            (9,'Hortalizas de hoja',3),
+            (10,'Germinados, brotes y microgreens',3),
+            (11,'Otras Verduras',3),
+            (12,'Arroz',4),
+            (13,'Quinoa',4),
+            (14,'Frijoles/Porotos',4),
+            (15,'Lentejas',4),
+            (16,'Otros Granos',4),
+            (17,'Leche',5),
+            (18,'Yogur',5),
+            (19,'Queso',5),
+            (20,'Mantequilla',5),
+            (21,'Otros Lácteos',5),
+            (22,'Pollo',6),
+            (23,'Res/Vacuno',6),
+            (24,'Cerdo',6),
+            (25,'Pescados',6),
+            (26,'Otras Carnes',6),
+            (27,'Albahaca',7),
+            (28,'Perejil',7),
+            (29,'Romero',7),
+            (30,'Canela',7),
+            (31,'Merkén',7),
+            (32,'Cilantro',7),
+            (33,'Otras Hierbas/Especias',7),
+            (34,'Semillas',8),
+            (35,'Tubérculos',8),
+            (36,'Semillas Heirlooms/Herencia',8),
+            (37,'Rizomas',8),
+            (38,'Otros Cultivos y Semillas',8);`, [])
           .then(() => console.log('Subcategorías predefinidas insertadas'))
           .catch((e) => console.log('Error insertando subcategorías: ' + JSON.stringify(e)));
-
-
       })
       .catch((e) => console.log('Error al crear o abrir la base de datos: ' + JSON.stringify(e)));
   }
