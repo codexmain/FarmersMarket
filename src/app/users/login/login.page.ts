@@ -4,6 +4,7 @@ import {
   ModalController,
   MenuController,
 } from '@ionic/angular';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { Router, NavigationExtras } from '@angular/router';
 import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
 import { DataBaseService } from 'src/app/services/data-base.service';
@@ -24,8 +25,9 @@ export class LoginPage implements OnInit {
     private alertController: AlertController,
     private modalController: ModalController,
     private menu: MenuController,
-    private DataBase: DataBaseService //sql
-  ) {}
+    private nativeStorage: NativeStorage, //Se agrega NativeStorage
+    private DataBase: DataBaseService //Llama a la base de datos y crea las tablas
+  ) { }
 
   listaUsers: any = [
     //tipo usuario 1 es client, 2 es seller y el 3 admin
@@ -140,7 +142,7 @@ export class LoginPage implements OnInit {
     },
   ];
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   async Logearse() {
     if (!this.email || !this.password) {
@@ -259,11 +261,20 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/register'], navigationextras);
   }
 
+
   Ingresar() {
-    let extras: NavigationExtras = {
-      replaceUrl: true,
-    };
-    localStorage.setItem('userEmail', this.email); // guarda email en local storage
-    this.router.navigate(['productos']);
+    this.nativeStorage.setItem('userEmail', this.email)
+      .then(() => {
+        console.log('Mensaje: Email guardado');
+        this.router.navigate(['productos'], { replaceUrl: true });//Impide volver con la flecha al login luego de ingresar 
+      })
+      .catch((e) => {
+        console.error('Mensaje: Error guardando el email: ', JSON.stringify(e));
+      });
+  }
+
+
+  Registrar() {
+    this.router.navigate(['register'], { replaceUrl: true });
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 
 @Component({
   selector: 'app-root',
@@ -8,16 +9,34 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit{
   userEmail: string='';
+
+
+  constructor(private router: Router, private nativeStorage: NativeStorage) {}
+
   ngOnInit() {
     this.updateUserEmail();
   }
+
+  // Actualiza el correo desde Native Storage
   updateUserEmail() {
-    this.userEmail = localStorage.getItem('userEmail') || 'Correo';
+    this.nativeStorage.getItem('userEmail')
+      .then((email) => {
+        this.userEmail = email || 'Correo';
+      })
+      .catch(() => {
+        this.userEmail = 'Correo'; // Valor predeterminado si no hay correo almacenado
+      });
   }
-  
-  constructor(private router: Router) {}
+
+  // Elimina el correo de Native Storage
   Salir() {
-    localStorage.removeItem('userEmail');
+    this.nativeStorage.remove('userEmail')
+      .then(() => {
+        console.log('Correo eliminado de Native Storage');
+        this.userEmail = 'Correo'; // Resetear el valor en la interfaz
+      })
+      .catch((error) => {
+        console.error('Error eliminando el correo de Native Storage', error);
+      });
   }
 }
-
