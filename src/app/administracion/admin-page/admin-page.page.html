@@ -29,14 +29,21 @@
     <div class="button-container">
       <ion-button id="modal-users" shape="round" class="fixed-size" [routerDirection]="'forward'"
         (click)="navigateToUsers()">Usuarios</ion-button>
+      
+      <ion-button id="modal-products" shape="round" class="fixed-size" [routerDirection]="'forward'"
+        [routerLink]="'/items'">Productos</ion-button>
     </div>
-    <!--
     <br>
-    <div class="button-container">
-      <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'"
-        (click)="navigateToClients()">Clientes</ion-button>
+    <div style="display: flex; justify-content: center;">
+      <ion-button id="modal-category" shape="round" class="fixed-size" [routerDirection]="'forward'"
+        [routerLink]="'/categorias'">Categorías</ion-button>
+
+      <ion-button id="modal-subcategory" shape="round" class="fixed-size" [routerDirection]="'forward'"
+        [routerLink]="'/subcategorias'">SubCategorías</ion-button>     
     </div>
-    <br> -->
+
+
+
   </ion-card>
   <div style="display: flex; justify-content: center;">
     <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'"

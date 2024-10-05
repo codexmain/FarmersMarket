@@ -49,20 +49,25 @@
 
     <ion-item>
       <ion-label position="floating">Empresa (Opcional)</ion-label>
-      <ion-input type="text" [(ngModel)]="empresa" name="empresa" required #empresaCtrl="ngModel"></ion-input>
+      <ion-input type="text" [(ngModel)]="empresa" name="empresa"  #empresaCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
       El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
     </div>
+
+    <ion-item>
+      <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="descEmpresa" name="descEmpresa"  #descEmpresaCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
+      La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
+    </div>
  
-
-
     <ion-item>
       <ion-label position="floating">Estado Usuario</ion-label>
       <ion-select [(ngModel)]="estadoUsuario" name="estadoUsuario" required #estadoUserCtrl="ngModel">
         <ion-select-option value="active">Cuenta Activa</ion-select-option>
         <ion-select-option value="disabled">Cuenta Deshabilitada</ion-select-option>
-        <ion-select-option value="delete">Cuenta Eliminada</ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="estadoUserCtrl.invalid && (estadoUserCtrl.dirty || estadoUserCtrl.touched)" class="error-message">

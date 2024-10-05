@@ -46,9 +46,10 @@ export class AddUsuariosPage implements OnInit {
   sNombre: string = '';
   aPaterno: string = '';
   aMaterno: string = '';
-  empresa: string = '';
   email: string = '';
   password: string = '';
+  empresa: string = '';
+  descEmpresa: string = '';
   region: string = '';
   comuna: string = '';
   direccion: string = '';
@@ -131,6 +132,13 @@ export class AddUsuariosPage implements OnInit {
       this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
       return;
     }
+
+    const descEmpresaPattern = /^[a-zA-Z0-9\s]{10,90}$/;
+    if (this.descEmpresa && !descEmpresaPattern.test(this.descEmpresa)) {
+      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
+      return;
+    }
+
 
     // Validar email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
