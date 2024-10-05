@@ -1,55 +1,36 @@
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
+import { AlertController, Platform } from '@ionic/angular';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataBaseService {
-  constructor(private sqlite: SQLite) { }
+  public database!: SQLiteObject;
 
-  //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
-  crearTablas() {
-    this.sqlite
-      .create({
-        name: 'data.db',
-        location: 'default',
-      })
-      .then((db: SQLiteObject) => {
 
-         // Crear tabla Tipos_Ro
+  
 
-        // Crear tabla de Regiones
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS region (
+  //variables para creacion de tablas
+  tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
-          );`, [])
-          .then(() => console.log('Tabla region creada'))
-          .catch((e) => console.log('Error creando tabla region: ' + JSON.stringify(e)));
+          )`;
 
-        // Crear tabla de Comunas
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS comuna (
+  tblComuna: string = `CREATE TABLE IF NOT EXISTS comuna (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             region_id INTEGER NOT NULL,
             FOREIGN KEY (region_id) REFERENCES region(id)
-          );`, [])
-          .then(() => console.log('Tabla comuna creada'))
-          .catch((e) => console.log('Error creando tabla comuna: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Tipos de Usuario
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS tipo_usuario (
+  tblTipoUsuario: string = `CREATE TABLE IF NOT EXISTS tipo_usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             descripcion TEXT NOT NULL UNIQUE
-          );`, [])
-          .then(() => console.log('Tabla tipo_usuario creada'))
-          .catch((e) => console.log('Error creando tabla tipo_usuario: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Usuarios
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS usuario (
+  tblUsuario: string = `CREATE TABLE IF NOT EXISTS usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             segundo_nombre TEXT,
@@ -64,13 +45,9 @@ export class DataBaseService {
             fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
             tipo_usuario_id INTEGER NOT NULL,
             FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
-          );`, [])
-          .then(() => console.log('Tabla usuario creada'))
-          .catch((e) => console.log('Error creando tabla usuario: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Direcciones
-        db.executeSql(
-          `CREATE TABLE direccion(
+  tblDireccion: string = `CREATE TABLE direccion(
             id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
             usuario_id INTEGER NOT NULL,
             comuna_id INTEGER NOT NULL,
@@ -78,33 +55,21 @@ export class DataBaseService {
             FOREIGN KEY (usuario_id) REFERENCES usuario(id),
             FOREIGN KEY (comuna_id) REFERENCES comuna(id),
             PRIMARY KEY (id, usuario_id)  -- Llave compuesta
-          );`, [])
-          .then(() => console.log('Tabla direccion creada'))
-          .catch((e) => console.log('Error creando tabla direccion: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Categorías
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS categoria (
+  tblCategoria: string = `CREATE TABLE IF NOT EXISTS categoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
-          );`, [])
-          .then(() => console.log('Tabla categoria creada'))
-          .catch((e) => console.log('Error creando tabla categoria: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Subcategorías
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS subcategoria (
+  tblSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             categoria_id INTEGER NOT NULL,
             FOREIGN KEY (categoria_id) REFERENCES categoria(id)
-          );`, [])
-          .then(() => console.log('Tabla subcategoria creada'))
-          .catch((e) => console.log('Error creando tabla subcategoria: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Productos
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS producto (
+  tblProducto: string = `CREATE TABLE IF NOT EXISTS producto (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             proveedor_id INTEGER NOT NULL,
             nombre TEXT NOT NULL,
@@ -117,26 +82,18 @@ export class DataBaseService {
             fecha_agregado TEXT DEFAULT(datetime('now')),
             FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
             FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
-          );`, [])
-          .then(() => console.log('Tabla producto creada'))
-          .catch((e) => console.log('Error creando tabla producto: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Carro de Compras
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS carro_compra (
+  tblCarroCompra: string = `CREATE TABLE IF NOT EXISTS carro_compra (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
             fecha_creacion TEXT DEFAULT(datetime('now')),
             total INTEGER DEFAULT 0,
             estado TEXT CHECK(estado IN ('creado', 'pagado', 'cancelado')) NOT NULL DEFAULT 'creado',
             FOREIGN KEY (usuario_id) REFERENCES usuario(id)
-          );`, [])
-          .then(() => console.log('Tabla carro_compra creada'))
-          .catch((e) => console.log('Error creando tabla carro_compra: ' + JSON.stringify(e)));
+          );`;
 
-        // Crear tabla de Detalles del Carro de Compras
-        db.executeSql(
-          `CREATE TABLE IF NOT EXISTS detalle_carro_compra (
+  tblDetalleCarroCompra: string = `CREATE TABLE IF NOT EXISTS detalle_carro_compra (
             id INTEGER NOT NULL,
             carro_id INTEGER NOT NULL,
             producto_id INTEGER NOT NULL,
@@ -145,14 +102,10 @@ export class DataBaseService {
             FOREIGN KEY (carro_id) REFERENCES carro_compra(id),
             FOREIGN KEY (producto_id) REFERENCES producto(id),
             PRIMARY KEY (id, carro_id)
-          );`, [])
-          .then(() => console.log('Tabla detalle_carro_compra creada'))
-          .catch((e) => console.log('Error creando tabla detalle_carro_compra: ' + JSON.stringify(e)));
+          );`;
 
-
-        // Insertar las categorías predefinidas (Buscar otra forma o tener que hacer lo mismo para tener usuarios ya creados)
-        db.executeSql(
-          `INSERT OR IGNORE INTO categoria (id,nombre) VALUES
+  //variables para realizar la precarga inicial de datos
+  registroCategoria: string = `INSERT OR IGNORE INTO categoria (id,nombre) VALUES
             (1,'Sin Categoría'),
             (2,'Frutas'),
             (3,'Verduras'),
@@ -160,14 +113,9 @@ export class DataBaseService {
             (5,'Lácteos'),
             (6,'Carnes'),
             (7,'Hierbas y Especias'),
-            (8,'Cultivos y Semillas');`, [])
-          .then(() => console.log('Categorías predefinidas insertadas'))
-          .catch((e) => console.log('Error insertando categorías: ' + JSON.stringify(e)));
+            (8,'Cultivos y Semillas');`;
 
-
-        // Insertar las subcategorías predefinidas(Por mientras ver la factibilidad de dejar datos asi en la base para tener usuarios)
-        db.executeSql(
-          `INSERT OR IGNORE INTO subcategoria (id,nombre,categoria_id) VALUES
+  registroSubcategoria: string = `INSERT OR IGNORE INTO subcategoria (id,nombre,categoria_id) VALUES
             (1,'Sin Subcategoría',1),
             (2,'Manzanas',2),
             (3,'Peras',2),
@@ -205,23 +153,14 @@ export class DataBaseService {
             (35,'Tubérculos',8),
             (36,'Semillas Heirlooms/Herencia',8),
             (37,'Rizomas',8),
-            (38,'Otros Cultivos y Semillas',8);`, [])
-          .then(() => console.log('Subcategorías predefinidas insertadas'))
-          .catch((e) => console.log('Error insertando subcategorías: ' + JSON.stringify(e)));
+            (38,'Otros Cultivos y Semillas',8);`;
 
-
-        //insertar tipo de usuarios predefinidos
-        db.executeSql(
-          `INSERT OR IGNORE INTO tipo_usuario (id,descripcion) VALUES
+  registroTipoUsuario: string = `INSERT OR IGNORE INTO tipo_usuario (id,descripcion) VALUES
             (1,'Cliente'),
             (2,'Vendedor'),
-            (3,'Administrador');`, [])
-          .then(() => console.log('Tipos de usuarios predefinidas insertadas'))
-          .catch((e) => console.log('Error insertando Tipos de usuarios: ' + JSON.stringify(e)));
+            (3,'Administrador');`;
 
-        //insertar regiones predefinida
-        db.executeSql(
-          `INSERT OR IGNORE INTO region (id,nombre) VALUES
+  registroRegion: string = `INSERT OR IGNORE INTO region (id,nombre) VALUES
             (1,'Región de Arica y Parinacota'),
             (2,'Región de Tarapacá'),
             (3,'Región de Antofagasta'),
@@ -237,13 +176,9 @@ export class DataBaseService {
             (13,'Región de Los Ríos'),
             (14,'Región de Los Lagos'),
             (15,'Región de Aysén'),
-            (16,'Región de Magallanes y de la Antártica Chilena');`, [])
-            .then(() => console.log('Regiones predefinidas insertadas'))
-            .catch((e) => console.log('Error insertando Regiones: ' + JSON.stringify(e)));
-  
-        //inserccion de comunas predefinida
-        db.executeSql(            
-          `INSERT OR IGNORE INTO comuna (id, nombre, region_id) VALUES
+            (16,'Región de Magallanes y de la Antártica Chilena');`;
+
+  registroComuna: string = `INSERT OR IGNORE INTO comuna (id, nombre, region_id) VALUES
             (1, 'Arica', 1),
             (2, 'Parinacota', 1),
             (3, 'Putre', 1),
@@ -370,22 +305,16 @@ export class DataBaseService {
             (124, 'Puerto Natales', 16),
             (125, 'Porvenir', 16),
             (126, 'Cerro Castillo', 16),
-            (127, 'Timaukel', 16);`, [])
-            .then(() => console.log('Comunas predefinidas insertadas'))
-            .catch((e) => console.log('Error insertando Comunas: ' + JSON.stringify(e)));          
+            (127, 'Timaukel', 16);`;
 
-        db.executeSql( 
-          `INSERT OR IGNORE INTO usuario (id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id) VALUES
+  registroUsuario: string = `INSERT OR IGNORE INTO usuario (id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id) VALUES
             (1,'N/A','','N/A','N/A','N/A','123456',NULL,NULL,NULL,'deshabilitada','2024-10-04 22:41:12',1),
             (2,'Vicente',NULL,'Rivera','Álvarez','example.Client@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',1),
             (3,'Alvaro','Israel','Barrera','Silva','example.Seller1@gmail.com','123456','Las Cosechas de Don Barrera','Se venden hortalizas de estación. ',NULL,'activa','2024-10-04 22:41:12',2),
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
-            (5,'Ignacio','Javier','Fuenzalida','Chandia','example.Admin@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',3);`, [])
-            .then(() => console.log('Usuarios predefinidos insertados'))
-            .catch((e) => console.log('Error insertando Usuarios: ' + JSON.stringify(e)));
+            (5,'Ignacio','Javier','Fuenzalida','Chandia','example.Admin@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',3);`;
 
-        db.executeSql(          
-          `INSERT OR IGNORE INTO producto (id,proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado) VALUES
+  registroProducto: string = `INSERT OR IGNORE INTO producto (id,proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado) VALUES
             (1,1,'Producto Desconocido','Descripción genérica para productos desconocidos.',0,0,0,NULL,1,'2024-10-04 20:20:28'),
             (2,3,'Manzana Roja','Manzana fresca y crujiente (500g).',1000,50,1,NULL,2,'2024-10-04 20:20:28'),
             (3,3,'Pera Williams','Deliciosas peras Williams (600g).',1200,30,1,NULL,3,'2024-10-04 20:20:28'),
@@ -406,16 +335,81 @@ export class DataBaseService {
             (18,4,'Romero','Romero fresco para tus recetas (30g).',600,35,1,NULL,29,'2024-10-04 20:20:28'),
             (19,4,'Canela','Canela en rama para tus postres (100g).',200,50,0,NULL,30,'2024-10-04 20:20:28'),
             (20,4,'Semillas de Chía','Semillas de chía saludables (200g).',1000,20,1,NULL,34,'2024-10-04 20:20:28'),
-            (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`, [])
-            .then(() => console.log('Productos predefinidos insertados'))
-            .catch((e) => console.log('Error insertando productos: ' + JSON.stringify(e)));
-         
+            (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`;
 
 
+  //variable para el status de la Base de datos
+  private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);            
 
-      })
-      .catch((e) => console.log('Error al crear o abrir la base de datos: ' + JSON.stringify(e)));
+  constructor(private sqlite: SQLite, private platform: Platform, private alertController: AlertController) { 
+    this.createBD();
   }
+
+  async presentAlert(titulo: string, msj:string) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      message: msj,
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+  }
+
+  dbState(){
+    return this.isDBReady.asObservable();
+  }  
+
+
+  //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
+  createBD(){
+    //varificar si la plataforma esta disponible
+    this.platform.ready().then(()=>{
+      //crear la Base de Datos
+      this.sqlite.create({
+        name: 'cutuco.db',
+        location: 'default'
+      }).then((db: SQLiteObject)=>{
+        //capturar la conexion a la BD
+        this.database = db;
+        //llamamos a la función para crear las tablas
+        this.crearTablas();
+      }).catch(e=>{
+        this.presentAlert('Base de Datos', 'Error en crear la BD: ' + JSON.stringify(e));
+      })
+    })
+
+  }
+
+  async crearTablas(){
+    try{
+      //ejecuto la creación de Tablas
+      await this.database.executeSql(this.tblRegion, []);
+      await this.database.executeSql(this.tblComuna, []);
+      await this.database.executeSql(this.tblTipoUsuario, []);
+      await this.database.executeSql(this.tblUsuario, []);
+      await this.database.executeSql(this.tblDireccion, []);
+      await this.database.executeSql(this.tblCategoria, []);
+      await this.database.executeSql(this.tblSubcategoria, []);
+      await this.database.executeSql(this.tblProducto, []);
+      await this.database.executeSql(this.tblCarroCompra, []);
+      await this.database.executeSql(this.tblDetalleCarroCompra, []);
+
+      //ejecuto los insert por defecto en el caso que existan
+      await this.database.executeSql(this.registroCategoria, []);
+      await this.database.executeSql(this.registroSubcategoria, []);
+      await this.database.executeSql(this.registroTipoUsuario, []);
+      await this.database.executeSql(this.registroRegion, []);
+      await this.database.executeSql(this.registroComuna, []);
+      await this.database.executeSql(this.registroUsuario, []);
+      await this.database.executeSql(this.registroProducto, []);
+
+      this.isDBReady.next(true);
+
+    }catch(e){
+      this.presentAlert('Creación de Tablas', 'Error en crear las tablas: ' + JSON.stringify(e));
+    }
+  }
+
 
 
   //Guardar usuarios en la base de datos (pendiente ingreso de productos y otros)
