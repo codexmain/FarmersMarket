@@ -58,7 +58,7 @@ export class AdminPagePage implements OnInit {  //! es obligatoria, ? es opciona
         emails: this.emails
       }
     };
-    this.router.navigate(['/users'], navigationExtras);
+    this.router.navigate(['/usuarios'], navigationExtras);
   }
 
 
