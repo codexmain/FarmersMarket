@@ -453,6 +453,74 @@ export class DataBaseService {
   });
   }
 
-//Funcion para CRUD pendiente
+
+
+
+//Funcion para CRUDs pendiente modulo de administración
+
+//variables para guardar los datos de las consultas en las tablas: datos imparciales
+listadoUsuarios = new BehaviorSubject([]);
+listadoCategorias = new BehaviorSubject([]);
+listadoSubCategorias = new BehaviorSubject([]);
+listadoProductos = new BehaviorSubject([]);
+
+//variables para guardar los datos de las consultas en las tablas: Variables para hacer tranferencia de llaves por combobox
+listadoCmbCategorias = new BehaviorSubject([]);
+listadoCmbSubCategorias = new BehaviorSubject([]);
+listadoCmbTipUsuario = new BehaviorSubject([]);
+listadoCmbProveedores = new BehaviorSubject([]);
+
+//Declaracion de los observables para la manipulación de la data: fetch generales
+fetchUsuarios
+fetchCategorias
+fetchSubCategorias
+fetchProductos
+
+//Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
+
+fetchCmbSubCategorias
+fetchCmbTipUsuario
+fetchCmbProveedores
+
+
+
+//CRUD USUARIOS, parte administración
+seleccionarUsuarios{ }
+
+eliminarUsuario{ }
+
+modificarUsuario{ }
+
+insertarUsuario { }
+
+
+//CRUD CATEGORIA, parte administración
+seleccionarCategorias{ } 
+
+eliminarCategoria { }
+
+modificarCategoria { }
+
+insertarCategoria { }
+
+
+//CRUD SUBCATEGORIA, parte administración
+seleccionarSubCategorias { }
+
+eliminarSubCategoria { }
+
+modificarSubCategoria { }
+
+insertarSubCategoria{ }
+
+
+//CRUD Producto, parte administración
+seleccionarProductos { }
+
+eliminarProducto { }
+
+modificarProducto { }
+
+insertarProducto { }
 
 }
