@@ -17,23 +17,23 @@ export class AppComponent implements OnInit{
     this.updateUserEmail();
   }
 
-  // Actualiza el correo desde Native Storage
+  // actualiza el correo desde Native Storage
   updateUserEmail() {
     this.nativeStorage.getItem('userEmail')
       .then((email) => {
         this.userEmail = email || 'Correo';
       })
       .catch(() => {
-        this.userEmail = 'Correo'; // Valor predeterminado si no hay correo almacenado
+        this.userEmail = 'Correo'; // valor predeterminado si no hay correo almacenado
       });
   }
 
-  // Elimina el correo de Native Storage
+  // elimina el correo de Native Storage
   Salir() {
     this.nativeStorage.remove('userEmail')
       .then(() => {
         console.log('Correo eliminado de Native Storage');
-        this.userEmail = 'Correo'; // Resetear el valor en la interfaz
+        this.userEmail = 'Correo'; // resetear el valor en la interfaz
       })
       .catch((error) => {
         console.error('Error eliminando el correo de Native Storage', error);
