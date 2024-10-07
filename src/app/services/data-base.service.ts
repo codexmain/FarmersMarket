@@ -2,6 +2,13 @@ import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { AlertController, Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Usuarios } from './usuarios';
+import { Categorias } from './categorias';
+import { Subcategorias } from './subcategorias';
+import { Productos } from './productos';
+import { CmbSubcategorias } from './cmb-subcategorias';
+import { CmbTipUsuario } from './cmb-tip-usuario';
+import { CmbProveedores } from './cmb-proveedores';
 
 @Injectable({
   providedIn: 'root',
@@ -465,62 +472,300 @@ listadoSubCategorias = new BehaviorSubject([]);
 listadoProductos = new BehaviorSubject([]);
 
 //variables para guardar los datos de las consultas en las tablas: Variables para hacer tranferencia de llaves por combobox
-listadoCmbCategorias = new BehaviorSubject([]);
 listadoCmbSubCategorias = new BehaviorSubject([]);
 listadoCmbTipUsuario = new BehaviorSubject([]);
 listadoCmbProveedores = new BehaviorSubject([]);
 
 //Declaracion de los observables para la manipulación de la data: fetch generales
-fetchUsuarios
-fetchCategorias
-fetchSubCategorias
-fetchProductos
+fetchUsuarios(): Observable<Usuarios[]>{
+  return this.listadoUsuarios.asObservable();
+}
+fetchUsuarioPorId(id: number): Promise<Usuarios> {
+  return this.database.executeSql('SELECT * FROM usuario WHERE id = ?', [id]).then(res => { //esto es para ver el detalle de un usuario en especifico
+      if (res.rows.length > 0) {
+          return {
+              id: res.rows.item(0).id,
+              nombre: res.rows.item(0).nombre,
+              segundo_nombre: res.rows.item(0).segundo_nombre,
+              apellido_paterno: res.rows.item(0).apellido_paterno,
+              apellido_materno: res.rows.item(0).apellido_materno,
+              email: res.rows.item(0).email,
+              contrasena: res.rows.item(0).contrasena,
+              nombre_empresa: res.rows.item(0).nombre_empresa,
+              descripcion_corta: res.rows.item(0).descripcion_corta,
+              foto_perfil: res.rows.item(0).foto_perfil,
+              estado_cuenta: res.rows.item(0).estado_cuenta,
+              fecha_registro: res.rows.item(0).fecha_registro,
+              tipo_usuario_id: res.rows.item(0).tipo_usuario_id
+          };
+      } else {
+          throw new Error('Producto no encontrado');
+      }
+  });
+}
+
+
+fetchCategorias(): Observable<Categorias[]>{
+  return this.listadoCategorias.asObservable();
+}
+
+fetchCategoriaPorId(id: number): Promise<Categorias> { //esto es para ver el detalle de un categoria en especifico
+  return this.database.executeSql('SELECT * FROM categoria WHERE id = ?', [id]).then(res => {
+      if (res.rows.length > 0) {
+          return {
+              id: res.rows.item(0).id,
+              nombre: res.rows.item(0).nombre
+          };
+      } else {
+          throw new Error('Producto no encontrado');
+      }
+  });
+}
+
+
+
+
+fetchSubCategorias(): Observable<Subcategorias[]>{
+  return this.listadoSubCategorias.asObservable();
+}
+
+fetchSubCategoriaPorId(id: number): Promise<Subcategorias> { //esto es para ver el detalle de una subcategoria en especifico
+  return this.database.executeSql('SELECT * FROM subcategoria WHERE id = ?', [id]).then(res => {
+      if (res.rows.length > 0) {
+          return {
+              id: res.rows.item(0).id,
+              nombre: res.rows.item(0).nombre,
+              categoria_id: res.rows.item(0).categoria_id,
+          };
+      } else {
+          throw new Error('Producto no encontrado');
+      }
+  });
+}
+
+
+fetchProductos(): Observable<Productos[]>{
+  return this.listadoProductos.asObservable();
+}
+
+fetchProductoPorId(id: number): Promise<Productos> { //esto es para ver el detalle de un producto en especifico
+  return this.database.executeSql('SELECT * FROM producto WHERE id = ?', [id]).then(res => {
+      if (res.rows.length > 0) {
+          return {
+              id: res.rows.item(0).id,
+              proveedor_id: res.rows.item(0).proveedor_id,
+              nombre: res.rows.item(0).nombre,
+              descripcion: res.rows.item(0).descripcion,
+              precio: res.rows.item(0).precio,
+              stock: res.rows.item(0).stock,
+              organico: res.rows.item(0).organico,
+              foto_producto: res.rows.item(0).foto_producto,
+              subcategoria_id: res.rows.item(0).subcategoria_id,
+              fecha_agregado: res.rows.item(0).fecha_agregado
+          };
+      } else {
+          throw new Error('Producto no encontrado');
+      }
+  });
+}
 
 //Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
 
-fetchCmbSubCategorias
-fetchCmbTipUsuario
-fetchCmbProveedores
+fetchCmbSubCategorias(): Observable<CmbSubcategorias[]>{
+  return this.listadoCmbSubCategorias.asObservable();
+}
+fetchCmbTipUsuario(): Observable<CmbTipUsuario[]>{
+  return this.listadoCmbTipUsuario.asObservable();
+}
+
+fetchCmbProveedores(): Observable<CmbProveedores[]>{
+  return this.listadoCmbProveedores.asObservable();
+}
 
 
 
-//CRUD USUARIOS, parte administración
-seleccionarUsuarios{ }
+//CRUD USUARIOS, parte administración. Todos los SELECTS
+seleccionarUsuarios(){
+  return this.database.executeSql('SELECT * FROM usuario', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Usuarios[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre,
+          segundo_nombre: res.rows.item(i).segundo_nombre,
+          apellido_paterno: res.rows.item(i).apellido_paterno,
+          apellido_materno: res.rows.item(i).apellido_materno,
+          email: res.rows.item(i).email,
+          contrasena: res.rows.item(i).contrasena,
+          nombre_empresa: res.rows.item(i).nombre_empresa,
+          descripcion_corta: res.rows.item(i).descripcion_corta,
+          foto_perfil: res.rows.item(i).foto_perfil,
+          estado_cuenta: res.rows.item(i).estado_cuenta,
+          fecha_registro: res.rows.item(i).fecha_registro,
+          tipo_usuario_id: res.rows.item(i).tipo_usuario_id
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoUsuarios.next(items as any);
+  })
+}
 
-eliminarUsuario{ }
 
-modificarUsuario{ }
+seleccionarCategorias(){
+  return this.database.executeSql('SELECT * FROM categoria', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Categorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCategorias.next(items as any);
+  })
+}
 
-insertarUsuario { }
+seleccionarSubCategorias(){
+  return this.database.executeSql('SELECT * FROM subcategoria', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Subcategorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre,
+          categoria_id: res.rows.item(i).categoria_id,
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoSubCategorias.next(items as any);
+  })
+}
 
 
-//CRUD CATEGORIA, parte administración
-seleccionarCategorias{ } 
+seleccionarProductos(){
+  return this.database.executeSql('SELECT * FROM usuario', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Productos[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          proveedor_id: res.rows.item(i).proveedor_id,
+          nombre: res.rows.item(i).nombre,
+          descripcion: res.rows.item(i).descripcion,
+          precio: res.rows.item(i).precio,
+          stock: res.rows.item(i).stock,
+          organico: res.rows.item(i).organico,
+          foto_producto: res.rows.item(i).foto_producto,
+          subcategoria_id: res.rows.item(i).subcategoria_id,
+          fecha_agregado: res.rows.item(i).fecha_agregado
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoProductos.next(items as any);
+  })
+}
 
-eliminarCategoria { }
+//todos los modificares
 
-modificarCategoria { }
+modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
+                apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+                descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+                fecha_registro:string, tipo_usuario_id:number){
+                  this.presentAlert("service","ID: " + id);
+                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, fecha_registro = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id,id]).then(res=>{
+                    this.presentAlert("Modificar","Usuario Modificado");
+                    this.seleccionarUsuarios();
+                  }).catch(e=>{
+                    this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+                  })}
 
-insertarCategoria { }
+
+
+modificarCategoria(id:number, nombre:string){
+  this.presentAlert("service","ID: " + id);
+  return this.database.executeSql('UPDATE categoria SET nombre = ? WHERE id = ?',[nombre,id]).then(res=>{
+    this.presentAlert("Modificar","Categoría Modificada");
+    this.seleccionarCategorias();
+  }).catch(e=>{
+    this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+modificarSubCategoria(id:number, nombre:string, categoria_id:number){
+  this.presentAlert("service","ID: " + id);
+  return this.database.executeSql('UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',[nombre,categoria_id,id]).then(res=>{
+    this.presentAlert("Modificar","SubCategoría Modificada");
+    this.seleccionarSubCategorias();
+  }).catch(e=>{
+    this.presentAlert('Modificar SubCategoría', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number, fecha_agregado:string){
+  this.presentAlert("service","ID: " + id);
+  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, fecha_agregado = ? WHERE id = ?',[proveedor_id, nombre, descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado,id]).then(res=>{
+    this.presentAlert("Modificar","Producto Modificado");
+    this.seleccionarProductos();
+  }).catch(e=>{
+    this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+
+//================================
+//eliminarUsuario{ }
+
+
+//insertarUsuario { }
+
+
+//eliminarCategoria { }
+
+
+//insertarCategoria { }
 
 
 //CRUD SUBCATEGORIA, parte administración
-seleccionarSubCategorias { }
 
-eliminarSubCategoria { }
 
-modificarSubCategoria { }
+//eliminarSubCategoria { }
 
-insertarSubCategoria{ }
+
+
+//insertarSubCategoria{ }
 
 
 //CRUD Producto, parte administración
-seleccionarProductos { }
 
-eliminarProducto { }
 
-modificarProducto { }
+//eliminarProducto { }
 
-insertarProducto { }
+//modificarProducto { }
 
+//insertarProducto { }
+
+
+//queries para los combobo
 }
