@@ -8,20 +8,21 @@
 </ion-header>
 
 <ion-content>
-  <div [formGroup]="productForm">
+  <div>
     <ion-card>
       <ion-row>
         <ion-col>
           <ion-list>
+            <form id="addProductForm" (ngSubmit)="agregarProducto()">
 
             <ion-item>
               <!--imagen-->
               <ion-thumbnail slot="start">
                 <ion-item>
                   <ion-label>Foto del Producto</ion-label>
-                  <ion-button (click)="pImagen()">Tomar Foto</ion-button>
+                  <ion-button (click)="tomarFotop()">Tomar Foto</ion-button>
                 </ion-item>
-                <img *ngIf="productImage" [src]="productImage" alt="Foto del Producto" />
+                <img *ngIf="pImagen" [src]="pImagen" alt="Foto del Producto" />
               </ion-thumbnail>
               
               <ion-label>
@@ -45,6 +46,7 @@
                 </ion-button>
               </div>
             </ion-item>
+          </form>
 
             <ion-item>
               <ion-thumbnail slot="start">
