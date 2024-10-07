@@ -15,8 +15,13 @@
           <ion-list>
 
             <ion-item>
+              <!--imagen-->
               <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
+                <ion-item>
+                  <ion-label>Foto del Producto</ion-label>
+                  <ion-button (click)="pImagen()">Tomar Foto</ion-button>
+                </ion-item>
+                <img *ngIf="productImage" [src]="productImage" alt="Foto del Producto" />
               </ion-thumbnail>
               
               <ion-label>
