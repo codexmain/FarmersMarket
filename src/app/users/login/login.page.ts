@@ -278,3 +278,13 @@ export class LoginPage implements OnInit {
     this.router.navigate(['register'], { replaceUrl: true });
   }
 }
+
+async iniciarSesion() {
+  const credencialesValidas = await this.DataBaseService.validarCredenciales(this.correo, this.contrasena);
+  
+  if (credencialesValidas) {
+    this.router.navigate(['productos'], { replaceUrl: true });
+  } else {
+    this.errorLogin = 'El correo o la contraseña son incorrectos.';
+  }
+}
