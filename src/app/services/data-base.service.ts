@@ -2,15 +2,19 @@ import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { AlertController, Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Usuarios } from './usuarios';
+import { Categorias } from './categorias';
+import { Subcategorias } from './subcategorias';
+import { Productos } from './productos';
+import { CmbSubcategorias } from './cmb-subcategorias';
+import { CmbTipUsuario } from './cmb-tip-usuario';
+import { CmbProveedores } from './cmb-proveedores';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataBaseService {
   public database!: SQLiteObject;
-
-
-  
 
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
@@ -337,15 +341,18 @@ export class DataBaseService {
             (20,4,'Semillas de Chía','Semillas de chía saludables (200g).',1000,20,1,NULL,34,'2024-10-04 20:20:28'),
             (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`;
 
-
   //variable para el status de la Base de datos
-  private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);            
+  private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(private sqlite: SQLite, private platform: Platform, private alertController: AlertController) { 
+  constructor(
+    private sqlite: SQLite,
+    private platform: Platform,
+    private alertController: AlertController
+  ) {
     this.createBD();
   }
 
-  async presentAlert(titulo: string, msj:string) {
+  async presentAlert(titulo: string, msj: string) {
     const alert = await this.alertController.create({
       header: titulo,
       message: msj,
@@ -355,33 +362,56 @@ export class DataBaseService {
     await alert.present();
   }
 
-  dbState(){
+  dbState() {
     return this.isDBReady.asObservable();
-  }  
-
-
-  //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
-  createBD(){
-    //varificar si la plataforma esta disponible
-    this.platform.ready().then(()=>{
-      //crear la Base de Datos
-      this.sqlite.create({
-        name: 'cutuco.db',
-        location: 'default'
-      }).then((db: SQLiteObject)=>{
-        //capturar la conexion a la BD
-        this.database = db;
-        //llamamos a la función para crear las tablas
-        this.crearTablas();
-      }).catch(e=>{
-        this.presentAlert('Base de Datos', 'Error en crear la BD: ' + JSON.stringify(e));
-      })
-    })
-
   }
 
-  async crearTablas(){
-    try{
+  // Método para validar las credenciales del usuario
+  async validarCredenciales(correo: string, contrasena: string): Promise<boolean> {
+    return this.database.executeSql('SELECT * FROM usuario WHERE email = ?', [correo]).then(async (res) => {
+      if (res.rows.length > 0) {
+        const usuario = res.rows.item(0);
+        
+        // Aquí puedes usar una función de comparación de contraseñas si las contraseñas están encriptadas
+        const contrasenaCorrecta = usuario.contrasena === contrasena; // Este es un ejemplo simple. Usa bcrypt o similar en producción.
+
+        return contrasenaCorrecta; // Retorna true si la contraseña es correcta, de lo contrario, false.
+      } else {
+        return false; // El correo no existe
+      }
+    }).catch((e) => {
+      console.error('Error al consultar la base de datos', e);
+      return false; // Manejo de errores
+    });
+  }
+
+  //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
+  createBD() {
+    //varificar si la plataforma esta disponible
+    this.platform.ready().then(() => {
+      //crear la Base de Datos
+      this.sqlite
+        .create({
+          name: 'cutuco.db',
+          location: 'default',
+        })
+        .then((db: SQLiteObject) => {
+          //capturar la conexion a la BD
+          this.database = db;
+          //llamamos a la función para crear las tablas
+          this.crearTablas();
+        })
+        .catch((e) => {
+          this.presentAlert(
+            'Base de Datos',
+            'Error en crear la BD: ' + JSON.stringify(e)
+          );
+        });
+    });
+  }
+
+  async crearTablas() {
+    try {
       //ejecuto la creación de Tablas
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
@@ -404,55 +434,440 @@ export class DataBaseService {
       await this.database.executeSql(this.registroProducto, []);
 
       this.isDBReady.next(true);
-
-    }catch(e){
-      this.presentAlert('Creación de Tablas', 'Error en crear las tablas: ' + JSON.stringify(e));
+    } catch (e) {
+      this.presentAlert(
+        'Creación de Tablas',
+        'Error en crear las tablas: ' + JSON.stringify(e)
+      );
     }
   }
 
-
-
   //Guardar usuarios en la base de datos (pendiente ingreso de productos y otros)
   registrarUsuarios(
-    pNombre: string, sNombre: string, aPaterno: string, aMaterno: string,
-    email: string, password: string, empresa: string,
-    region: string, comuna: string, direccion: string
+    pNombre: string,
+    sNombre: string,
+    aPaterno: string,
+    aMaterno: string,
+    email: string,
+    password: string,
+    empresa: string,
+    region: string,
+    comuna: string,
+    direccion: string
   ) {
-    this.sqlite.create({
-      name: 'data.db',
-      location: 'default',
-    }).then((db: SQLiteObject) => {
-    // Insertar el usuario en la tabla Usuarios
-    db.executeSql(
-      `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa) 
-       VALUES(?,?,?,?,?,?,?,?)`, 
-      [pNombre, sNombre, aPaterno, aMaterno, email, password, empresa,]
-    ).then((res) => {
-      console.log('Mensaje: Cuenta usuario creada');
-      
-      // Obtener el ID del usuario recién creado
-      const usuarioId = res.insertId;
+    this.sqlite
+      .create({
+        name: 'data.db',
+        location: 'default',
+      })
+      .then((db: SQLiteObject) => {
+        // Insertar el usuario en la tabla Usuarios
+        db.executeSql(
+          `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa) 
+       VALUES(?,?,?,?,?,?,?,?)`,
+          [pNombre, sNombre, aPaterno, aMaterno, email, password, empresa]
+        )
+          .then((res) => {
+            console.log('Mensaje: Cuenta usuario creada');
 
-      // Insertar la dirección del usuario en la tabla Direcciones, ahora con region_id
-      db.executeSql(
-        `INSERT INTO Direcciones(usuario_id, comuna_id, region_id, direccion) 
-         VALUES(?, (SELECT id FROM Comunas WHERE nombre = ?), (SELECT id FROM Regiones WHERE nombre = ?), ?)`, 
-        [usuarioId, comuna, region, direccion]
-      ).then(() => {
-        console.log('Mensaje: Dirección registrada');
-      }).catch((e) => {
-        console.log('Mensaje: ERROR al guardar Dirección: ' + JSON.stringify(e));
+            // Obtener el ID del usuario recién creado
+            const usuarioId = res.insertId;
+
+            // Insertar la dirección del usuario en la tabla Direcciones, ahora con region_id
+            db.executeSql(
+              `INSERT INTO Direcciones(usuario_id, comuna_id, region_id, direccion) 
+         VALUES(?, (SELECT id FROM Comunas WHERE nombre = ?), (SELECT id FROM Regiones WHERE nombre = ?), ?)`,
+              [usuarioId, comuna, region, direccion]
+            )
+              .then(() => {
+                console.log('Mensaje: Dirección registrada');
+              })
+              .catch((e) => {
+                console.log(
+                  'Mensaje: ERROR al guardar Dirección: ' + JSON.stringify(e)
+                );
+              });
+          })
+          .catch((e) => {
+            console.log(
+              'Mensaje: ERROR al guardar Usuario: ' + JSON.stringify(e)
+            );
+          });
+      })
+      .catch((e) => {
+        console.log('Mensaje: ERROR al crear o abrir DB: ' + JSON.stringify(e));
       });
-
-    }).catch((e) => {
-      console.log('Mensaje: ERROR al guardar Usuario: ' + JSON.stringify(e));
-    });
-
-  }).catch((e) => {
-    console.log('Mensaje: ERROR al crear o abrir DB: ' + JSON.stringify(e));
-  });
   }
 
-//Funcion para CRUD pendiente
+  //Funcion para CRUDs pendiente modulo de administración
 
+  //variables para guardar los datos de las consultas en las tablas: datos imparciales
+  listadoUsuarios = new BehaviorSubject([]);
+  listadoCategorias = new BehaviorSubject([]);
+  listadoSubCategorias = new BehaviorSubject([]);
+  listadoProductos = new BehaviorSubject([]);
+
+  //variables para guardar los datos de las consultas en las tablas: Variables para hacer tranferencia de llaves por combobox
+  listadoCmbSubCategorias = new BehaviorSubject([]);
+  listadoCmbTipUsuario = new BehaviorSubject([]);
+  listadoCmbProveedores = new BehaviorSubject([]);
+
+  //Declaracion de los observables para la manipulación de la data: fetch generales
+  fetchUsuarios(): Observable<Usuarios[]> {
+    return this.listadoUsuarios.asObservable();
+  }
+  fetchUsuarioPorId(id: number): Promise<Usuarios> {
+    return this.database
+      .executeSql('SELECT * FROM usuario WHERE id = ?', [id])
+      .then((res) => {
+        //esto es para ver el detalle de un usuario en especifico
+        if (res.rows.length > 0) {
+          return {
+            id: res.rows.item(0).id,
+            nombre: res.rows.item(0).nombre,
+            segundo_nombre: res.rows.item(0).segundo_nombre,
+            apellido_paterno: res.rows.item(0).apellido_paterno,
+            apellido_materno: res.rows.item(0).apellido_materno,
+            email: res.rows.item(0).email,
+            contrasena: res.rows.item(0).contrasena,
+            nombre_empresa: res.rows.item(0).nombre_empresa,
+            descripcion_corta: res.rows.item(0).descripcion_corta,
+            foto_perfil: res.rows.item(0).foto_perfil,
+            estado_cuenta: res.rows.item(0).estado_cuenta,
+            fecha_registro: res.rows.item(0).fecha_registro,
+            tipo_usuario_id: res.rows.item(0).tipo_usuario_id,
+          };
+        } else {
+          throw new Error('Producto no encontrado');
+        }
+      });
+  }
+
+  fetchCategorias(): Observable<Categorias[]> {
+    return this.listadoCategorias.asObservable();
+  }
+
+  fetchCategoriaPorId(id: number): Promise<Categorias> {
+    //esto es para ver el detalle de un categoria en especifico
+    return this.database
+      .executeSql('SELECT * FROM categoria WHERE id = ?', [id])
+      .then((res) => {
+        if (res.rows.length > 0) {
+          return {
+            id: res.rows.item(0).id,
+            nombre: res.rows.item(0).nombre,
+          };
+        } else {
+          throw new Error('Producto no encontrado');
+        }
+      });
+  }
+
+  fetchSubCategorias(): Observable<Subcategorias[]> {
+    return this.listadoSubCategorias.asObservable();
+  }
+
+  fetchSubCategoriaPorId(id: number): Promise<Subcategorias> {
+    //esto es para ver el detalle de una subcategoria en especifico
+    return this.database
+      .executeSql('SELECT * FROM subcategoria WHERE id = ?', [id])
+      .then((res) => {
+        if (res.rows.length > 0) {
+          return {
+            id: res.rows.item(0).id,
+            nombre: res.rows.item(0).nombre,
+            categoria_id: res.rows.item(0).categoria_id,
+          };
+        } else {
+          throw new Error('Producto no encontrado');
+        }
+      });
+  }
+
+  fetchProductos(): Observable<Productos[]> {
+    return this.listadoProductos.asObservable();
+  }
+
+  fetchProductoPorId(id: number): Promise<Productos> {
+    //esto es para ver el detalle de un producto en especifico
+    return this.database
+      .executeSql('SELECT * FROM producto WHERE id = ?', [id])
+      .then((res) => {
+        if (res.rows.length > 0) {
+          return {
+            id: res.rows.item(0).id,
+            proveedor_id: res.rows.item(0).proveedor_id,
+            nombre: res.rows.item(0).nombre,
+            descripcion: res.rows.item(0).descripcion,
+            precio: res.rows.item(0).precio,
+            stock: res.rows.item(0).stock,
+            organico: res.rows.item(0).organico,
+            foto_producto: res.rows.item(0).foto_producto,
+            subcategoria_id: res.rows.item(0).subcategoria_id,
+            fecha_agregado: res.rows.item(0).fecha_agregado,
+          };
+        } else {
+          throw new Error('Producto no encontrado');
+        }
+      });
+  }
+
+  //Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
+
+  fetchCmbSubCategorias(): Observable<CmbSubcategorias[]> {
+    return this.listadoCmbSubCategorias.asObservable();
+  }
+  fetchCmbTipUsuario(): Observable<CmbTipUsuario[]> {
+    return this.listadoCmbTipUsuario.asObservable();
+  }
+
+  fetchCmbProveedores(): Observable<CmbProveedores[]> {
+    return this.listadoCmbProveedores.asObservable();
+  }
+
+  //CRUD USUARIOS, parte administración. Todos los SELECTS
+  seleccionarUsuarios() {
+    return this.database.executeSql('SELECT * FROM usuario', []).then((res) => {
+      //variable para almacenar el resultado de la consulta
+      let items: Usuarios[] = [];
+      //valido si trae al menos un registro
+      if (res.rows.length > 0) {
+        //recorro mi resultado
+        for (var i = 0; i < res.rows.length; i++) {
+          //agrego los registros a mi lista
+          items.push({
+            id: res.rows.item(i).id,
+            nombre: res.rows.item(i).nombre,
+            segundo_nombre: res.rows.item(i).segundo_nombre,
+            apellido_paterno: res.rows.item(i).apellido_paterno,
+            apellido_materno: res.rows.item(i).apellido_materno,
+            email: res.rows.item(i).email,
+            contrasena: res.rows.item(i).contrasena,
+            nombre_empresa: res.rows.item(i).nombre_empresa,
+            descripcion_corta: res.rows.item(i).descripcion_corta,
+            foto_perfil: res.rows.item(i).foto_perfil,
+            estado_cuenta: res.rows.item(i).estado_cuenta,
+            fecha_registro: res.rows.item(i).fecha_registro,
+            tipo_usuario_id: res.rows.item(i).tipo_usuario_id,
+          });
+        }
+      }
+      //actualizar el observable de usuarios
+      this.listadoUsuarios.next(items as any);
+    });
+  }
+
+  seleccionarCategorias() {
+    return this.database
+      .executeSql('SELECT * FROM categoria', [])
+      .then((res) => {
+        //variable para almacenar el resultado de la consulta
+        let items: Categorias[] = [];
+        //valido si trae al menos un registro
+        if (res.rows.length > 0) {
+          //recorro mi resultado
+          for (var i = 0; i < res.rows.length; i++) {
+            //agrego los registros a mi lista
+            items.push({
+              id: res.rows.item(i).id,
+              nombre: res.rows.item(i).nombre,
+            });
+          }
+        }
+        //actualizar el observable de usuarios
+        this.listadoCategorias.next(items as any);
+      });
+  }
+
+  seleccionarSubCategorias() {
+    return this.database
+      .executeSql('SELECT * FROM subcategoria', [])
+      .then((res) => {
+        //variable para almacenar el resultado de la consulta
+        let items: Subcategorias[] = [];
+        //valido si trae al menos un registro
+        if (res.rows.length > 0) {
+          //recorro mi resultado
+          for (var i = 0; i < res.rows.length; i++) {
+            //agrego los registros a mi lista
+            items.push({
+              id: res.rows.item(i).id,
+              nombre: res.rows.item(i).nombre,
+              categoria_id: res.rows.item(i).categoria_id,
+            });
+          }
+        }
+        //actualizar el observable de usuarios
+        this.listadoSubCategorias.next(items as any);
+      });
+  }
+
+  seleccionarProductos() {
+    return this.database.executeSql('SELECT * FROM usuario', []).then((res) => {
+      //variable para almacenar el resultado de la consulta
+      let items: Productos[] = [];
+      //valido si trae al menos un registro
+      if (res.rows.length > 0) {
+        //recorro mi resultado
+        for (var i = 0; i < res.rows.length; i++) {
+          //agrego los registros a mi lista
+          items.push({
+            id: res.rows.item(i).id,
+            proveedor_id: res.rows.item(i).proveedor_id,
+            nombre: res.rows.item(i).nombre,
+            descripcion: res.rows.item(i).descripcion,
+            precio: res.rows.item(i).precio,
+            stock: res.rows.item(i).stock,
+            organico: res.rows.item(i).organico,
+            foto_producto: res.rows.item(i).foto_producto,
+            subcategoria_id: res.rows.item(i).subcategoria_id,
+            fecha_agregado: res.rows.item(i).fecha_agregado,
+          });
+        }
+      }
+      //actualizar el observable de usuarios
+      this.listadoProductos.next(items as any);
+    });
+  }
+
+  //todos los modificares
+
+  modificarUsuario(
+    id: number,
+    nombre: string,
+    segundo_nombre: string,
+    apellido_paterno: string,
+    apellido_materno: string,
+    email: string,
+    contrasena: string,
+    nombre_empresa: string,
+    descripcion_corta: string,
+    foto_perfil: string,
+    estado_cuenta: string,
+    fecha_registro: string,
+    tipo_usuario_id: number
+  ) {
+    this.presentAlert('service', 'ID: ' + id);
+    return this.database
+      .executeSql(
+        'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, fecha_registro = ?, tipo_usuario_id = ?  WHERE id = ?',
+        [
+          nombre,
+          segundo_nombre,
+          apellido_paterno,
+          apellido_materno,
+          email,
+          contrasena,
+          nombre_empresa,
+          descripcion_corta,
+          foto_perfil,
+          estado_cuenta,
+          fecha_registro,
+          tipo_usuario_id,
+          id,
+        ]
+      )
+      .then((res) => {
+        this.presentAlert('Modificar', 'Usuario Modificado');
+        this.seleccionarUsuarios();
+      })
+      .catch((e) => {
+        this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+      });
+  }
+
+  modificarCategoria(id: number, nombre: string) {
+    this.presentAlert('service', 'ID: ' + id);
+    return this.database
+      .executeSql('UPDATE categoria SET nombre = ? WHERE id = ?', [nombre, id])
+      .then((res) => {
+        this.presentAlert('Modificar', 'Categoría Modificada');
+        this.seleccionarCategorias();
+      })
+      .catch((e) => {
+        this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+      });
+  }
+
+  modificarSubCategoria(id: number, nombre: string, categoria_id: number) {
+    this.presentAlert('service', 'ID: ' + id);
+    return this.database
+      .executeSql(
+        'UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',
+        [nombre, categoria_id, id]
+      )
+      .then((res) => {
+        this.presentAlert('Modificar', 'SubCategoría Modificada');
+        this.seleccionarSubCategorias();
+      })
+      .catch((e) => {
+        this.presentAlert(
+          'Modificar SubCategoría',
+          'Error: ' + JSON.stringify(e)
+        );
+      });
+  }
+
+  modificarProducto(
+    id: number,
+    proveedor_id: number,
+    nombre: string,
+    descripcion: string,
+    precio: number,
+    stock: number,
+    organico: number,
+    foto_producto: string,
+    subcategoria_id: number,
+    fecha_agregado: string
+  ) {
+    this.presentAlert('service', 'ID: ' + id);
+    return this.database
+      .executeSql(
+        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, fecha_agregado = ? WHERE id = ?',
+        [
+          proveedor_id,
+          nombre,
+          descripcion,
+          precio,
+          stock,
+          organico,
+          foto_producto,
+          subcategoria_id,
+          fecha_agregado,
+          id,
+        ]
+      )
+      .then((res) => {
+        this.presentAlert('Modificar', 'Producto Modificado');
+        this.seleccionarProductos();
+      })
+      .catch((e) => {
+        this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+      });
+  }
+
+  //================================
+  //eliminarUsuario{ }
+
+  //insertarUsuario { }
+
+  //eliminarCategoria { }
+
+  //insertarCategoria { }
+
+  //CRUD SUBCATEGORIA, parte administración
+
+  //eliminarSubCategoria { }
+
+  //insertarSubCategoria{ }
+
+  //CRUD Producto, parte administración
+
+  //eliminarProducto { }
+
+  //modificarProducto { }
+
+  //insertarProducto { }
+
+  //queries para los combobo
 }
