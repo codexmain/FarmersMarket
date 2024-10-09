@@ -49,7 +49,7 @@
 
     <ion-item>
       <ion-label position="floating">Empresa (Opcional)</ion-label>
-      <ion-input type="text" [(ngModel)]="empresa" name="empresa"  #empresaCtrl="ngModel"></ion-input>
+      <ion-input type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()" #empresaCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
       El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
@@ -57,7 +57,7 @@
 
     <ion-item>
       <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
-      <ion-input type="text" [(ngModel)]="descEmpresa" name="descEmpresa"  #descEmpresaCtrl="ngModel"></ion-input>
+      <ion-input type="text" [(ngModel)]="descEmpresa" name="descEmpresa" (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
       La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.

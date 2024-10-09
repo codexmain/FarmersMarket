@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuController, ModalController, AlertController, NavParams } from '@ionic/angular';
+import { MenuController, ModalController, AlertController, NavParams, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
 
@@ -15,7 +15,7 @@ interface RegionesComunas { //permite hacer la dependencia de comuna / region, p
 export class AddUsuariosPage implements OnInit {
 
 
-  constructor(private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
+  constructor(private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
 
   }
   emails: string[] = [];
@@ -54,13 +54,30 @@ export class AddUsuariosPage implements OnInit {
   comuna: string = '';
   direccion: string = '';
   estadoUsuario: string ='';
+  empresaObligatoria: boolean = false;
+  descEmpresaObligatoria: boolean = false;
   
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
+  }
 
   onRegionChange(event: any) {
     this.selectedRegion = event.detail.value;
     this.comunas = this.regionesComunas[this.selectedRegion] || [];
   }
 
+  onFieldsChange() {
+    if (this.empresa.length > 0 || this.descEmpresa.length > 0) {
+      this.empresaObligatoria = true;
+      this.descEmpresaObligatoria = true;
+      this.presentToast('Los campos "Empresa" y "Descripción Empresa" son ahora obligatorios y la cuenta será Proveedor/Vendedor.');
+    }
+  }
 
   dismiss() {
     this.modalController.dismiss();
@@ -91,11 +108,10 @@ export class AddUsuariosPage implements OnInit {
     return;
   }
   
-  // Validar empresa
-  if (!this.empresa) {
-    this.presentAlert('Error', 'La empresa es un campo obligatorio.');
+  // Validar empresa y descEmpresa si se han marcado como obligatorios
+  if ((this.empresaObligatoria && !this.empresa) || (this.descEmpresaObligatoria && !this.descEmpresa)) {
+    this.presentAlert('Error', 'Los campos "Empresa" y "Descripción Empresa" son obligatorios.');
     return;
-  
   }
   // Validar email
   if (!this.email) {
