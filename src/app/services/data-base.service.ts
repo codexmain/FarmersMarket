@@ -793,7 +793,7 @@ modificarSubCategoria(id:number, nombre:string, categoria_id:number){
 
 modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number){
   this.presentAlert("service","ID: " + id);
-  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id, nombre, descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
+  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
     this.presentAlert("Modificar","Producto Modificado");
     this.seleccionarProductos();
   }).catch(e=>{
@@ -807,14 +807,22 @@ modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:str
 insertarUsuario(nombre:string, segundo_nombre:string, apellido_paterno:string,
                 apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
                 descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
-                tipo_usuario_id:number){
-                  return this.database.executeSql('INSERT INTO usuario(nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)',[nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id]).then(res=>{
-                    this.presentAlert("Insertar","Usuario Registrado");
-                    this.seleccionarUsuarios();
-                  }).catch(e=>{
+                tipo_usuario_id:number, comuna_id:number, direccion: string){
+                  return this.database.executeSql('INSERT INTO usuario(nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id]).then(res => {
+                    const usuarioId = res.insertId; // Obtener el ID del nuevo usuario
+            
+                    // Ahora insertar la dirección asociada al usuario
+                    return this.database.executeSql(
+                        'INSERT INTO direccion(id, usuario_id, comuna_id, direccion) VALUES (?,?,?,?)',
+                        [1, usuarioId, comuna_id, direccion]
+                    );
+                }).then(() => {
+                    this.presentAlert("Insertar", "Usuario y dirección registrados con éxito");
+                    this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                }).catch(e => {
                     this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
-                  })
-                }
+                });
+            }
 
 insertarCategoria(nombre:string){
   return this.database.executeSql('INSERT INTO categoria(nombre) VALUES (?)',[nombre]).then(res=>{
