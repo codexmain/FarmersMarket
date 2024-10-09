@@ -10,6 +10,7 @@ import { CmbSubcategorias } from './cmb-subcategorias';
 import { CmbTipUsuario } from './cmb-tip-usuario';
 import { CmbProveedores } from './cmb-proveedores';
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -499,7 +500,7 @@ fetchUsuarioPorId(id: number): Promise<Usuarios> {
               tipo_usuario_id: res.rows.item(0).tipo_usuario_id
           };
       } else {
-          throw new Error('Producto no encontrado');
+          throw new Error('Usuario no encontrado');
       }
   });
 }
@@ -517,7 +518,7 @@ fetchCategoriaPorId(id: number): Promise<Categorias> { //esto es para ver el det
               nombre: res.rows.item(0).nombre
           };
       } else {
-          throw new Error('Producto no encontrado');
+          throw new Error('Categoria no encontrada');
       }
   });
 }
@@ -538,7 +539,7 @@ fetchSubCategoriaPorId(id: number): Promise<Subcategorias> { //esto es para ver 
               categoria_id: res.rows.item(0).categoria_id,
           };
       } else {
-          throw new Error('Producto no encontrado');
+          throw new Error('Subcategoría no encontrada');
       }
   });
 }
@@ -687,14 +688,81 @@ seleccionarProductos(){
   })
 }
 
+//creacion de las queries para los combobox
+
+seleccionarCbmProveedores(){
+  return this.database.executeSql('SELECT id, nombre_empresa FROM usuario WHERE nombre_empresa NOTNULL', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbProveedores[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre_empresa: res.rows.item(i).id,
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbProveedores.next(items as any);
+  })
+}
+
+
+seleccionarCmbSubCategorias(id: number){
+  return this.database.executeSql('SELECT id, nombre FROM sbcategoria WHERE categoria_id = ?', [id]).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbSubcategorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).id,
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbSubCategorias.next(items as any);
+  })
+}
+
+
+
+seleccionarCmbTipUsuario(){
+  return this.database.executeSql('SELECT * FROM tipo_usuario', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbTipUsuario[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          descripcion: res.rows.item(i).id,
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbTipUsuario.next(items as any);
+  })
+}
+
+
+
 //todos los modificares
 
 modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
                 apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
                 descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
-                fecha_registro:string, tipo_usuario_id:number){
+                tipo_usuario_id:number){
                   this.presentAlert("service","ID: " + id);
-                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, fecha_registro = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id,id]).then(res=>{
+                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
                     this.presentAlert("Modificar","Usuario Modificado");
                     this.seleccionarUsuarios();
                   }).catch(e=>{
@@ -723,9 +791,9 @@ modificarSubCategoria(id:number, nombre:string, categoria_id:number){
   })
 }
 
-modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number, fecha_agregado:string){
+modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number){
   this.presentAlert("service","ID: " + id);
-  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, fecha_agregado = ? WHERE id = ?',[proveedor_id, nombre, descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado,id]).then(res=>{
+  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id, nombre, descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
     this.presentAlert("Modificar","Producto Modificado");
     this.seleccionarProductos();
   }).catch(e=>{
@@ -734,38 +802,196 @@ modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:str
 }
 
 
+//todos los inserts.
+
+insertarUsuario(nombre:string, segundo_nombre:string, apellido_paterno:string,
+                apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+                descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+                tipo_usuario_id:number){
+                  return this.database.executeSql('INSERT INTO usuario(nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)',[nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id]).then(res=>{
+                    this.presentAlert("Insertar","Usuario Registrado");
+                    this.seleccionarUsuarios();
+                  }).catch(e=>{
+                    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+                  })
+                }
+
+insertarCategoria(nombre:string){
+  return this.database.executeSql('INSERT INTO categoria(nombre) VALUES (?)',[nombre]).then(res=>{
+    this.presentAlert("Insertar","Categoría Registrada");
+    this.seleccionarCategorias();
+  }).catch(e=>{
+    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+insertarSubCategoria(nombre:string, categoria_id:number){
+  return this.database.executeSql('INSERT INTO subcategoria(nombre,categoria_id) VALUES (?,?)',[nombre, categoria_id]).then(res=>{
+    this.presentAlert("Insertar","Subcategoría Registrada");
+    this.seleccionarSubCategorias();
+  }).catch(e=>{
+    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+insertarProducto(proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, 
+                organico:number, foto_producto:string, subcategoria_id:number){
+                  return this.database.executeSql('INSERT INTO producto(proveedor_id,nombre,descripcion,precio,stock, organico, foto_producto, subcategoria_id) VALUES (?,?,?,?,?,?,?,?)',[proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id]).then(res=>{
+                    this.presentAlert("Insertar","Producto Registrado");
+                    this.seleccionarProductos();
+                  }).catch(e=>{
+                    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+                  })
+                }
+
+
+
 //================================
-//eliminarUsuario{ }
+
+//accion de eliminar de todos los cruds de la parte de administracion
+eliminarUsuario(id: number) {
+  this.esRegistroProtegido('usuario', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar este usuario porque es un registro protegido.");
+      } else {
+          // Actualizar registros en las tablas que dependen de usuario
+          this.database.executeSql('UPDATE producto SET proveedor_id = 1 WHERE proveedor_id = ?', [id])
+              .then(() => {
+                  return this.database.executeSql('UPDATE direccion SET usuario_id = 1 WHERE usuario_id = ?', [id]);
+              })
+              .then(() => {
+                  return this.database.executeSql('UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?', [id]);
+              })
+              .then(() => {
+                  // Finalmente, eliminar el usuario
+                  return this.database.executeSql('DELETE FROM usuario WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Usuario eliminado con éxito");
+                  this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
 
 
-//insertarUsuario { }
+
+eliminarCategoria(id: number) {
+  this.esRegistroProtegido('categoria', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar esta categoría porque es un registro protegido.");
+      } else {
+          // Actualizar subcategorías para establecer valor por defecto
+          this.database.executeSql('UPDATE subcategoria SET categoria_id = 1 WHERE categoria_id = ?', [id])
+              .then(() => {
+                  // Luego, eliminar la categoría
+                  return this.database.executeSql('DELETE FROM categoria WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Categoría eliminada con éxito");
+                  this.seleccionarCategorias(); // Actualizar la lista de categorías
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
 
 
-//eliminarCategoria { }
+eliminarSubcategoria(id: number) {
+  this.esRegistroProtegido('subcategoria', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar esta subcategoría porque es un registro protegido.");
+      } else {
+          // Actualizar registros en la tabla de productos
+          this.database.executeSql('UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?', [id])
+              .then(() => {
+                  // Finalmente, eliminar la subcategoría
+                  return this.database.executeSql('DELETE FROM subcategoria WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Subcategoría eliminada con éxito");
+                  this.seleccionarSubCategorias(); // Actualizar la lista de subcategorías
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
 
 
-//insertarCategoria { }
+eliminarProducto(id: number) {
+  this.esRegistroProtegido('producto', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar este producto porque es un registro protegido.");
+      } else {
+          // Actualizar registros en la tabla de detalle_carro_compra
+          this.database.executeSql('UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?', [id])
+              .then(() => {
+                  // Finalmente, eliminar el producto
+                  return this.database.executeSql('DELETE FROM producto WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Producto eliminado con éxito");
+                  this.seleccionarProductos(); // Actualizar la lista de productos
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
 
 
-//CRUD SUBCATEGORIA, parte administración
-
-
-//eliminarSubCategoria { }
 
 
 
-//insertarSubCategoria{ }
+//===============================
+//validaciones necesarios para formularios
+
+verificarCorreoExistente(correo: string): Promise<boolean> {
+  return this.database.executeSql('SELECT COUNT(*) AS count FROM usuario WHERE correo = ?', [correo]).then(res => {
+      return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+  });
+}
 
 
-//CRUD Producto, parte administración
+esRegistroProtegido(tipo: string, id: number): Promise<boolean> {
+  let query: string;
+  let params: any[];
 
+  if (tipo === 'categoria') {
+      query = 'SELECT COUNT(*) AS count FROM categoria WHERE id = ? AND nombre = "Sin Categoría"';
+      params = [id];
+  } else if (tipo === 'subcategoria') {
+      query = 'SELECT COUNT(*) AS count FROM subcategoria WHERE id = ? AND nombre = "Sin Subcategoría"';
+      params = [id];
+  } else if (tipo === 'usuario') {
+      query = 'SELECT COUNT(*) AS count FROM usuario WHERE id = ? AND nombre = "N/A"';
+      params = [id];
+  } else if (tipo === 'producto') {
+      query = 'SELECT COUNT(*) AS count FROM producto WHERE id = ? AND nombre = "Producto Desconocido"';
+      params = [id];
+  } else {
+      return Promise.resolve(false); // Registro no protegido
+  }
 
-//eliminarProducto { }
+  return this.database.executeSql(query, params).then(res => {
+      return res.rows.item(0).count > 0; // Devuelve true si es un registro protegido
+  });
+}
 
-//modificarProducto { }
-
-//insertarProducto { }
-
-
-//queries para los combobo
 }
