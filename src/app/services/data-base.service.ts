@@ -9,6 +9,8 @@ import { Productos } from './productos';
 import { CmbSubcategorias } from './cmb-subcategorias';
 import { CmbTipUsuario } from './cmb-tip-usuario';
 import { CmbProveedores } from './cmb-proveedores';
+import { CmbRegion } from './cmb-region';
+import { CmbComuna } from './cmb-comuna';
 
 
 @Injectable({
@@ -477,6 +479,9 @@ listadoCmbSubCategorias = new BehaviorSubject([]);
 listadoCmbTipUsuario = new BehaviorSubject([]);
 listadoCmbProveedores = new BehaviorSubject([]);
 
+listadoCmbRegiones = new BehaviorSubject([]);
+listadoCmbComunas = new BehaviorSubject([]);
+
 //Declaracion de los observables para la manipulación de la data: fetch generales
 fetchUsuarios(): Observable<Usuarios[]>{
   return this.listadoUsuarios.asObservable();
@@ -583,6 +588,13 @@ fetchCmbProveedores(): Observable<CmbProveedores[]>{
   return this.listadoCmbProveedores.asObservable();
 }
 
+fetchCmbRegiones(): Observable<CmbRegion[]>{
+  return this.listadoCmbRegiones.asObservable();
+}
+
+fetchCmbComuna(): Observable<CmbComuna[]>{
+  return this.listadoCmbComunas.asObservable();
+}
 
 
 //CRUD USUARIOS, parte administración. Todos los SELECTS
@@ -753,6 +765,46 @@ seleccionarCmbTipUsuario(){
   })
 }
 
+seleccionarCmbRegiones(){
+  return this.database.executeSql('SELECT * FROM region', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbRegion[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbRegiones.next(items as any);
+  })
+}
+
+seleccionarCmbComunas(id: number){
+  return this.database.executeSql('SELECT id, nombre FROM subcategoria WHERE region_id = ?', [id]).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbComuna[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).id,
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbComunas.next(items as any);
+  })
+}
+
 
 
 //todos los modificares
@@ -817,7 +869,7 @@ insertarUsuario(nombre:string, segundo_nombre:string, apellido_paterno:string,
                         [1, usuarioId, comuna_id, direccion]
                     );
                 }).then(() => {
-                    this.presentAlert("Insertar", "Usuario y dirección registrados con éxito");
+                    this.presentAlert("Insertar", "Usuario y dirección registrados con éxito"); //despues al llegar a la parte de direcciones se hace la query, observador de direcciones no hay
                     this.seleccionarUsuarios(); // Actualizar la lista de usuarios
                 }).catch(e => {
                     this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));

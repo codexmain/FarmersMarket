@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent, ModalController} from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ModalController, ActionSheetController} from '@ionic/angular';
 import { AddUsuariosPage } from '../add-usuarios/add-usuarios.page'
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { DataBaseService } from 'src/app/services/data-base.service'
 
 @Component({
   selector: 'app-usuarios',
@@ -10,76 +10,111 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./usuarios.page.scss'],
 })
 export class UsuariosPage implements OnInit {
-  emails: string[] = []; 
 
-  constructor(private modalController: ModalController, private route: ActivatedRoute, private router: Router) {
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras?.state) {  //recibir de admin page el array de correos
-      this.emails = navigation.extras.state['emails'];
-    }
+
+  constructor(private bd: DataBaseService, private modalController: ModalController, private route: ActivatedRoute, private router: Router,private actionSheetController: ActionSheetController) {
+
   }
 
-  items: string[] = [];
+  arregloUsuarios: any = [
+    {
+      id: '',
+      nombre: '',
+      segundo_nombre: '',
+      apellido_paterno: '',
+      apellido_materno: '',
+      email: '',
+      contrasena: '',
+      nombre_empresa: '',
+      descripcion_corta: '',
+      foto_perfil: '',
+      estado_cuenta: '',
+      fecha_registro: '',
+      tipo_usuario_id: ''
+    }
+  ]
+  page: number = 0;
 
-  public actionSheetButtons = [
-    {
-      text: 'Editar',
-      data: {
-        action: 'update',
-      },
-    },
-    {
-      text: 'Visualizar',
-      data: {
-        action: 'read',
-      },
-    },
-    {
-      text: 'Eliminar',
-      role: 'destructive',
-      data: {
-        action: 'delete',
-      },
-    },
-
-    {
-      text: 'Cancelar',
-      role: 'cancel',
-      data: {
-        action: 'cancel',
-      }}
-
-  ];
 
 
 
   ngOnInit() {
-    this.generateItems();
-    console.log(this.emails);
+    this.bd.dbState().subscribe(data=>{
+      //validar si la bd esta lista
+      if(data){
+        //subscribir al observable de la listaNoticias
+        this.bd.fetchUsuarios().subscribe(res=>{
+          this.arregloUsuarios = res;
+        })
+      }
+    })
   }
 
-  private generateItems() {
-    const count = this.items.length + 1;
-    for (let i = 0; i <= 50; i++) {
-      this.items.push(`Usuario ${count + i}`);  //aca se cambia el nombre del como se muestra en el html.
-    }
+
+  async presentActionSheet(noticia: any) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Opciones',
+      buttons: [
+        {
+          text: 'Modificar',
+          handler: () => this.modificar(noticia)
+        },
+        {
+          text: 'Visualizar',
+          handler: () => this.visualizar(noticia)
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => this.eliminar(noticia)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
   }
 
-  onIonInfinite(ev: InfiniteScrollCustomEvent) {
-    this.generateItems();
-    setTimeout(() => {
-      (ev as InfiniteScrollCustomEvent).target.complete();
-    }, 500);}
 
-
-    async presentModal() {
+    async presentModal() { //este present modal es para 
       const modal = await this.modalController.create({
         component: AddUsuariosPage,
-        componentProps: { emails: this.emails }
       });
   
       return await modal.present();}
+    
 
-}
+    async modificar(usuario: any) {
+      const modal = await this.modalController.create({
+        component: EditNoticiasPage, //crear la pagina de edicio
+        componentProps: { usuario: usuario }
+      });
+      modal.onDidDismiss().then(() => {
+      });
+      return await modal.present();
+    }
+
+    async visualizar(usuario: any) {
+      const modal = await this.modalController.create({
+        component: ViewNoticiasPage, //crear la pagina de visualizacion
+        componentProps: { usuario: usuario }
+      });
+      return await modal.present();
+    }
+
+    eliminar(id: number) {
+      this.bd.eliminarUsuario(id)
+    }
+
+    agregar() {
+      this.presentModal(); // Mostrar modal para agregar usuario
+    }
+  }
+
+
+
+
 
 
