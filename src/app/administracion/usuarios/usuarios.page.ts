@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent, ModalController, ActionSheetController} from '@ionic/angular';
 import { AddUsuariosPage } from '../add-usuarios/add-usuarios.page'
+import { ViewUsuarioPage } from '../view-usuario/view-usuario.page';
+import { ModificarUsuarioPage } from '../modificar-usuario/modificar-usuario.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from 'src/app/services/data-base.service'
 
@@ -23,17 +25,22 @@ export class UsuariosPage implements OnInit {
       segundo_nombre: '',
       apellido_paterno: '',
       apellido_materno: '',
+      nombreCompleto: '',
       email: '',
       contrasena: '',
       nombre_empresa: '',
+      empresaMostrarListar: '',
       descripcion_corta: '',
+      descripcionMostrarListar: '',
       foto_perfil: '',
       estado_cuenta: '',
       fecha_registro: '',
-      tipo_usuario_id: ''
+      tipo_usuario_id: '',
+      descTipUser: ''
+
     }
   ]
-  page: number = 0;
+
 
 
 
@@ -51,22 +58,22 @@ export class UsuariosPage implements OnInit {
   }
 
 
-  async presentActionSheet(noticia: any) {
+  async presentActionSheet(x: any) {
     const actionSheet = await this.actionSheetController.create({
       header: 'Opciones',
       buttons: [
         {
           text: 'Modificar',
-          handler: () => this.modificar(noticia)
+          handler: () => this.modificar(x)
         },
         {
           text: 'Visualizar',
-          handler: () => this.visualizar(noticia)
+          handler: () => this.visualizar(x)
         },
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminar(noticia)
+          handler: () => this.eliminar(x)
         },
         {
           text: 'Cancelar',
@@ -86,26 +93,26 @@ export class UsuariosPage implements OnInit {
       return await modal.present();}
     
 
-    async modificar(usuario: any) {
+    async modificar(x: any) {
       const modal = await this.modalController.create({
-        component: EditNoticiasPage, //crear la pagina de edicio
-        componentProps: { usuario: usuario }
+        component: ModificarUsuarioPage, //crear la pagina de edicio
+        componentProps: { usuario: x }
       });
       modal.onDidDismiss().then(() => {
       });
       return await modal.present();
     }
 
-    async visualizar(usuario: any) {
+    async visualizar(x: any) {
       const modal = await this.modalController.create({
-        component: ViewNoticiasPage, //crear la pagina de visualizacion
-        componentProps: { usuario: usuario }
+        component: ViewUsuarioPage, //crear la pagina de visualizacion
+        componentProps: { usuario: x }
       });
       return await modal.present();
     }
 
-    eliminar(id: number) {
-      this.bd.eliminarUsuario(id)
+    eliminar(x: any) {
+      this.bd.eliminarUsuario(x.id)
     }
 
     agregar() {

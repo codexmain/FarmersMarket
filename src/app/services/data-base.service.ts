@@ -599,7 +599,12 @@ fetchCmbComuna(): Observable<CmbComuna[]>{
 
 //CRUD USUARIOS, parte administración. Todos los SELECTS
 seleccionarUsuarios(){
-  return this.database.executeSql('SELECT * FROM usuario', []).then(res=>{
+  return this.database.executeSql(`SELECT u.id, u.nombre, u.segundo_nombre, u.apellido_paterno, u.apellido_materno,
+u.nombre ||' '|| COALESCE (u.segundo_nombre,'') ||' ' || u.apellido_paterno ||' '|| COALESCE (u.apellido_materno,'') as nombreCompleto, 
+u.email, u.contrasena, u.nombre_empresa, COALESCE (u.nombre_empresa, "Sin Empresa") empresaMostrarListar,u.descripcion_corta, COALESCE(u.descripcion_corta, "Sin Empresa") as descripcionMostrarListar, 
+u.foto_perfil, u.estado_cuenta, u.fecha_registro, u.tipo_usuario_id, tu.descripcion as descTipUser
+FROM usuario u
+JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id`, []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: Usuarios[] = [];
      //valido si trae al menos un registro
@@ -613,14 +618,18 @@ seleccionarUsuarios(){
           segundo_nombre: res.rows.item(i).segundo_nombre,
           apellido_paterno: res.rows.item(i).apellido_paterno,
           apellido_materno: res.rows.item(i).apellido_materno,
+          nombreCompleto: res.rows.item(i).nombreCompleto,
           email: res.rows.item(i).email,
           contrasena: res.rows.item(i).contrasena,
           nombre_empresa: res.rows.item(i).nombre_empresa,
+          empresaMostrarListar: res.rows.item(i).empresaMostrarListar,
           descripcion_corta: res.rows.item(i).descripcion_corta,
+          descripcionMostrarListar: res.rows.item(i).descripcionMostrarListar,
           foto_perfil: res.rows.item(i).foto_perfil,
           estado_cuenta: res.rows.item(i).estado_cuenta,
           fecha_registro: res.rows.item(i).fecha_registro,
-          tipo_usuario_id: res.rows.item(i).tipo_usuario_id
+          tipo_usuario_id: res.rows.item(i).tipo_usuario_id,
+          descTipUser: res.rows.item(i).descTipUser
         })
       }
      }
@@ -651,7 +660,9 @@ seleccionarCategorias(){
 }
 
 seleccionarSubCategorias(){
-  return this.database.executeSql('SELECT * FROM subcategoria', []).then(res=>{
+  return this.database.executeSql(`SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria
+FROM subcategoria sbct
+JOIN categoria ct  ON sbct.categoria_id = ct.id`, []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: Subcategorias[] = [];
      //valido si trae al menos un registro
@@ -663,6 +674,7 @@ seleccionarSubCategorias(){
           id: res.rows.item(i).id,
           nombre: res.rows.item(i).nombre,
           categoria_id: res.rows.item(i).categoria_id,
+          nombreCategoria: res.rows.item(i).nombreCategoria
         })
       }
      }
@@ -673,7 +685,32 @@ seleccionarSubCategorias(){
 
 
 seleccionarProductos(){
-  return this.database.executeSql('SELECT * FROM usuario', []).then(res=>{
+  return this.database.executeSql(`SELECT 
+    p.id,
+    p.proveedor_id,
+    p.nombre AS nombre_producto,
+    p.descripcion AS descripcion_producto,
+    p.precio,
+    p.stock,
+    p.organico,
+    CASE 
+        WHEN p.organico = 1 THEN 'Verdadero'
+        ELSE 'Negativo'
+    END AS organicoEnTexto,
+    p.foto_producto,
+    p.subcategoria_id,
+    p.fecha_agregado,
+    s.nombre AS nombre_subcategoria,
+    u.nombre_empresa AS nombre_proveedor,
+    c.nombre AS nombre_categoria
+FROM 
+    producto p
+JOIN 
+    subcategoria s ON p.subcategoria_id = s.id
+JOIN 
+    usuario u ON p.proveedor_id = u.id
+JOIN 
+    categoria c ON s.categoria_id = c.id`, []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: Productos[] = [];
      //valido si trae al menos un registro
@@ -689,9 +726,13 @@ seleccionarProductos(){
           precio: res.rows.item(i).precio,
           stock: res.rows.item(i).stock,
           organico: res.rows.item(i).organico,
+          organicoEnTexto: res.rows.item(i).organicoEnTexto,
           foto_producto: res.rows.item(i).foto_producto,
           subcategoria_id: res.rows.item(i).subcategoria_id,
-          fecha_agregado: res.rows.item(i).fecha_agregado
+          fecha_agregado: res.rows.item(i).fecha_agregado,
+          nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
+          nombre_proveedor: res.rows.item(i).nombre_proveedor,
+          nombre_categoria: res.rows.item(i).nombre_categoria
         })
       }
      }

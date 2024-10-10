@@ -6,7 +6,11 @@ export class Productos {
     precio!: number;
     stock!: number;
     organico!: number;
+    organicoEnTexto?: string;
     foto_producto?: string;
     subcategoria_id!: number;
     fecha_agregado?: string;
+    nombre_subcategoria?: string;
+    nombre_proveedor?: string;
+    nombre_categoria?: string;
 }
