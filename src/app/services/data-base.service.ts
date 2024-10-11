@@ -9,6 +9,8 @@ import { Productos } from './productos';
 import { CmbSubcategorias } from './cmb-subcategorias';
 import { CmbTipUsuario } from './cmb-tip-usuario';
 import { CmbProveedores } from './cmb-proveedores';
+/*
+import { CartItem } from '../cliente/carrito/carrito.page';arreglar carrito*/
 
 @Injectable({
   providedIn: 'root',
@@ -367,22 +369,28 @@ export class DataBaseService {
   }
 
   // Método para validar las credenciales del usuario
-  async validarCredenciales(correo: string, contrasena: string): Promise<boolean> {
-    return this.database.executeSql('SELECT * FROM usuario WHERE email = ?', [correo]).then(async (res) => {
-      if (res.rows.length > 0) {
-        const usuario = res.rows.item(0);
-        
-        // Aquí puedes usar una función de comparación de contraseñas si las contraseñas están encriptadas
-        const contrasenaCorrecta = usuario.contrasena === contrasena; // Este es un ejemplo simple. Usa bcrypt o similar en producción.
+  async validarCredenciales(
+    correo: string,
+    contrasena: string
+  ): Promise<boolean> {
+    return this.database
+      .executeSql('SELECT * FROM usuario WHERE email = ?', [correo])
+      .then(async (res) => {
+        if (res.rows.length > 0) {
+          const usuario = res.rows.item(0);
 
-        return contrasenaCorrecta; // Retorna true si la contraseña es correcta, de lo contrario, false.
-      } else {
-        return false; // El correo no existe
-      }
-    }).catch((e) => {
-      console.error('Error al consultar la base de datos', e);
-      return false; // Manejo de errores
-    });
+          // Aquí puedes usar una función de comparación de contraseñas si las contraseñas están encriptadas
+          const contrasenaCorrecta = usuario.contrasena === contrasena; // Este es un ejemplo simple. Usa bcrypt o similar en producción.
+
+          return contrasenaCorrecta; // Retorna true si la contraseña es correcta, de lo contrario, false.
+        } else {
+          return false; // El correo no existe
+        }
+      })
+      .catch((e) => {
+        console.error('Error al consultar la base de datos', e);
+        return false; // Manejo de errores
+      });
   }
 
   //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
@@ -453,7 +461,10 @@ export class DataBaseService {
     empresa: string,
     region: string,
     comuna: string,
-    direccion: string
+    direccion: string,
+    //faltan estos datos creo(corregir de ser necesario)
+    Imagen: string,
+    tipo_usuario_id: number
   ) {
     this.sqlite
       .create({
@@ -463,8 +474,8 @@ export class DataBaseService {
       .then((db: SQLiteObject) => {
         // Insertar el usuario en la tabla Usuarios
         db.executeSql(
-          `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa) 
-       VALUES(?,?,?,?,?,?,?,?)`,
+          `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa,foto_perfil,tipo_usuario_id) 
+       VALUES(?,?,?,?,?,?,?,?,?,?)`,
           [pNombre, sNombre, aPaterno, aMaterno, email, password, empresa]
         )
           .then((res) => {
@@ -703,7 +714,7 @@ export class DataBaseService {
   }
 
   seleccionarProductos() {
-    return this.database.executeSql('SELECT * FROM usuario', []).then((res) => {
+    return this.database.executeSql('SELECT * FROM producto', []).then((res) => {
       //variable para almacenar el resultado de la consulta
       let items: Productos[] = [];
       //valido si trae al menos un registro
@@ -870,4 +881,153 @@ export class DataBaseService {
   //insertarProducto { }
 
   //queries para los combobo
+
+  //Validar usuario
+  async validateUser(email: string, password: string): Promise<boolean> {
+    const query = 'SELECT * FROM usuario WHERE email = ? AND contrasena = ?';
+    const result = await this.database.executeSql(query, [email, password]);
+    return result.rows.length > 0;
+  }
+
+  //Recuperar contraseña y comprobar email existente
+  async emailExists(email: string): Promise<boolean> {
+    const query = 'SELECT * FROM usuario WHERE email = ?';
+    const result = await this.database.executeSql(query, [email]);
+    return result.rows.length > 0;
+  }
+
+  //actualizar contrasena
+  async updatePassword(email: string, newPassword: string) {
+    const query = 'UPDATE usuario SET contrasena = ? WHERE email = ?';
+    await this.database.executeSql(query, [newPassword, email]);
+  }
+
+  //OBTENER PRODUCTOS
+  getProducts(): Observable<Productos[]> {
+    return new Observable((observer) => {
+      this.database
+        .executeSql('SELECT * FROM producto', [])
+        .then((res) => {
+          let productos: Productos[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            productos.push(res.rows.item(i));
+          }
+          observer.next(productos);
+          observer.complete();
+        })
+        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
+    });
+  }
+
+  //OBTENER CATEGORIA
+  getCategories(): Observable<Categorias[]> {
+    return new Observable((observer) => {
+      this.database
+        .executeSql('SELECT * FROM categoria', [])
+        .then((res) => {
+          let categorias: Categorias[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            categorias.push(res.rows.item(i));
+          }
+          observer.next(categorias);
+          observer.complete();
+        })
+        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
+    });
+  }
+  //OBTENER SUBCATEGORIA
+  getSubcategories(categoryId: number): Observable<Subcategorias[]> {
+    return new Observable((observer) => {
+      this.database
+        .executeSql('SELECT * FROM subcategoria WHERE categoria_id = ?', [
+          categoryId,
+        ])
+        .then((res) => {
+          let subcategorias: Subcategorias[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            subcategorias.push(res.rows.item(i));
+          }
+          observer.next(subcategorias);
+          observer.complete();
+        })
+        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
+    });
+  }
+
+//OBTENER PRODUCTOS POR REGION
+  getRandomProductsByRegion(regionId: number): Observable<Productos[]> {
+    return new Observable(observer => {
+      //CAMBIAR POR GPS DEL MAPA O NOSE
+      this.database.executeSql('SELECT * FROM productos WHERE regionId = ? ORDER BY RANDOM()', [regionId]).then(res => {
+        let productos: Productos[] = [];
+        for (let i = 0; i < res.rows.length; i++) {
+          productos.push(res.rows.item(i));
+        }
+        observer.next(productos);
+        observer.complete();
+      }).catch(e => observer.error(e));
+    });
+  }
+
+
+ //FUNCIONES CARRITOR DE COMPRAS (crear tabla carrito o otra forma)
+ /*export interface CartItem {
+  productId: number;
+  quantity: number;
+}
+
+export interface Cart {
+  id: number; // Composite key
+  items: CartItem[];
+  totalAmount: number;
+}pendiente en el carrito.ts
+  ddToCart(cartId: number, productId: number, quantity: number): Observable<void> {
+    return new Observable(observer => {
+      const query = 'INSERT INTO Detalles_Carro_Compras (cartId, productId, quantity) VALUES (?, ?, ?)';
+      this.database.executeSql(query, [cartId, productId, quantity]).then(() => {
+        observer.next();
+        observer.complete();
+      }).catch(e => observer.error(e));
+    });
+  }
+
+  createNewCart(): Observable<number> {
+    return new Observable(observer => {
+      const query = 'INSERT INTO Carro_Compras DEFAULT VALUES';
+      this.database.executeSql(query, []).then(res => {
+        const newCartId = res.insertId; // Assuming insertId is returned
+        observer.next(newCartId);
+        observer.complete();
+      }).catch(e => observer.error(e));
+    });
+  }
+
+  getCartItems(cartId: number): Observable<CartItem[]> {
+    return new Observable(observer => {
+      const query = 'SELECT * FROM Detalles_Carro_Compras WHERE cartId = ?';
+      this.database.executeSql(query, [cartId]).then(res => {
+        let items: CartItem[] = [];
+        for (let i = 0; i < res.rows.length; i++) {
+          items.push(res.rows.item(i));
+        }
+        observer.next(items);
+        observer.complete();
+      }).catch(e => observer.error(e));
+    });
+  }
+//eliminar carrito al salir usuario
+  deleteCart(cartId: number): Observable<void> {
+    return new Observable(observer => {
+      const deleteDetailsQuery = 'DELETE FROM Detalles_Carro_Compras WHERE cartId = ?';
+      const deleteCartQuery = 'DELETE FROM Carro_Compras WHERE id = ?';
+  
+      this.database.executeSql(deleteDetailsQuery, [cartId]).then(() => {
+        return this.database.executeSql(deleteCartQuery, [cartId]);
+      }).then(() => {
+        observer.next();
+        observer.complete();
+      }).catch(e => observer.error(e));
+    });
+  }*/
+
 }

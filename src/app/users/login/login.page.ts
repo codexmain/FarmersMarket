@@ -9,6 +9,7 @@ import { Router, NavigationExtras } from '@angular/router';
 import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
 import { DataBaseService } from 'src/app/services/data-base.service';
 
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -26,8 +27,20 @@ export class LoginPage implements OnInit {
     private modalController: ModalController,
     private menu: MenuController,
     private nativeStorage: NativeStorage, //Se agrega NativeStorage
-    private DataBase: DataBaseService //Llama a la base de datos y crea las tablas
+    private DataBase: DataBaseService //Llama a la base de datos
   ) { }
+
+
+//validar login
+  async login() {
+    const isValid = await this.DataBase.validateUser(this.email, this.password);
+    if (isValid) {
+      console.log('Logeado con exito');
+      this.router.navigate(['/productos']);//IR A LA PAGINA PRODUCTOS
+    } else {
+        this.showAlert('Invalido','email o contraseña incorrectos');
+    }
+  }
 
   listaUsers: any = [
     //tipo usuario 1 es client, 2 es seller y el 3 admin
@@ -279,12 +292,3 @@ export class LoginPage implements OnInit {
   }
 }
 
-async iniciarSesion() {
-  const credencialesValidas = await this.DataBaseService.validarCredenciales(this.correo, this.contrasena);
-  
-  if (credencialesValidas) {
-    this.router.navigate(['productos'], { replaceUrl: true });
-  } else {
-    this.errorLogin = 'El correo o la contraseña son incorrectos.';
-  }
-}

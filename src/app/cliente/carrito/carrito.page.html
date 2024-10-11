@@ -6,6 +6,26 @@
     <ion-title>Carrito</ion-title>
   </ion-toolbar>
 </ion-header>
+<!--pendiente modificar-->
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let item of cartItems">
+      <ion-label>
+        Producto ID: {{ item.productId }}<br>
+        Cantidad: {{ item.quantity }}
+      </ion-label>
+      <ion-button (click)="addToCart(item.productId)">Agregar</ion-button>
+      <ion-button (click)="removeFromCart(item.productId)">Eliminar</ion-button>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label>Total Compras:</ion-label>
+      <h2>{{ calculateTotal() | currency }}</h2>
+    </ion-item>
+    
+    <ion-button fill="solid" expand="full" (click)="confirmarCompra()">Confirmar compra</ion-button>
+  </ion-list>
+</ion-content>
 
 <ion-content>
   <div>

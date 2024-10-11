@@ -48,6 +48,9 @@ export class RegisterPage implements OnInit {
   comuna: string = '';
   direccion: string = '';
   Imagen: string = '';
+  //falta descripcion corta en el html ._.
+  descripcion_Corta: string='';
+  tipo_usuario_id: number = 1;
 
   selectedRegion: string = '';
   comunas: string[] = [];
@@ -123,7 +126,9 @@ export class RegisterPage implements OnInit {
       this.password,
       this.direccion,
       this.region,
-      this.comuna
+      this.comuna,
+      this.Imagen,
+      this.tipo_usuario_id
     ); // ENviar Usuario al SQL
   }
 
@@ -136,8 +141,31 @@ export class RegisterPage implements OnInit {
 
     await alert.present();
   }
+//comprobamos el email existe
+async ComprobarEmail(): Promise<boolean> {
+  const exists = await this.DataBase.emailExists(this.email);
+  if (exists) {
+    this.presentAlert('Error', 'El correo electrónico ya está registrado.');
+    return false; 
+  }
+  return true;
+}
+
+
+
+
 
   async registrarse() {
+    const emailValid = await this.ComprobarEmail();
+    if (!emailValid) {
+      return; // email ya existe, no se puede registrar
+    }
+    //comprobar tipo usuario
+    let tipo_usuario_id = 1; //cliente
+    if (this.empresa && this.descripcion_Corta) {
+      tipo_usuario_id = 2; // vendedor
+    }
+
     // Validar pNombre
 
     if (!this.pNombre || this.pNombre.length < 2) {
@@ -259,6 +287,7 @@ export class RegisterPage implements OnInit {
 
     // Si todas las validaciones pasan
     this.presentAlert('Éxito', 'Su cuenta se ha creado exitosamente.');
+    this.registrarUsuarios();
     console.log('Formulario válido, proceder con el registro.');
     this.router.navigate(['/login']);
   }
