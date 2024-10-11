@@ -1063,8 +1063,8 @@ eliminarProducto(id: number) {
 //===============================
 //validaciones necesarios para formularios
 
-verificarCorreoExistente(correo: string): Promise<boolean> {
-  return this.database.executeSql('SELECT COUNT(*) AS count FROM usuario WHERE correo = ?', [correo]).then(res => {
+verificarCorreoExistente(email: string): Promise<boolean> {
+  return this.database.executeSql('SELECT COUNT(*) AS count FROM usuario WHERE email = ?', [email]).then(res => {
       return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
   });
 }

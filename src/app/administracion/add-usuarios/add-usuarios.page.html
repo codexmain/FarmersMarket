@@ -62,12 +62,22 @@
     <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
       La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
     </div>
+
+    <ion-item>
+      <ion-label>Tipo de Usuario</ion-label>
+      <ion-select [(ngModel)]="tipoUsuario" name="tipoUsuario" #tipUserCtrl="ngModel" required>
+        <ion-select-option *ngFor="let tipUsuario of arrayCmbTipoUsuario" [value]="tipUsuario.id">{{ tipUsuario.descripcion }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="tipUserCtrl.invalid && (tipUserCtrl.dirty || tipUserCtrl.touched)" class="error-message">
+      El Tipo de usuario es obligatorio.
+    </div>     
  
     <ion-item>
       <ion-label position="floating">Estado Usuario</ion-label>
       <ion-select [(ngModel)]="estadoUsuario" name="estadoUsuario" required #estadoUserCtrl="ngModel">
-        <ion-select-option value="active">Cuenta Activa</ion-select-option>
-        <ion-select-option value="disabled">Cuenta Deshabilitada</ion-select-option>
+        <ion-select-option value="activa">Cuenta Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">Cuenta Deshabilitada</ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="estadoUserCtrl.invalid && (estadoUserCtrl.dirty || estadoUserCtrl.touched)" class="error-message">
@@ -75,15 +85,15 @@
     </div>
 
     <ion-item>
-      <ion-label position="floating">Email</ion-label>
+      <ion-label position="floating">Correo Electrónico</ion-label>
       <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
-      El email es obligatorio y debe tener un formato válido.
+      El correo es obligatorio y debe tener un formato válido.
     </div>
 
     <ion-item>
-      <ion-label position="floating">Password</ion-label>
+      <ion-label position="floating">Contraseña</ion-label>
       <ion-input type="password" [(ngModel)]="password" name="password" required minlength="10" #passwordCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
@@ -94,33 +104,18 @@
 
     <ion-item>
       <ion-label>Región</ion-label>
-      <ion-select [(ngModel)]="region" name="region" required #regionCtrl="ngModel" (ionChange)="onRegionChange($event)">
-        <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
-        <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
-        <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
-        <ion-select-option value="atacama">Región de Atacama</ion-select-option>
-        <ion-select-option value="coquimbo">Región de Coquimbo</ion-select-option>
-        <ion-select-option value="valparaiso">Región de Valparaíso</ion-select-option>
-        <ion-select-option value="metropolitana">Región Metropolitana de Santiago</ion-select-option>
-        <ion-select-option value="ohiggins">Región del Libertador General Bernardo O'Higgins</ion-select-option>
-        <ion-select-option value="maule">Región del Maule</ion-select-option>
-        <ion-select-option value="nuble">Región de Ñuble</ion-select-option>
-        <ion-select-option value="biobio">Región del Biobío</ion-select-option>
-        <ion-select-option value="araucania">Región de La Araucanía</ion-select-option>
-        <ion-select-option value="rios">Región de Los Ríos</ion-select-option>
-        <ion-select-option value="lagos">Región de Los Lagos</ion-select-option>
-        <ion-select-option value="aysen">Región de Aysén</ion-select-option>
-        <ion-select-option value="magallanes">Región de Magallanes y de la Antártica Chilena</ion-select-option>
+      <ion-select [(ngModel)]="region" name="region" #regionCtrl="ngModel" required (ionChange)="onRegionChange($event)">
+        <ion-select-option *ngFor="let region of arrayCmbRegiones" [value]="region.id">{{ region.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
       La región es obligatoria.
     </div>
-  
+
     <ion-item>
       <ion-label>Comuna</ion-label>
-      <ion-select [(ngModel)]="comuna" name="comuna" required #comunaCtrl="ngModel" [disabled]="!selectedRegion">
-        <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
+      <ion-select [(ngModel)]="comuna" name="comuna" #comunaCtrl="ngModel" required [disabled]="!region">
+        <ion-select-option *ngFor="let comuna of arrayCmbComunas" [value]="comuna.id">{{ comuna.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">

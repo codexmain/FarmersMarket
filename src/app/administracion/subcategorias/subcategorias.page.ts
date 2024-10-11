@@ -19,7 +19,9 @@ export class SubcategoriasPage implements OnInit {
     {
       id: '',
       nombre: '',
-      categoria_id: ''
+      categoria_id: '',
+      nombreCategoria: ''
+
     }
   ]
 
