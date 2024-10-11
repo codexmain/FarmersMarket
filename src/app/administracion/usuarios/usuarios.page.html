@@ -5,30 +5,33 @@
     </ion-buttons>
     <ion-title>Usuarios</ion-title>  
     <ion-button slot="end" (click)="presentModal()">
-      <ion-icon name="add-outline">  </ion-icon>
+      <ion-icon name="add-outline"></ion-icon>
     </ion-button>  
   </ion-toolbar>
 </ion-header>
 
-
-<ion-content>
-  <ion-grid><ion-searchbar placeholder="Buscar Usuario"></ion-searchbar></ion-grid>
-  <ion-card>
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-searchbar placeholder="Buscar Usuario"></ion-searchbar>
+  </ion-grid>
   <ion-list>
-    <ion-item *ngFor="let item of items; let index">
-      <ion-avatar slot="start">
-        <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
-      </ion-avatar>
-      <ion-label>{{ item }}
-        <ion-button style="float: right; padding: 0px; margin: 0px;"
-        fill="solid" color="warning" slot="end" [id]="'open-action-sheet-' + index">Más Acciones</ion-button>
-      </ion-label> 
+    <ion-item *ngFor="let user of arregloUsuarios">
+      <ion-label>
+        <h5>ID Usuario: {{ user.id }}</h5>
+        <p>Nombre: {{ user.nombreCompleto }}</p>
+        <p>Email: {{ user.email }}</p>
+        <p>Empresa: {{ user.empresaMostrarListar }}</p>
+        <p>Descripción Empresa: {{ user.descripcionMostrarListar }}</p>
+        <p>Tipo Usuario: {{ user.descTipUser }}</p>
+      </ion-label>
+      <ion-button 
+        fill="solid" 
+        color="warning" 
+        slot="end" 
+        (click)="presentActionSheet(user)" 
+        style="padding: 0; margin: 0;">
+        Más Acciones
+      </ion-button>
     </ion-item>
-    <ion-action-sheet *ngFor="let item of items; let index" [trigger]="'open-action-sheet-' + index"
-        header="Más Acciones" [buttons]="actionSheetButtons"></ion-action-sheet>
   </ion-list>
-  <ion-infinite-scroll>
-    <ion-infinite-scroll-content loadingText="Cargando..." loadingSpinner="bubbles"></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
-</ion-card>
 </ion-content>
