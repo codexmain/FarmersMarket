@@ -13,40 +13,51 @@
       <ion-row>
         <ion-col>
           <ion-list>
-            <form id="addProductForm" (ngSubmit)="agregarProducto()">
-
-            <ion-item>
-              <!--imagen-->
-              <ion-thumbnail slot="start">
-                <ion-item>
-                  <ion-label>Foto del Producto</ion-label>
-                  <ion-button (click)="tomarFotop()">Tomar Foto</ion-button>
-                </ion-item>
-                <img *ngIf="pImagen" [src]="pImagen" alt="Foto del Producto" />
-              </ion-thumbnail>
-              
-              <ion-label>
-                <ion-input type="imagen" label="Sube la imagen referencial" labelPlacement="floating"
-                  placeholder="" name="imagen"></ion-input>
-
-
-                <ion-input formControlName="titulo" type="text" label="Ingresa Titulo" labelPlacement="floating"
-                  placeholder="Titulo" name="titulo"></ion-input>
-                  
-                <ion-input formControlName="valor" type="number" label="Ingresa Valor" labelPlacement="floating"
-                  placeholder="Valor" name="valor"></ion-input>
-                <ion-input formControlName="descripcion" type="text" label="Ingresa Descripcion"
-                  labelPlacement="floating" placeholder="Descripcion" name="descripcion"></ion-input>
-                <ion-input formControlName="stock" type="number" label="Ingresa Stock" labelPlacement="floating"
-                  placeholder="Stock" name="stock" min="0" max="99"></ion-input>
-              </ion-label>
-              <div class="button-container">
-                <ion-button fill="solid" color="success" (click)="agregarProducto()">
-                  <ion-icon name="add-outline"></ion-icon>
-                </ion-button>
-              </div>
-            </ion-item>
-          </form>
+            <form id="addProductForm" (ngSubmit)="agregarProducto()" #productForm="ngForm">
+              <ion-item>
+                <!-- Imagen -->
+                <ion-thumbnail slot="start">
+                  <ion-item>
+                    <ion-label>Foto del Producto</ion-label>
+                    <ion-button (click)="tomarFotop()">Tomar Foto</ion-button>
+                  </ion-item>
+                  <img *ngIf="pImagen" [src]="pImagen" alt="Foto del Producto" />
+                </ion-thumbnail>
+            
+                <ion-label>
+                  <ion-input type="file" accept="image/*" (change)="onImageSelected($event)" name="imagen" required></ion-input>
+                  <div *ngIf="productForm.controls.imagen?.invalid && (productForm.controls.imagen?.dirty || productForm.controls.imagen?.touched)" class="error-message">
+                    La imagen es obligatoria.
+                  </div>
+            
+                  <ion-input formControlName="titulo" type="text" placeholder="Ingresa Titulo" labelPlacement="floating" required minlength="3"></ion-input>
+                  <div *ngIf="productForm.controls.titulo?.invalid && (productForm.controls.titulo?.dirty || productForm.controls.titulo?.touched)" class="error-message">
+                    El título es obligatorio y debe tener al menos 3 caracteres.
+                  </div>
+            
+                  <ion-input formControlName="valor" type="number" placeholder="Ingresa Valor" labelPlacement="floating" required min="0"></ion-input>
+                  <div *ngIf="productForm.controls.valor?.invalid && (productForm.controls.valor?.dirty || productForm.controls.valor?.touched)" class="error-message">
+                    El valor es obligatorio y debe ser un número positivo.
+                  </div>
+            
+                  <ion-input formControlName="descripcion" type="text" placeholder="Ingresa Descripcion" labelPlacement="floating" required minlength="10"></ion-input>
+                  <div *ngIf="productForm.controls.descripcion?.invalid && (productForm.controls.descripcion?.dirty || productForm.controls.descripcion?.touched)" class="error-message">
+                    La descripción es obligatoria y debe tener al menos 10 caracteres.
+                  </div>
+            
+                  <ion-input formControlName="stock" type="number" placeholder="Ingresa Stock" labelPlacement="floating" required min="0" max="99"></ion-input>
+                  <div *ngIf="productForm.controls.stock?.invalid && (productForm.controls.stock?.dirty || productForm.controls.stock?.touched)" class="error-message">
+                    El stock es obligatorio y debe estar entre 0 y 99.
+                  </div>
+                </ion-label>
+            
+                <div class="button-container">
+                  <ion-button fill="solid" color="success" type="submit" [disabled]="productForm.invalid">
+                    <ion-icon name="add-outline"></ion-icon> Agregar Producto
+                  </ion-button>
+                </div>
+              </ion-item>
+            </form>
 
             <ion-item>
               <ion-thumbnail slot="start">
