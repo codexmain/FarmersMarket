@@ -11,6 +11,7 @@ export class Productos {
     subcategoria_id!: number;
     fecha_agregado?: string;
     nombre_subcategoria?: string;
+    categoria_id?: string;
     nombre_proveedor?: string;
     nombre_categoria?: string;
 }

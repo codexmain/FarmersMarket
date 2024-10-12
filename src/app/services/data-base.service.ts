@@ -486,93 +486,17 @@ listadoCmbComunas = new BehaviorSubject([]);
 fetchUsuarios(): Observable<Usuarios[]>{
   return this.listadoUsuarios.asObservable();
 }
-fetchUsuarioPorId(id: number): Promise<Usuarios> {
-  return this.database.executeSql('SELECT * FROM usuario WHERE id = ?', [id]).then(res => { //esto es para ver el detalle de un usuario en especifico
-      if (res.rows.length > 0) {
-          return {
-              id: res.rows.item(0).id,
-              nombre: res.rows.item(0).nombre,
-              segundo_nombre: res.rows.item(0).segundo_nombre,
-              apellido_paterno: res.rows.item(0).apellido_paterno,
-              apellido_materno: res.rows.item(0).apellido_materno,
-              email: res.rows.item(0).email,
-              contrasena: res.rows.item(0).contrasena,
-              nombre_empresa: res.rows.item(0).nombre_empresa,
-              descripcion_corta: res.rows.item(0).descripcion_corta,
-              foto_perfil: res.rows.item(0).foto_perfil,
-              estado_cuenta: res.rows.item(0).estado_cuenta,
-              fecha_registro: res.rows.item(0).fecha_registro,
-              tipo_usuario_id: res.rows.item(0).tipo_usuario_id
-          };
-      } else {
-          throw new Error('Usuario no encontrado');
-      }
-  });
-}
-
 
 fetchCategorias(): Observable<Categorias[]>{
   return this.listadoCategorias.asObservable();
 }
 
-fetchCategoriaPorId(id: number): Promise<Categorias> { //esto es para ver el detalle de un categoria en especifico
-  return this.database.executeSql('SELECT * FROM categoria WHERE id = ?', [id]).then(res => {
-      if (res.rows.length > 0) {
-          return {
-              id: res.rows.item(0).id,
-              nombre: res.rows.item(0).nombre
-          };
-      } else {
-          throw new Error('Categoria no encontrada');
-      }
-  });
-}
-
-
-
-
 fetchSubCategorias(): Observable<Subcategorias[]>{
   return this.listadoSubCategorias.asObservable();
 }
 
-fetchSubCategoriaPorId(id: number): Promise<Subcategorias> { //esto es para ver el detalle de una subcategoria en especifico
-  return this.database.executeSql('SELECT * FROM subcategoria WHERE id = ?', [id]).then(res => {
-      if (res.rows.length > 0) {
-          return {
-              id: res.rows.item(0).id,
-              nombre: res.rows.item(0).nombre,
-              categoria_id: res.rows.item(0).categoria_id,
-          };
-      } else {
-          throw new Error('Subcategoría no encontrada');
-      }
-  });
-}
-
-
 fetchProductos(): Observable<Productos[]>{
   return this.listadoProductos.asObservable();
-}
-
-fetchProductoPorId(id: number): Promise<Productos> { //esto es para ver el detalle de un producto en especifico
-  return this.database.executeSql('SELECT * FROM producto WHERE id = ?', [id]).then(res => {
-      if (res.rows.length > 0) {
-          return {
-              id: res.rows.item(0).id,
-              proveedor_id: res.rows.item(0).proveedor_id,
-              nombre: res.rows.item(0).nombre,
-              descripcion: res.rows.item(0).descripcion,
-              precio: res.rows.item(0).precio,
-              stock: res.rows.item(0).stock,
-              organico: res.rows.item(0).organico,
-              foto_producto: res.rows.item(0).foto_producto,
-              subcategoria_id: res.rows.item(0).subcategoria_id,
-              fecha_agregado: res.rows.item(0).fecha_agregado
-          };
-      } else {
-          throw new Error('Producto no encontrado');
-      }
-  });
 }
 
 //Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
@@ -695,12 +619,13 @@ seleccionarProductos(){
     p.organico,
     CASE 
         WHEN p.organico = 1 THEN 'Verdadero'
-        ELSE 'Negativo'
+        ELSE 'Falso'
     END AS organicoEnTexto,
     p.foto_producto,
     p.subcategoria_id,
     p.fecha_agregado,
     s.nombre AS nombre_subcategoria,
+    s.categoria_id AS categoria_id, -- ID de la categoría desde la subcategoría
     u.nombre_empresa AS nombre_proveedor,
     c.nombre AS nombre_categoria
 FROM 
@@ -731,6 +656,7 @@ JOIN
           subcategoria_id: res.rows.item(i).subcategoria_id,
           fecha_agregado: res.rows.item(i).fecha_agregado,
           nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
+          categoria_id: res.rows.item(i).categoria_id,
           nombre_proveedor: res.rows.item(i).nombre_proveedor,
           nombre_categoria: res.rows.item(i).nombre_categoria
         })
