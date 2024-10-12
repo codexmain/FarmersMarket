@@ -62,3 +62,9 @@ ion-list{
     --background: #9a310b;
 
 }
+
+.custom-card-header {
+    --background: linear-gradient(90deg, rgba(246,129,4,1) 0%, rgba(196,118,2,1) 100%);
+    --color: white;
+    text-align: center;
+  }
