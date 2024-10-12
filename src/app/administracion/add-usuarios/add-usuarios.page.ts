@@ -163,23 +163,30 @@ export class AddUsuariosPage implements OnInit {
     return;
   }
 
+  //validacion tipo usuario
+  if (!this.estadoUsuario) {
+    this.presentAlert('Error', 'El Estado del usuario es obligatorio.');
+    return;
+  }
+
+
   // Validar email
   if (!this.email) {
     this.presentAlert('Error', 'El email es obligatorio.');
     return;
   }
 
-    // Validar región
-    if (!this.region) {
-      this.presentAlert('Error', 'La región es obligatoria.');
-      return;
-    }
+  // Validar región
+  if (!this.region) {
+    this.presentAlert('Error', 'La región es obligatoria.');
+    return;
+  }
 
     // Validar comuna
-    if (!this.comuna) {
-      this.presentAlert('Error', 'La comuna es obligatoria.');
-      return;
-    }
+  if (!this.comuna) {
+    this.presentAlert('Error', 'La comuna es obligatoria.');
+    return;
+  }
 
     // Validar pNombre, sNombre, aPaterno, aMaterno
     const namePattern = /^[a-zA-Z\s]{2,}$/;
