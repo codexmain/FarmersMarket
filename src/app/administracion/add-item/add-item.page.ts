@@ -165,7 +165,7 @@ export class AddItemPage implements OnInit {
         this.proveedor_id, this.nombre, this.descripcion, this.precio, this.stock, 
         this.organico, '', this.subcategoria_id
       );
-      this.presentAlert('Éxito', 'Su ha agregado el Producto exitosamente.');
+      this.presentAlert('Éxito', 'Se ha agregado el Producto exitosamente.');
       console.log('Formulario válido, proceder con el registro.');
       this.modalController.dismiss();
     }

@@ -14,18 +14,16 @@
 
 <ion-content [fullscreen]="false">
   <ion-card>
-    <ion-card-header class="ion-text-center" color="primary">Formulario Categorías</ion-card-header>
+    <ion-card-header class="custom-card-header">Formulario Categorías</ion-card-header>
   <form id="addCategoryForm" (ngSubmit)="agregarCategoria()">
 
     <ion-item>
       <ion-label position="floating">Nombre Categoría</ion-label>
-      <ion-input type="text" [(ngModel)]="categoryName" name="categoryName" minlength="5"  required #categoryCtrl="ngModel"></ion-input>
+      <ion-input type="text" [(ngModel)]="nombre" name="nombre" minlength="5"  required #categoryCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
       El nombre de la Categoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.
     </div>
-
-
   </form>
 </ion-card>
 </ion-content>
