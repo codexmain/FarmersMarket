@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuController, ModalController, AlertController, NavParams } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DataBaseService } from 'src/app/services/data-base.service';
 
 @Component({
   selector: 'app-add-subcategoria',
@@ -9,14 +10,33 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class AddSubcategoriaPage implements OnInit {
 
-  constructor(private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
+  arrayCmbCategorias: any = [
+    {
+      id: '',
+      nombre: ''
+    }
+  ]
+
+  nombre: string = '';
+  categoria_id!: number;
+
+  constructor(private bd: DataBaseService, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
   }
 
-  subCategoryName: string = '';
-  category!: number;
+
+
+
 
 
   ngOnInit() {
+    this.bd.dbState().subscribe(data=>{
+      //validar si la bd esta lista
+      if(data){
+        this.bd.fetchCategorias().subscribe(res=>{
+          this.arrayCmbCategorias = res;
+        })  
+      }
+    })
   }
 
   async presentAlert(header: string, message: string) {
@@ -31,22 +51,23 @@ export class AddSubcategoriaPage implements OnInit {
 
   async agregarSubCategoria(){
 
-  if (!this.subCategoryName) {
+  if (!this.nombre) {
     this.presentAlert('Error', 'La SubCategoría es un campo obligatorio.');
     return;}
   
 
   const subCategoryPattern = /^[a-zA-Z0-9\s]{5,50}$/;
-  if (this.subCategoryName && !subCategoryPattern.test(this.subCategoryName)) {
+  if (this.nombre && !subCategoryPattern.test(this.nombre)) {
     this.presentAlert('Error', 'El nombre de la Subcategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
     return;
   }
   // Validar región
-  if (!this.category) {
+  if (!this.categoria_id) {
      this.presentAlert('Error', 'La Categoría es obligatoria.');
      return;}
     // Si todas las validaciones pasan
-    this.presentAlert('Éxito', 'Su ha agregado el cliente exitosamente.');
+    await this.bd.insertarSubCategoria(this.nombre,this.categoria_id);
+    this.presentAlert('Éxito', 'Se ha agregado la Subcategoría exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
     this.modalController.dismiss();
   }

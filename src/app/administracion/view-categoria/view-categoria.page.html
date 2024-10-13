@@ -1,13 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>viewCategoria</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">viewCategoria</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header class="custom-card-header">Detalles Categoría</ion-card-header>
+    <ion-item>
+      <ion-label position="floating">Nombre Categoría</ion-label>
+      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="nombre" name="nombre"></ion-input>
+    </ion-item>
+
+</ion-card>
 </ion-content>

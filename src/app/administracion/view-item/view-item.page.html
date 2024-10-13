@@ -51,7 +51,7 @@
 
     <ion-item>
       <ion-label>Seleccionar Categoría</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="categoria_id" name="categoria_id" #categoryCtrl="ngModel">
+      <ion-select [disabled]="isDisabled" [(ngModel)]="categoria_id" name="categoria_id" >
         <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>
@@ -59,7 +59,7 @@
 
     <ion-item>
       <ion-label>Seleccionar SubCategoría</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="subcategoria_id" name="subcategoria_id" #subCategoryCtrl="ngModel">
+      <ion-select [disabled]="isDisabled" [(ngModel)]="subcategoria_id" name="subcategoria_id">
         <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>

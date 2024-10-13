@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuController, ModalController, AlertController, NavParams, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataBaseService } from 'src/app/services/data-base.service'
+import { DataBaseService } from '../../services/data-base.service';
 
 
 
@@ -261,7 +261,7 @@ export class AddUsuariosPage implements OnInit {
       this.password, this.empresa, this.descEmpresa, '', this.estadoUsuario, 
       this.tipoUsuario, this.comuna, this.direccion
     );
-    this.presentAlert('Éxito', 'Su ha agregado el cliente exitosamente.');
+    this.presentAlert('Éxito', 'Se ha agregado el cliente exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
     this.modalController.dismiss();
   }
