@@ -376,7 +376,7 @@ export class DataBaseService {
     this.platform.ready().then(()=>{
       //crear la Base de Datos
       this.sqlite.create({
-        name: 'cutuco3.db',
+        name: 'cutucox1.db',
         location: 'default'
       }).then((db: SQLiteObject)=>{
         //capturar la conexion a la BD
@@ -749,10 +749,10 @@ modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_pater
                 apellido_materno:string, email:string, nombre_empresa:string, 
                 descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
                 tipo_usuario_id:number){
-                  this.presentAlert("service","ID: " + id);
                   return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
                     this.presentAlert("Modificar","Usuario Modificado");
                     this.seleccionarUsuarios(); //actualizar en su seccion en sí
+                    this.seleccionarCbmProveedores();
                   }).catch(e=>{
                     this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
                   })}
@@ -760,7 +760,6 @@ modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_pater
 
 
 modificarCategoria(id:number, nombre:string){
-  this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE categoria SET nombre = ? WHERE id = ?',[nombre,id]).then(res=>{
     this.presentAlert("Modificar","Categoría Modificada");
     this.seleccionarCategorias(); //actualizar en su seccion en sí
@@ -771,7 +770,6 @@ modificarCategoria(id:number, nombre:string){
 }
 
 modificarSubCategoria(id:number, nombre:string, categoria_id:number){
-  this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',[nombre,categoria_id,id]).then(res=>{
     this.presentAlert("Modificar","SubCategoría Modificada");
     this.seleccionarSubCategorias(); //actualizar en su seccion en sí
@@ -784,7 +782,6 @@ modificarSubCategoria(id:number, nombre:string, categoria_id:number){
 }
 
 modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number){
-  this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
     this.presentAlert("Modificar","Producto Modificado");
     this.seleccionarProductos(); //actualizar en su seccion en sí
@@ -812,6 +809,7 @@ insertarUsuario(nombre:string, segundo_nombre:string, apellido_paterno:string,
                 }).then(() => {
                     this.presentAlert("Insertar", "Usuario y dirección registrados con éxito"); //despues al llegar a la parte de direcciones se hace la query, observador de direcciones no hay
                     this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                    this.seleccionarCbmProveedores(); //actualizar el combobox de proveedores
                 }).catch(e => {
                     this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
                 });
@@ -870,6 +868,7 @@ eliminarUsuario(id: number) {
               .then(() => {
                   this.presentAlert("Eliminar", "Usuario eliminado con éxito");
                   this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                  this.seleccionarCbmProveedores();
               })
               .catch(e => {
                   this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));

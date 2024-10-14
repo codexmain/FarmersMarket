@@ -189,7 +189,7 @@ export class AddUsuariosPage implements OnInit {
   }
 
     // Validar pNombre, sNombre, aPaterno, aMaterno
-    const namePattern = /^[a-zA-Z\s]{2,}$/;
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
     if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
         (this.sNombre && !namePattern.test(this.sNombre)) ||
         (this.aMaterno && !namePattern.test(this.aMaterno))) {
@@ -200,13 +200,13 @@ export class AddUsuariosPage implements OnInit {
 
 
     // Validar empresa
-    const empresaPattern = /^[a-zA-Z0-9\s]{3,}$/;
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
     if (this.empresa && !empresaPattern.test(this.empresa)) {
       this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
       return;
     }
 
-    const descEmpresaPattern = /^[a-zA-Z0-9\s]{10,90}$/;
+    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
     if (this.descEmpresa && !descEmpresaPattern.test(this.descEmpresa)) {
       this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
       return;
@@ -228,7 +228,7 @@ export class AddUsuariosPage implements OnInit {
 
 
     // Validar dirección
-    const direccionPattern = /^[a-zA-Z0-9\s]+$/;
+    const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
     if (!direccionPattern.test(this.direccion)) {
       this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
       return;

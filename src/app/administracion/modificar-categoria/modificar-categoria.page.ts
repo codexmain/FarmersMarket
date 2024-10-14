@@ -31,7 +31,7 @@ export class ModificarCategoriaPage implements OnInit {
   
     // validar formato categoria
   
-    const categoryPattern = /^[a-zA-Z0-9\s]{5,50}$/;
+    const categoryPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s]{5,50}$/;
     if (this.nombre && !categoryPattern.test(this.nombre)) {
       this.presentAlert('Error', 'El nombre de la categoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;}
