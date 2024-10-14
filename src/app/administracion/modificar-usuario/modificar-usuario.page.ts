@@ -8,6 +8,8 @@ import { DataBaseService } from 'src/app/services/data-base.service';
 })
 export class ModificarUsuarioPage implements OnInit {
   //esto para traer la data de la parte principal
+
+  isDisabled = true;
   usuario: any;
 
   //cosas del formulario
@@ -98,7 +100,7 @@ export class ModificarUsuarioPage implements OnInit {
       // Procede a actualizar el usuario en la base de datos
       await this.bd.modificarUsuario(this.usuario.id, this.nombre,
                                     this.segundo_nombre, this.apellido_paterno, this.apellido_materno, this.email,
-                                    this.contrasena, this.nombre_empresa, this.descripcion_corta, '', this.estado_cuenta, this.tipo_usuario_id);
+                                    this.nombre_empresa, this.descripcion_corta, '', this.estado_cuenta, this.tipo_usuario_id);
   
       this.modalController.dismiss({ success: true });}
 
@@ -168,27 +170,6 @@ export class ModificarUsuarioPage implements OnInit {
             this.presentAlert('Error', 'El correo ingresado ya está asociado a otra cuenta.');
             return false;
           }
-        }
-
-                    // Validar contraseña
-        if (this.contrasena.length < 10 || this.contrasena.length > 30) {
-          this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
-          return false;
-        }
-
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
-          return false;
-        }
-
-        if (/(\d)\1/.test(this.contrasena) || /([a-zA-Z])\1/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
-          return false;
-        }
-
-        if (!/(?=.*[A-Z].*[A-Z])/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-          return false; 
         }
     
         // Agrega más validaciones según sea necesario
