@@ -44,7 +44,7 @@ export class ModificarSubcategoriaPage implements OnInit {
       return false;}
     
   
-    const subCategoryPattern = /^[a-zA-Z0-9\s]{5,50}$/;
+    const subCategoryPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s]{5,50}$/;
     if (this.nombre && !subCategoryPattern.test(this.nombre)) {
       this.presentAlert('Error', 'El nombre de la Subcategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;

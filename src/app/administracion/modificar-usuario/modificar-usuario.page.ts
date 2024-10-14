@@ -137,7 +137,7 @@ export class ModificarUsuarioPage implements OnInit {
         }
 
             // Validar pNombre, sNombre, aPaterno, aMaterno
-        const namePattern = /^[a-zA-Z\s]{2,}$/;
+        const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
         if (!namePattern.test(this.nombre) || !namePattern.test(this.apellido_paterno) ||
             (this.segundo_nombre && !namePattern.test(this.segundo_nombre)) ||
             (this.apellido_materno && !namePattern.test(this.apellido_materno))) {
@@ -145,13 +145,13 @@ export class ModificarUsuarioPage implements OnInit {
           return;
         }
         // Validar empresa
-        const empresaPattern = /^[a-zA-Z0-9\s]{3,}$/;
+        const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
         if (this.nombre_empresa && !empresaPattern.test(this.nombre_empresa)) {
           this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
           return;
         }
 
-        const descEmpresaPattern = /^[a-zA-Z0-9\s]{10,90}$/;
+        const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
         if (this.descripcion_corta && !descEmpresaPattern.test(this.descripcion_corta)) {
           this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
           return false;
