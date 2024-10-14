@@ -35,8 +35,8 @@ export class AddItemPage implements OnInit {
 
 
   proveedor_id!: number;
-  nombre: string = '';
-  descripcion: string = '';
+  nombre_producto: string = '';
+  descripcion_producto: string = '';
   precio!: number;
   stock: number = 0;
   organico: number = 0; //default de organico en false
@@ -122,7 +122,7 @@ export class AddItemPage implements OnInit {
       this.presentAlert('Error', 'El Vendedor es un campo obligatorio.');
       return;}
 
-    if (!this.nombre) {
+    if (!this.nombre_producto) {
       this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
       return;}
 
@@ -148,7 +148,7 @@ export class AddItemPage implements OnInit {
       this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
       return;}    
       
-    if (this.nombre.length < 3 || this.nombre.length > 40) {
+    if (this.nombre_producto.length < 3 || this.nombre_producto.length > 40) {
       this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
       return;}  
       
@@ -162,7 +162,7 @@ export class AddItemPage implements OnInit {
 
       // Si todas las validaciones pasan
       await this.bd.insertarProducto(
-        this.proveedor_id, this.nombre, this.descripcion, this.precio, this.stock, 
+        this.proveedor_id, this.nombre_producto, this.descripcion_producto, this.precio, this.stock, 
         this.organico, '', this.subcategoria_id
       );
       this.presentAlert('Éxito', 'Se ha agregado el Producto exitosamente.');

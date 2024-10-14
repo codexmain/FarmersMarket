@@ -12,8 +12,8 @@ export class ModificarItemPage implements OnInit {
   producto: any //para la transferencia de argumentos de navParams
 
   proveedor_id!: number;
-  nombre: string = '';
-  descripcion: string = '';
+  nombre_producto: string = '';
+  descripcion_producto: string = '';
   precio!: number;
   stock: number = 0;
   organico: number = 0; //default de organico en false
@@ -49,8 +49,8 @@ export class ModificarItemPage implements OnInit {
 
   ngOnInit() {
     this.proveedor_id = this.producto.proveedor_id;
-    this.nombre = this.producto.nombre;
-    this.descripcion = this.producto.descripcion;
+    this.nombre_producto = this.producto.nombre_producto;
+    this.descripcion_producto = this.producto.descripcion_producto;
     this.precio = this.producto.precio;
     this.stock = this.producto.stock;
     this.organico = this.producto.organico;
@@ -117,7 +117,7 @@ export class ModificarItemPage implements OnInit {
       this.presentAlert('Error', 'El Vendedor es un campo obligatorio.');
       return false;}
 
-    if (!this.nombre) {
+    if (!this.nombre_producto) {
       this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
       return false;}
 
@@ -143,7 +143,7 @@ export class ModificarItemPage implements OnInit {
       this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
       return false;}    
       
-    if (this.nombre.length < 3 || this.nombre.length > 40) {
+    if (this.nombre_producto.length < 3 || this.nombre_producto.length > 40) {
       this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
       return false;}  
       
@@ -169,8 +169,8 @@ export class ModificarItemPage implements OnInit {
     }
       // Procede a actualizar el usuario en la base de datos
       const subcategoriaId = this.subcategoria_id as number
-      await this.bd.modificarProducto(this.producto.id, this.proveedor_id,this.nombre,
-                                    this.descripcion, this.precio, this.stock, this.organico, '', subcategoriaId);
+      await this.bd.modificarProducto(this.producto.id, this.proveedor_id,this.nombre_producto,
+                                    this.descripcion_producto, this.precio, this.stock, this.organico, '', subcategoriaId);
   
       this.modalController.dismiss({ success: true });}
 
