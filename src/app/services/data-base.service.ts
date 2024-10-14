@@ -406,12 +406,25 @@ export class DataBaseService {
 
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
+      this.seleccionarCategorias();
       await this.database.executeSql(this.registroSubcategoria, []);
+      this.seleccionarSubCategorias();
       await this.database.executeSql(this.registroTipoUsuario, []);
+      this.seleccionarCmbTipUsuario();
+      
+
       await this.database.executeSql(this.registroRegion, []);
+      this.seleccionarCmbRegiones();
+
       await this.database.executeSql(this.registroComuna, []);
+
+
       await this.database.executeSql(this.registroUsuario, []);
+      this.seleccionarUsuarios();
+      this.seleccionarCbmProveedores();
+
       await this.database.executeSql(this.registroProducto, []);
+      this.seleccionarProductos();
 
       this.isDBReady.next(true);
 
@@ -602,8 +615,8 @@ JOIN
         items.push({
           id: res.rows.item(i).id,
           proveedor_id: res.rows.item(i).proveedor_id,
-          nombre: res.rows.item(i).nombre,
-          descripcion: res.rows.item(i).descripcion,
+          nombre_producto: res.rows.item(i).nombre_producto,
+          descripcion_producto: res.rows.item(i).descripcion_producto,
           precio: res.rows.item(i).precio,
           stock: res.rows.item(i).stock,
           organico: res.rows.item(i).organico,
@@ -636,7 +649,7 @@ seleccionarCbmProveedores(){
         //agrego los registros a mi lista
         items.push({
           id: res.rows.item(i).id,
-          nombre_empresa: res.rows.item(i).id,
+          nombre_empresa: res.rows.item(i).nombre_empresa
         })
       }
      }
@@ -679,7 +692,7 @@ seleccionarCmbTipUsuario(){
         //agrego los registros a mi lista
         items.push({
           id: res.rows.item(i).id,
-          descripcion: res.rows.item(i).id,
+          descripcion: res.rows.item(i).descripcion
         })
       }
      }
@@ -739,7 +752,7 @@ modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_pater
                   this.presentAlert("service","ID: " + id);
                   return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
                     this.presentAlert("Modificar","Usuario Modificado");
-                    this.seleccionarUsuarios();
+                    this.seleccionarUsuarios(); //actualizar en su seccion en sí
                   }).catch(e=>{
                     this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
                   })}
@@ -750,7 +763,8 @@ modificarCategoria(id:number, nombre:string){
   this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE categoria SET nombre = ? WHERE id = ?',[nombre,id]).then(res=>{
     this.presentAlert("Modificar","Categoría Modificada");
-    this.seleccionarCategorias();
+    this.seleccionarCategorias(); //actualizar en su seccion en sí
+    this.seleccionarSubCategorias();
   }).catch(e=>{
     this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
   })
@@ -760,7 +774,10 @@ modificarSubCategoria(id:number, nombre:string, categoria_id:number){
   this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',[nombre,categoria_id,id]).then(res=>{
     this.presentAlert("Modificar","SubCategoría Modificada");
-    this.seleccionarSubCategorias();
+    this.seleccionarSubCategorias(); //actualizar en su seccion en sí
+    this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
+
+
   }).catch(e=>{
     this.presentAlert('Modificar SubCategoría', 'Error: ' + JSON.stringify(e));
   })
@@ -770,7 +787,8 @@ modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:str
   this.presentAlert("service","ID: " + id);
   return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
     this.presentAlert("Modificar","Producto Modificado");
-    this.seleccionarProductos();
+    this.seleccionarProductos(); //actualizar en su seccion en sí
+    
   }).catch(e=>{
     this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
   })
@@ -878,6 +896,7 @@ eliminarCategoria(id: number) {
               .then(() => {
                   this.presentAlert("Eliminar", "Categoría eliminada con éxito");
                   this.seleccionarCategorias(); // Actualizar la lista de categorías
+                  this.seleccionarSubCategorias();
               })
               .catch(e => {
                   this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
@@ -903,6 +922,7 @@ eliminarSubcategoria(id: number) {
               .then(() => {
                   this.presentAlert("Eliminar", "Subcategoría eliminada con éxito");
                   this.seleccionarSubCategorias(); // Actualizar la lista de subcategorías
+                  this.seleccionarProductos();
               })
               .catch(e => {
                   this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));

@@ -21,8 +21,8 @@ export class ItemsPage implements OnInit {
     {
       id: '',
       proveedor_id: '',
-      nombre: '',
-      descripcion: '',
+      nombre_producto: '',
+      descripcion_producto: '',
       precio: '',
       stock: '',
       organico: '',
