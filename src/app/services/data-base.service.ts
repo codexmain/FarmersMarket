@@ -57,7 +57,7 @@ export class DataBaseService {
             FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
           );`;
 
-  tblDireccion: string = `CREATE TABLE direccion(
+  tblDireccion: string = `CREATE TABLE IF NOT EXISTS direccion(
             id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
             usuario_id INTEGER NOT NULL,
             comuna_id INTEGER NOT NULL,
@@ -376,7 +376,7 @@ export class DataBaseService {
     this.platform.ready().then(()=>{
       //crear la Base de Datos
       this.sqlite.create({
-        name: 'cutuco.db',
+        name: 'cutuco2.db',
         location: 'default'
       }).then((db: SQLiteObject)=>{
         //capturar la conexion a la BD
@@ -422,53 +422,9 @@ export class DataBaseService {
 
 
 
-  //Guardar usuarios en la base de datos (pendiente ingreso de productos y otros)
-  registrarUsuarios(
-    pNombre: string, sNombre: string, aPaterno: string, aMaterno: string,
-    email: string, password: string, empresa: string,
-    region: string, comuna: string, direccion: string
-  ) {
-    this.sqlite.create({
-      name: 'data.db',
-      location: 'default',
-    }).then((db: SQLiteObject) => {
-    // Insertar el usuario en la tabla Usuarios
-    db.executeSql(
-      `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa) 
-       VALUES(?,?,?,?,?,?,?,?)`, 
-      [pNombre, sNombre, aPaterno, aMaterno, email, password, empresa,]
-    ).then((res) => {
-      console.log('Mensaje: Cuenta usuario creada');
-      
-      // Obtener el ID del usuario recién creado
-      const usuarioId = res.insertId;
-
-      // Insertar la dirección del usuario en la tabla Direcciones, ahora con region_id
-      db.executeSql(
-        `INSERT INTO Direcciones(usuario_id, comuna_id, region_id, direccion) 
-         VALUES(?, (SELECT id FROM Comunas WHERE nombre = ?), (SELECT id FROM Regiones WHERE nombre = ?), ?)`, 
-        [usuarioId, comuna, region, direccion]
-      ).then(() => {
-        console.log('Mensaje: Dirección registrada');
-      }).catch((e) => {
-        console.log('Mensaje: ERROR al guardar Dirección: ' + JSON.stringify(e));
-      });
-
-    }).catch((e) => {
-      console.log('Mensaje: ERROR al guardar Usuario: ' + JSON.stringify(e));
-    });
-
-  }).catch((e) => {
-    console.log('Mensaje: ERROR al crear o abrir DB: ' + JSON.stringify(e));
-  });
-  }
-
-
-
-
 //Funcion para CRUDs pendiente modulo de administración
 
-//variables para guardar los datos de las consultas en las tablas: datos imparciales
+//variables para guardar los datos de las consultas en las tablas: 
 listadoUsuarios = new BehaviorSubject([]);
 listadoCategorias = new BehaviorSubject([]);
 listadoSubCategorias = new BehaviorSubject([]);

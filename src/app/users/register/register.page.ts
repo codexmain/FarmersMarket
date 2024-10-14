@@ -77,20 +77,6 @@ export class RegisterPage implements OnInit {
     console.log(this.emails);
   }
 
-  registrarUsuarios(){
-    this.DataBase.registrarUsuarios(
-      this.pNombre,
-      this.sNombre,
-      this.aPaterno,
-      this.aMaterno,
-      this.empresa,
-      this.email,
-      this.password,
-      this.direccion,
-      this.region,
-      this.comuna
-    ); // ENviar Usuario al SQL
-  }
 
   async presentAlert(header: string, message: string) {
     const alert = await this.alertController.create({
