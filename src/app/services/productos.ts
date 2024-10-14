@@ -39,8 +39,8 @@ export class ProductosService {
 export class Productos {
     id!: number;
     proveedor_id!: number;
-    nombre!: string;
-    descripcion?: string;
+    nombre_producto!: string;
+    descripcion_producto?: string;
     precio!: number;
     stock!: number;
     organico!: number;

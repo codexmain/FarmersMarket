@@ -5,7 +5,7 @@ import { ModificarItemPage } from '../modificar-item/modificar-item.page';
 import { ViewItemPage } from '../view-item/view-item.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
-import { identity } from 'rxjs';
+
 
 
 @Component({
@@ -21,8 +21,8 @@ export class ItemsPage implements OnInit {
     {
       id: '',
       proveedor_id: '',
-      nombre: '',
-      descripcion: '',
+      nombre_producto: '',
+      descripcion_producto: '',
       precio: '',
       stock: '',
       organico: '',
