@@ -18,7 +18,7 @@
   <form id="addProductForm" (ngSubmit)="agregarProducto()">
 
     <ion-item>
-      <ion-label>Seleccionar Vendedor</ion-label>
+      <ion-label>Seleccionar Vendedor:</ion-label>
       <ion-select [(ngModel)]="proveedor_id" name="proveedor_id"  #sellerCtrl="ngModel" required>
         <ion-select-option *ngFor="let vendedor of arrayCmbProvedores" [value]="vendedor.id">{{ vendedor.nombre_empresa }}</ion-select-option> <!--esto hay que conectarlo a la base de datos  --> 
       </ion-select>
@@ -44,7 +44,7 @@
     </div>
 
     <ion-item>
-      <ion-label position="floating">Precio Producto</ion-label>
+      <ion-label position="floating">Precio Producto (CLP)</ion-label>
       <ion-input type="number" [(ngModel)]="precio" name="precio" required #productPriceCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="productPriceCtrl.invalid && (productPriceCtrl.dirty || productPriceCtrl.touched)" class="error-message">
@@ -60,7 +60,7 @@
     </div>  
 
     <ion-item>
-      <ion-label>El Producto Es Orgánico:</ion-label>
+      <ion-label>¿Producto Orgánico?:</ion-label>
       <ion-select [(ngModel)]="organico" name="organico" required #orgCtrl="ngModel" >
         <ion-select-option value=0>No es Orgánico</ion-select-option>
         <ion-select-option value=1>Es Orgánico</ion-select-option>
@@ -72,7 +72,7 @@
     
 
     <ion-item>
-      <ion-label>Seleccionar Categoría</ion-label>
+      <ion-label>Seleccionar Categoría:</ion-label>
       <ion-select [(ngModel)]="categoria_id" name="categoria_id" #categoryCtrl="ngModel" required (ionChange)="onCategoriaChange($event)">
         <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
       </ion-select>
@@ -82,7 +82,7 @@
     </div>      
 
     <ion-item>
-      <ion-label>Seleccionar SubCategoría</ion-label>
+      <ion-label>Seleccionar SubCategoría:</ion-label>
       <ion-select [(ngModel)]="subcategoria_id" name="subcategoria_id" #subCategoryCtrl="ngModel" required [disabled]="!categoria_id">
         <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
       </ion-select>

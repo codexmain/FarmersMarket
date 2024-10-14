@@ -26,7 +26,7 @@
     </div>
 
     <ion-item>
-      <ion-label>Seleccionar Categoría</ion-label>
+      <ion-label>Seleccionar Categoría:</ion-label>
       <ion-select [(ngModel)]="categoria_id" name="categoria_id" required #categoryCtrl="ngModel" >
         <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
       </ion-select>

@@ -376,7 +376,7 @@ export class DataBaseService {
     this.platform.ready().then(()=>{
       //crear la Base de Datos
       this.sqlite.create({
-        name: 'cutuco2.db',
+        name: 'cutuco3.db',
         location: 'default'
       }).then((db: SQLiteObject)=>{
         //capturar la conexion a la BD
@@ -660,7 +660,7 @@ seleccionarCbmProveedores(){
 
 
 seleccionarCmbSubCategorias(id: number){
-  return this.database.executeSql('SELECT id, nombre FROM sbcategoria WHERE categoria_id = ?', [id]).then(res=>{
+  return this.database.executeSql('SELECT id, nombre FROM subcategoria WHERE categoria_id = ?', [id]).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: CmbSubcategorias[] = [];
      //valido si trae al menos un registro
@@ -670,7 +670,7 @@ seleccionarCmbSubCategorias(id: number){
         //agrego los registros a mi lista
         items.push({
           id: res.rows.item(i).id,
-          nombre: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
         })
       }
      }
@@ -722,7 +722,7 @@ seleccionarCmbRegiones(){
 }
 
 seleccionarCmbComunas(id: number){
-  return this.database.executeSql('SELECT id, nombre FROM subcategoria WHERE region_id = ?', [id]).then(res=>{
+  return this.database.executeSql('SELECT id, nombre FROM comuna WHERE region_id = ?', [id]).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: CmbComuna[] = [];
      //valido si trae al menos un registro
@@ -732,7 +732,7 @@ seleccionarCmbComunas(id: number){
         //agrego los registros a mi lista
         items.push({
           id: res.rows.item(i).id,
-          nombre: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
         })
       }
      }
@@ -746,11 +746,11 @@ seleccionarCmbComunas(id: number){
 //todos los modificares
 
 modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
-                apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+                apellido_materno:string, email:string, nombre_empresa:string, 
                 descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
                 tipo_usuario_id:number){
                   this.presentAlert("service","ID: " + id);
-                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
+                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
                     this.presentAlert("Modificar","Usuario Modificado");
                     this.seleccionarUsuarios(); //actualizar en su seccion en sí
                   }).catch(e=>{

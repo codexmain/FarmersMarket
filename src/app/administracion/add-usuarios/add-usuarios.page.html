@@ -64,7 +64,7 @@
     </div>
 
     <ion-item>
-      <ion-label>Tipo de Usuario</ion-label>
+      <ion-label>Tipo de Usuario:</ion-label>
       <ion-select [(ngModel)]="tipoUsuario" name="tipoUsuario" #tipUserCtrl="ngModel" required>
         <ion-select-option *ngFor="let tipUsuario of arrayCmbTipoUsuario" [value]="tipUsuario.id">{{ tipUsuario.descripcion }}</ion-select-option>
       </ion-select>
@@ -74,7 +74,7 @@
     </div>     
  
     <ion-item>
-      <ion-label>Estado Usuario</ion-label>
+      <ion-label>Estado Usuario:</ion-label>
       <ion-select [(ngModel)]="estadoUsuario" name="estadoUsuario" required #estadoUserCtrl="ngModel">
         <ion-select-option value="activa">Cuenta Activa</ion-select-option>
         <ion-select-option value="deshabilitada">Cuenta Deshabilitada</ion-select-option>
@@ -103,7 +103,7 @@
     <br/>
 
     <ion-item>
-      <ion-label>Región</ion-label>
+      <ion-label>Región:</ion-label>
       <ion-select [(ngModel)]="region" name="region" #regionCtrl="ngModel" required (ionChange)="onRegionChange($event)">
         <ion-select-option *ngFor="let region of arrayCmbRegiones" [value]="region.id">{{ region.nombre }}</ion-select-option>
       </ion-select>
@@ -113,7 +113,7 @@
     </div>
 
     <ion-item>
-      <ion-label>Comuna</ion-label>
+      <ion-label>Comuna:</ion-label>
       <ion-select [(ngModel)]="comuna" name="comuna" #comunaCtrl="ngModel" required [disabled]="!region">
         <ion-select-option *ngFor="let comuna of arrayCmbComunas" [value]="comuna.id">{{ comuna.nombre }}</ion-select-option>
       </ion-select>
