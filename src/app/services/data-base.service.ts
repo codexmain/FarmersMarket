@@ -26,7 +26,7 @@ export class DataBaseService {
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
-          )`;
+          );`;
 
   tblComuna: string = `CREATE TABLE IF NOT EXISTS comuna (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -346,6 +346,58 @@ export class DataBaseService {
             (19,4,'Canela','Canela en rama para tus postres (100g).',200,50,0,NULL,30,'2024-10-04 20:20:28'),
             (20,4,'Semillas de Chía','Semillas de chía saludables (200g).',1000,20,1,NULL,34,'2024-10-04 20:20:28'),
             (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`;
+
+
+//declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
+
+tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS categoria (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL UNIQUE
+);`;
+
+
+tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL,
+  categoria_id INTEGER NOT NULL
+);`;
+
+tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS usuario (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL,
+  segundo_nombre TEXT,
+  apellido_paterno TEXT NOT NULL,
+  apellido_materno TEXT,
+  email TEXT UNIQUE NOT NULL,
+  contrasena TEXT NOT NULL,
+  nombre_empresa TEXT,
+  descripcion_corta TEXT, 
+  foto_perfil TEXT,
+  estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
+  fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
+  tipo_usuario_id INTEGER NOT NULL
+);`;
+
+tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS producto (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  proveedor_id INTEGER NOT NULL,
+  nombre TEXT NOT NULL,
+  descripcion TEXT,
+  precio INTEGER NOT NULL,
+  stock INTEGER NOT NULL,
+  organico INTEGER NOT NULL CHECK(organico IN (0, 1)),
+  foto_producto TEXT,
+  subcategoria_id INTEGER NOT NULL,
+  fecha_agregado TEXT DEFAULT(datetime('now'))
+);`;
+
+tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS direccion(
+  id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
+  usuario_id INTEGER NOT NULL,
+  comuna_id INTEGER NOT NULL,
+  direccion TEXT NOT NULL,
+  PRIMARY KEY (id, usuario_id)  -- Llave compuesta
+);`;
 
 
   //variable para el status de la Base de datos
@@ -890,6 +942,7 @@ eliminarCategoria(id: number) {
           this.database.executeSql('UPDATE subcategoria SET categoria_id = 1 WHERE categoria_id = ?', [id])
               .then(() => {
                   // Luego, eliminar la categoría
+                  
                   return this.database.executeSql('DELETE FROM categoria WHERE id = ?', [id]);
               })
               .then(() => {
