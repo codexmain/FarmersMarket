@@ -1,0 +1,111 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
+    <ion-buttons slot="end">
+      <ion-button type="submit" form="editUserForm" fill="clear" expand="full">
+        Modificar
+      </ion-button>
+    </ion-buttons>  
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header class="custom-card-header">Modificar Usuario</ion-card-header>
+  <form id="editUserForm" (ngSubmit)="modificarUser()"> 
+
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input type="text" [(ngModel)]="nombre" name="nombre" required minlength="2" #nombreCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="nombreCtrl.invalid && (nombreCtrl.dirty || nombreCtrl.touched)" class="error-message">
+      El primer nombre es obligatorio y debe tener al menos 2 caracteres.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Apellido Paterno</ion-label>
+      <ion-input type="text" [(ngModel)]="apellido_paterno" name="apellido_paterno" required minlength="2" #aPaternoCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
+      El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Segundo Nombre (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="segundo_nombre" name="segundo_nombre" #sNombreCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
+      El segundo nombre debe tener al menos 2 caracteres y no contener números.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Apellido Materno (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="apellido_materno" name="apellido_materno" #aMaternoCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
+      El apellido materno debe tener al menos 2 caracteres y no contener números.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Empresa (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="nombre_empresa" name="nombre_empresa" (ionChange)="onFieldsChange()" #empresaCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
+      El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
+      <ion-input type="text" [(ngModel)]="descripcion_corta" name="descripcion_corta" (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
+      La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
+    </div>
+
+    
+    <ion-item>
+      <ion-label>Tipo de Usuario</ion-label>
+      <ion-select [(ngModel)]="tipo_usuario_id" name="tipo_usuario_id" required #tipoCtrl="ngModel">
+        <ion-select-option *ngFor="let tipo of arrayCmbTipoUsuario" [value]="tipo.id">
+          {{ tipo.descripcion }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="tipoCtrl.invalid && (tipoCtrl.dirty || tipoCtrl.touched)" class="error-message">
+      El Tipo de usuario es obligatorio.
+    </div>
+
+    <ion-item>
+      <ion-label>Estado Usuario</ion-label>
+      <ion-select [(ngModel)]="estado_cuenta" name="estado_cuenta" required #estadoCtrl="ngModel">
+        <ion-select-option value="activa">Cuenta Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">Cuenta Deshabilitada</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoCtrl.invalid && (estadoCtrl.dirty || estadoCtrl.touched)" class="error-message">
+      El estado del Usuario es obligatorio.
+    </div>
+
+
+    <ion-item>
+      <ion-label position="floating">Correo Electrónico</ion-label>
+      <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
+      El correo es obligatorio y debe tener un formato válido.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input type="password" [(ngModel)]="contrasena" name="contrasena" required minlength="10" #contrasenaCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="contrasenaCtrl.invalid && (contrasenaCtrl.dirty || contrasenaCtrl.touched)" class="error-message">
+      La contraseña es obligatoria y debe tener al menos 10 caracteres.
+    </div>
+
+  
+  </form> 
+</ion-card>
+</ion-content>

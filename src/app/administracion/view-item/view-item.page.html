@@ -1,0 +1,68 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header class="custom-card-header">Detalles Producto</ion-card-header>
+
+
+    <ion-item>
+      <ion-label>Seleccionar Vendedor</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="proveedor_id" name="proveedor_id">
+        <ion-select-option *ngFor="let vendedor of arrayCmbProvedores" [value]="vendedor.id">{{ vendedor.nombre_empresa }}</ion-select-option> <!--esto hay que conectarlo a la base de datos  --> 
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Nombre Producto</ion-label>
+      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="nombre" name="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripción Producto</ion-label>
+      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="descripcion" name="descripcion" ></ion-input>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label position="floating">Precio Producto</ion-label>
+      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="precio" name="precio"></ion-input>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label position="floating">Stock/Existencias del Producto</ion-label>
+      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="stock" name="stock"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>El Producto Es Orgánico:</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="organico" name="organico">
+        <ion-select-option value=0>No es Orgánico</ion-select-option>
+        <ion-select-option value=1>Es Orgánico</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Seleccionar Categoría</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="categoria_id" name="categoria_id" >
+        <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    
+
+    <ion-item>
+      <ion-label>Seleccionar SubCategoría</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="subcategoria_id" name="subcategoria_id">
+        <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+</ion-card>
+</ion-content>

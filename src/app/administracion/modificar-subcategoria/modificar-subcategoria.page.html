@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
+    <ion-buttons slot="end">
+      <ion-button type="submit" form="editSubcategoryForm" fill="clear" expand="full">
+        Modificar
+      </ion-button>
+    </ion-buttons>  
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header class="custom-card-header">Modificar SubCategoría</ion-card-header>
+  <form id="editSubcategoryForm" (ngSubmit)="modificarSubcategoria()">
+
+    <ion-item>
+      <ion-label position="floating">Nombre SubCategoría</ion-label>
+      <ion-input type="text" [(ngModel)]="nombre" name="nombre" required minlength="5" required #subCategoryCtrl="ngModel"></ion-input>
+    </ion-item>
+    <div *ngIf="subCategoryCtrl.invalid && (subCategoryCtrl.dirty || subCategoryCtrl.touched)" class="error-message">
+      El nombre de la SubCategoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.
+    </div>
+
+    <ion-item>
+      <ion-label>Seleccionar Categoría</ion-label>
+      <ion-select [(ngModel)]="categoria_id" name="categoria_id" required #categoryCtrl="ngModel" >
+        <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
+      La Categoría es obligatoria.
+    </div>      
+  </form>
+</ion-card>
+</ion-content>

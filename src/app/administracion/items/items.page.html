@@ -4,17 +4,35 @@
       <ion-button [routerDirection]="'back'" [routerLink]="'/admin-page'">Cancelar</ion-button>
     </ion-buttons>
     <ion-title>Productos</ion-title>  
-    <ion-button slot="end" (click)="presentModal()">
+    <ion-button slot="end" (click)="agregar()">
       <ion-icon name="add-outline">  </ion-icon>
     </ion-button>  
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-grid><ion-searchbar placeholder="Buscar Productos"></ion-searchbar></ion-grid>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">productos</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid>
+    <ion-searchbar placeholder="Buscar Producto"></ion-searchbar>
+  </ion-grid>
+  <ion-list>
+    <ion-item *ngFor="let product of arrayProductos">
+      <ion-label>
+        <h5>ID Producto: {{ product.id }}</h5>
+        <p>Nombre Proveedor: {{ product.nombre_proveedor }}</p>
+        <p>Nombre Producto: {{ product.nombre }}</p>
+        <p>Precio: {{ product.precio }}</p>
+        <p>Stock: {{ product.stock }}</p>
+        <p>Categoria relacionada: {{ product.nombre_categoria }}</p>
+        <p>Subcategoría relacionada: {{ product.nombre_subcategoria }}</p>
+      </ion-label>
+      <ion-button 
+        fill="solid" 
+        color="warning" 
+        slot="end" 
+        (click)="presentActionSheet(product)" 
+        style="padding: 0; margin: 0;">
+        Más Acciones
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>
