@@ -2,18 +2,48 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { DataBaseService } from 'src/app/services/data-base.service';
+import { Device } from '@capacitor/device';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit{
-  userEmail: string='';
+export class AppComponent implements OnInit {
+  userEmail: string = '';
   alertController: any;
 
+  public isWeb: boolean;
+  public load: boolean;
 
-  constructor(private router: Router, private nativeStorage: NativeStorage, private dataBaseService: DataBaseService) {}
+  constructor(
+    private router: Router,
+    private nativeStorage: NativeStorage,
+    private dataBaseService: DataBaseService,
+    private platform: Platform,
+  ) {
+    this.isWeb = false;
+    this.load = false;
+    this.initApp();}
+
+    initApp(){
+
+      this.platform.ready().then( async () => {
+  
+        // Comprobamos si estamos en web
+        const info = await Device.getInfo();
+        this.isWeb = info.platform == 'web';
+  
+        // Iniciamos la base de datos
+        this.dataBaseService.init();
+        // Esperamos a que la base de datos este lista
+        this.dataBaseService.dbReady.subscribe(load => {
+          this.load = load;
+        })
+      })
+  
+    }
 
   ngOnInit() {
     this.updateUserEmail();
@@ -21,7 +51,8 @@ export class AppComponent implements OnInit{
 
   // actualiza el correo desde Native Storage
   updateUserEmail() {
-    this.nativeStorage.getItem('userEmail')
+    this.nativeStorage
+      .getItem('userEmail')
       .then((email) => {
         this.userEmail = email || 'Correo';
       })
@@ -32,7 +63,8 @@ export class AppComponent implements OnInit{
 
   // elimina el correo de Native Storage
   Salir() {
-    this.nativeStorage.remove('userEmail')
+    this.nativeStorage
+      .remove('userEmail')
       .then(() => {
         console.log('Correo eliminado de Native Storage');
         this.userEmail = 'Correo'; // resetear el valor en la interfaz

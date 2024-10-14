@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -12,10 +12,15 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx'; //sql
 
+import { defineCustomElements as jeepSqlite } from 'jeep-sqlite/loader'
+jeepSqlite(window)
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync(),SQLite, NativeStorage],
   bootstrap: [AppComponent],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ]
 })
 export class AppModule {}
