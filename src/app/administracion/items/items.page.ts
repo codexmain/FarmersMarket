@@ -5,6 +5,7 @@ import { ModificarItemPage } from '../modificar-item/modificar-item.page';
 import { ViewItemPage } from '../view-item/view-item.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
+import { Productos } from 'src/app/services/productos';
 
 
 
@@ -37,6 +38,28 @@ export class ItemsPage implements OnInit {
     }
   ]
 
+  searchTerm: string = '';
+
+  filteredProductos: any = [
+    {
+      id: '',
+      proveedor_id: '',
+      nombre_producto: '',
+      descripcion_producto: '',
+      precio: '',
+      stock: '',
+      organico: '',
+      organicoEnTexto: '',
+      foto_producto: '',
+      subcategoria_id: '',
+      fecha_agregado: '',
+      nombre_subcategoria: '',
+      categoria_id: '',
+      nombre_proveedor: '',
+      nombre_categoria: ''
+    }
+  ]
+
 
   ngOnInit() {
     this.bd.dbState().subscribe(data=>{
@@ -45,10 +68,25 @@ export class ItemsPage implements OnInit {
         //subscribir al observable de la listaNoticias
         this.bd.fetchProductos().subscribe(res=>{
           this.arrayProductos = res;
+          this.filteredProductos = res;
+
         })
       }
     })
   }
+
+    // Método para filtrar las categorías
+    searchItems() {
+    if (this.searchTerm.trim() === '') {
+      // Si el searchTerm está vacío, mostrar todas las categorías
+      this.filteredProductos = this.arrayProductos;
+    } else {
+      // Filtrar las categorías
+      this.filteredProductos = this.arrayProductos.filter((product: Productos) => 
+        product.nombre_producto.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+  }  
 
   async presentActionSheet(x: any) {
     const actionSheet = await this.actionSheetController.create({
