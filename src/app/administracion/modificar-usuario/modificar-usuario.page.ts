@@ -8,6 +8,8 @@ import { DataBaseService } from 'src/app/services/data-base.service';
 })
 export class ModificarUsuarioPage implements OnInit {
   //esto para traer la data de la parte principal
+
+  isDisabled = true;
   usuario: any;
 
   //cosas del formulario
@@ -98,7 +100,7 @@ export class ModificarUsuarioPage implements OnInit {
       // Procede a actualizar el usuario en la base de datos
       await this.bd.modificarUsuario(this.usuario.id, this.nombre,
                                     this.segundo_nombre, this.apellido_paterno, this.apellido_materno, this.email,
-                                    this.contrasena, this.nombre_empresa, this.descripcion_corta, '', this.estado_cuenta, this.tipo_usuario_id);
+                                    this.nombre_empresa, this.descripcion_corta, '', this.estado_cuenta, this.tipo_usuario_id);
   
       this.modalController.dismiss({ success: true });}
 
@@ -135,7 +137,7 @@ export class ModificarUsuarioPage implements OnInit {
         }
 
             // Validar pNombre, sNombre, aPaterno, aMaterno
-        const namePattern = /^[a-zA-Z\s]{2,}$/;
+        const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
         if (!namePattern.test(this.nombre) || !namePattern.test(this.apellido_paterno) ||
             (this.segundo_nombre && !namePattern.test(this.segundo_nombre)) ||
             (this.apellido_materno && !namePattern.test(this.apellido_materno))) {
@@ -143,13 +145,13 @@ export class ModificarUsuarioPage implements OnInit {
           return;
         }
         // Validar empresa
-        const empresaPattern = /^[a-zA-Z0-9\s]{3,}$/;
+        const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
         if (this.nombre_empresa && !empresaPattern.test(this.nombre_empresa)) {
           this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
           return;
         }
 
-        const descEmpresaPattern = /^[a-zA-Z0-9\s]{10,90}$/;
+        const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
         if (this.descripcion_corta && !descEmpresaPattern.test(this.descripcion_corta)) {
           this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
           return false;
@@ -168,27 +170,6 @@ export class ModificarUsuarioPage implements OnInit {
             this.presentAlert('Error', 'El correo ingresado ya está asociado a otra cuenta.');
             return false;
           }
-        }
-
-                    // Validar contraseña
-        if (this.contrasena.length < 10 || this.contrasena.length > 30) {
-          this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
-          return false;
-        }
-
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
-          return false;
-        }
-
-        if (/(\d)\1/.test(this.contrasena) || /([a-zA-Z])\1/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
-          return false;
-        }
-
-        if (!/(?=.*[A-Z].*[A-Z])/.test(this.contrasena)) {
-          this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-          return false; 
         }
     
         // Agrega más validaciones según sea necesario

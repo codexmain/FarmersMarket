@@ -48,7 +48,7 @@
 
   
   <ion-item>
-    <ion-label>Tipo de Usuario</ion-label>
+    <ion-label>Tipo de Usuario:</ion-label>
     <ion-select [disabled]="isDisabled" [(ngModel)]="tipo_usuario_id" name="tipo_usuario_id">
       <ion-select-option *ngFor="let tipo of arrayCmbTipoUsuario" [value]="tipo.id">
         {{ tipo.descripcion }}
@@ -58,7 +58,7 @@
 
 
   <ion-item>
-    <ion-label>Estado Usuario</ion-label>
+    <ion-label>Estado Usuario:</ion-label>
     <ion-select [disabled]="isDisabled" [(ngModel)]="estado_cuenta" name="estado_cuenta">
       <ion-select-option value="activa">Cuenta Activa</ion-select-option>
       <ion-select-option value="deshabilitada">Cuenta Deshabilitada</ion-select-option>
