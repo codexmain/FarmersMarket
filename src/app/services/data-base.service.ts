@@ -456,6 +456,14 @@ tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS direccion(
       await this.database.executeSql(this.tblCarroCompra, []);
       await this.database.executeSql(this.tblDetalleCarroCompra, []);
 
+      //creacion de las tablas de respaldo
+      await this.database.executeSql(this.tblRespaldoCategoria, []);
+      await this.database.executeSql(this.tblRespaldoSubcategoria, []);
+      await this.database.executeSql(this.tblRespaldoUsuario, []);
+      await this.database.executeSql(this.tblRespaldoProducto, []);
+      await this.database.executeSql(this.tblRespaldoDirecciones, []);
+
+
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
       this.seleccionarCategorias();
