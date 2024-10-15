@@ -466,30 +466,93 @@ tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
 
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
-      this.seleccionarCategorias();
+      await this.seleccionarCategorias();
       await this.database.executeSql(this.registroSubcategoria, []);
-      this.seleccionarSubCategorias();
+      await this.seleccionarSubCategorias();
       await this.database.executeSql(this.registroTipoUsuario, []);
-      this.seleccionarCmbTipUsuario();
+      await this.seleccionarCmbTipUsuario();
       
 
       await this.database.executeSql(this.registroRegion, []);
-      this.seleccionarCmbRegiones();
+      await this.seleccionarCmbRegiones();
 
       await this.database.executeSql(this.registroComuna, []);
 
 
       await this.database.executeSql(this.registroUsuario, []);
-      this.seleccionarUsuarios();
-      this.seleccionarCbmProveedores();
+      await this.seleccionarUsuarios();
+      await this.seleccionarCbmProveedores();
 
       await this.database.executeSql(this.registroProducto, []);
-      this.seleccionarProductos();
+      await this.seleccionarProductos();
+
+      await this.eliminarDatosIniciales(); //y ahora como se modifican deben actualizarse todos los observables afectados
+      await this.seleccionarUsuarios();
+      await this.seleccionarCbmProveedores();
+      await this.seleccionarCategorias();
+      await this.seleccionarSubCategorias();
+      await this.seleccionarProductos();
+
+
 
       this.isDBReady.next(true);
 
     }catch(e){
       this.presentAlert('Creación de Tablas', 'Error en crear las tablas: ' + JSON.stringify(e));
+    }
+  }
+
+  async eliminarDatosIniciales() {
+    try {
+      // Eliminar categorías iniciales
+      const categoriasIniciales = await this.database.executeSql('SELECT * FROM categoria', []);
+      for (let i = 0; i < categoriasIniciales.rows.length; i++) {
+        const categoria = categoriasIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_categoria WHERE id = ?', [categoria.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM categoria WHERE id = ?', [categoria.id]);
+        }
+      }
+  
+      // Eliminar subcategorías iniciales
+      const subcategoriasIniciales = await this.database.executeSql('SELECT * FROM subcategoria', []);
+      for (let i = 0; i < subcategoriasIniciales.rows.length; i++) {
+        const subcategoria = subcategoriasIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_subcategoria WHERE id = ?', [subcategoria.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM subcategoria WHERE id = ?', [subcategoria.id]);
+        }
+      }
+  
+      // Eliminar productos iniciales
+      const productosIniciales = await this.database.executeSql('SELECT * FROM producto', []);
+      for (let i = 0; i < productosIniciales.rows.length; i++) {
+        const producto = productosIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_producto WHERE id = ?', [producto.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM producto WHERE id = ?', [producto.id]);
+        }
+      }
+  
+      // Eliminar usuarios iniciales
+      const usuariosIniciales = await this.database.executeSql('SELECT * FROM usuario', []);
+      for (let i = 0; i < usuariosIniciales.rows.length; i++) {
+        const usuario = usuariosIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_usuario WHERE id = ?', [usuario.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM usuario WHERE id = ?', [usuario.id]);
+        }
+      }
+    } catch (e) {
+      this.presentAlert('Eliminar Datos Iniciales', 'Error: ' + JSON.stringify(e));
     }
   }
 
