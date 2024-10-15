@@ -108,7 +108,7 @@ export class UsuariosPage implements OnInit {
   }
 
   eliminar(x: any) {
-    this.bd.eliminarUsuario(x.id)
+    this.bd.eliminarUsuario(x.id, x.nombre, x.segundo_nombre, x.apellido_paterno, x.apellido_materno, x.email, x.contrasena, x.nombre_empresa, x.descripcion_corta, x.foto_perfil, x.estado_cuenta, x.tipo_usuario_id)
   }
 
   agregar() {

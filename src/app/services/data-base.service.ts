@@ -350,20 +350,20 @@ export class DataBaseService {
 
 //declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
 
-tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS categoria (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_categoria (
+  id INTEGER PRIMARY KEY NOT NULL,
   nombre TEXT NOT NULL UNIQUE
 );`;
 
 
-tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_subcategoria (
+  id INTEGER PRIMARY KEY NOT NULL,
   nombre TEXT NOT NULL,
   categoria_id INTEGER NOT NULL
 );`;
 
-tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS usuario (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS respaldo_usuario (
+  id INTEGER PRIMARY KEY NOT NULL,
   nombre TEXT NOT NULL,
   segundo_nombre TEXT,
   apellido_paterno TEXT NOT NULL,
@@ -378,8 +378,8 @@ tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS usuario (
   tipo_usuario_id INTEGER NOT NULL
 );`;
 
-tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS producto (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS respaldo_producto (
+  id INTEGER PRIMARY KEY NOT NULL,
   proveedor_id INTEGER NOT NULL,
   nombre TEXT NOT NULL,
   descripcion TEXT,
@@ -391,7 +391,7 @@ tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS producto (
   fecha_agregado TEXT DEFAULT(datetime('now'))
 );`;
 
-tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS direccion(
+tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
   id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
   usuario_id INTEGER NOT NULL,
   comuna_id INTEGER NOT NULL,
@@ -908,7 +908,10 @@ insertarProducto(proveedor_id:number, nombre:string, descripcion:string, precio:
 //================================
 
 //accion de eliminar de todos los cruds de la parte de administracion
-eliminarUsuario(id: number) {
+eliminarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
+  apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+  descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+  tipo_usuario_id:number) {
   this.esRegistroProtegido('usuario', id).then(esProtegido => {
       if (esProtegido) {
           this.presentAlert("Eliminar", "No se puede eliminar este usuario porque es un registro protegido.");
@@ -920,6 +923,10 @@ eliminarUsuario(id: number) {
               })
               .then(() => {
                   return this.database.executeSql('UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?', [id]);
+              })
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_usuario(id, nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',[id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id]);
               })
               .then(() => {
                   // Finalmente, eliminar el usuario
@@ -941,13 +948,18 @@ eliminarUsuario(id: number) {
 
 
 
-eliminarCategoria(id: number) {
+eliminarCategoria(id:number, nombre:string) {
   this.esRegistroProtegido('categoria', id).then(esProtegido => {
       if (esProtegido) {
           this.presentAlert("Eliminar", "No se puede eliminar esta categoría porque es un registro protegido.");
       } else {
           // Actualizar subcategorías para establecer valor por defecto
           this.database.executeSql('UPDATE subcategoria SET categoria_id = 1 WHERE categoria_id = ?', [id])
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_categoria (id, nombre) VALUES (?, ?)', 
+                  [id, nombre]);
+              })
               .then(() => {
                   // Luego, eliminar la categoría
                   
@@ -968,13 +980,19 @@ eliminarCategoria(id: number) {
 }
 
 
-eliminarSubcategoria(id: number) {
+eliminarSubcategoria(id:number, nombre:string, categoria_id:number) {
   this.esRegistroProtegido('subcategoria', id).then(esProtegido => {
       if (esProtegido) {
           this.presentAlert("Eliminar", "No se puede eliminar esta subcategoría porque es un registro protegido.");
       } else {
           // Actualizar registros en la tabla de productos
           this.database.executeSql('UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?', [id])
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_subcategoria (id, nombre, categoria_id) VALUES (?, ?, ?)', 
+                  [id, nombre, categoria_id]);
+              })
+
               .then(() => {
                   // Finalmente, eliminar la subcategoría
                   return this.database.executeSql('DELETE FROM subcategoria WHERE id = ?', [id]);
@@ -994,7 +1012,7 @@ eliminarSubcategoria(id: number) {
 }
 
 
-eliminarProducto(id: number) {
+eliminarProducto(id:number, proveedor_id:number, nombre_producto:string, descripcion_producto:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number) {
   this.esRegistroProtegido('producto', id).then(esProtegido => {
       if (esProtegido) {
           this.presentAlert("Eliminar", "No se puede eliminar este producto porque es un registro protegido.");
@@ -1002,9 +1020,16 @@ eliminarProducto(id: number) {
           // Actualizar registros en la tabla de detalle_carro_compra
           this.database.executeSql('UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?', [id])
               .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                  [id, proveedor_id, nombre_producto, descripcion_producto, precio, stock, organico, foto_producto, subcategoria_id]);
+              })
+
+              .then(() => {
                   // Finalmente, eliminar el producto
                   return this.database.executeSql('DELETE FROM producto WHERE id = ?', [id]);
               })
+              
               .then(() => {
                   this.presentAlert("Eliminar", "Producto eliminado con éxito");
                   this.seleccionarProductos(); // Actualizar la lista de productos
@@ -1056,5 +1081,4 @@ esRegistroProtegido(tipo: string, id: number): Promise<boolean> {
       return res.rows.item(0).count > 0; // Devuelve true si es un registro protegido
   });
 }
-
 }
