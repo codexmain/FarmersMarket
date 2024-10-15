@@ -5,6 +5,7 @@ import { ViewUsuarioPage } from '../view-usuario/view-usuario.page';
 import { ModificarUsuarioPage } from '../modificar-usuario/modificar-usuario.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from 'src/app/services/data-base.service'
+import { Usuarios } from 'src/app/services/usuarios';
 
 @Component({
   selector: 'app-usuarios',
@@ -41,6 +42,31 @@ export class UsuariosPage implements OnInit {
     }
   ]
 
+  searchTerm: string = '';
+
+  filteredUsuarios: any = [
+    {
+      id: '',
+      nombre: '',
+      segundo_nombre: '',
+      apellido_paterno: '',
+      apellido_materno: '',
+      nombreCompleto: '',
+      email: '',
+      contrasena: '',
+      nombre_empresa: '',
+      empresaMostrarListar: '',
+      descripcion_corta: '',
+      descripcionMostrarListar: '',
+      foto_perfil: '',
+      estado_cuenta: '',
+      fecha_registro: '',
+      tipo_usuario_id: '',
+      descTipUser: ''
+
+    }
+  ]
+
   ngOnInit() {
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
@@ -48,9 +74,24 @@ export class UsuariosPage implements OnInit {
         //subscribir al observable de la listaNoticias
         this.bd.fetchUsuarios().subscribe(res=>{
           this.arregloUsuarios = res;
+          this.filteredUsuarios = res;
+
         })
       }
     })
+  }
+
+  // Método para filtrar las categorías
+  searchUsuarios() {
+    if (this.searchTerm.trim() === '') {
+      // Si el searchTerm está vacío, mostrar todas las categorías
+      this.filteredUsuarios = this.arregloUsuarios;
+    } else {
+      // Filtrar las categorías
+      this.filteredUsuarios = this.arregloUsuarios.filter((user: Usuarios) => 
+        user.nombreCompleto.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
 
 

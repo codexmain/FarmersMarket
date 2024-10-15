@@ -5,6 +5,7 @@ import { ViewCategoriaPage } from '../view-categoria/view-categoria.page';
 import { ModificarCategoriaPage } from '../modificar-categoria/modificar-categoria.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
+import { Categorias } from 'src/app/services/categorias';
 
 @Component({
   selector: 'app-categorias',
@@ -23,6 +24,18 @@ export class CategoriasPage implements OnInit {
     }
   ]
 
+  searchTerm: string = '';
+
+  filteredCategorias: any = [
+    {
+      id: '',
+      nombre: ''
+
+    }
+  ]
+
+
+
   ngOnInit() {
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
@@ -30,9 +43,23 @@ export class CategoriasPage implements OnInit {
         //subscribir al observable de la listaNoticias
         this.bd.fetchCategorias().subscribe(res=>{
           this.arrayCategorias = res;
+          this.filteredCategorias = res; // Inicialmente, mostrar todas las categorías
         })
       }
     })
+  }
+
+  // Método para filtrar las categorías
+  searchCategorias() {
+    if (this.searchTerm.trim() === '') {
+      // Si el searchTerm está vacío, mostrar todas las categorías
+      this.filteredCategorias = this.arrayCategorias;
+    } else {
+      // Filtrar las categorías
+      this.filteredCategorias = this.arrayCategorias.filter((cat: Categorias) => 
+        cat.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
 
   async presentActionSheet(x: any) {

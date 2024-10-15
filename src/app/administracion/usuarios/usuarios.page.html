@@ -12,10 +12,14 @@
 
 <ion-content [fullscreen]="true">
   <ion-grid>
-    <ion-searchbar placeholder="Buscar Usuario"></ion-searchbar>
+    <ion-searchbar     
+      placeholder="Buscar Usuario(s)" 
+      [(ngModel)]="searchTerm" 
+      (ionInput)="searchUsuarios()">
+    </ion-searchbar>
   </ion-grid>
   <ion-list>
-    <ion-item *ngFor="let user of arregloUsuarios">
+    <ion-item *ngFor="let user of filteredUsuarios">
       <ion-label>
         <h5>ID Usuario: {{ user.id }}</h5>
         <p>Nombre: {{ user.nombreCompleto }}</p>
@@ -32,6 +36,12 @@
         style="padding: 0; margin: 0;">
         Más Acciones
       </ion-button>
+    </ion-item>
+    <ion-item *ngIf="filteredUsuarios.length === 0">
+      <ion-label>
+        <h5>Ups... Usuario(s) no encontrado(s).</h5>
+        <P>Deje la barra de búsqueda vacía o busque nuevamente lo que desea.</P>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>

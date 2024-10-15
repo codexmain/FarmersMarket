@@ -13,10 +13,14 @@
 
 <ion-content [fullscreen]="true">
   <ion-grid>
-    <ion-searchbar placeholder="Buscar SubCategoría"></ion-searchbar>
+    <ion-searchbar 
+      placeholder="Buscar SubCategoría(s)"
+      [(ngModel)]="searchTerm" 
+      (ionInput)="searchSubcategorias()">
+    </ion-searchbar>
   </ion-grid>
   <ion-list>
-    <ion-item *ngFor="let subcat of arraySubCategorias">
+    <ion-item *ngFor="let subcat of filteredSubCategorias">
       <ion-label>
         <h5>ID SubCategoría: {{ subcat.id }}</h5>
         <p>Nombre SubCategoría: {{ subcat.nombre }}</p>
@@ -30,6 +34,12 @@
         style="padding: 0; margin: 0;">
         Más Acciones
       </ion-button>
+    </ion-item>
+    <ion-item *ngIf="filteredSubCategorias.length === 0">
+      <ion-label>
+        <h5>Ups... SubCategoría(s) no encontrada(s).</h5>
+        <P>Deje la barra de búsqueda vacía o busque nuevamente lo que desea.</P>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>

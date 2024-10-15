@@ -4,7 +4,7 @@ export class Usuarios {
     segundo_nombre?: string;
     apellido_paterno!: string;
     apellido_materno?: string;
-    nombreCompleto?: string;
+    nombreCompleto!: string;
     email!: string;
     contrasena!: string;
     nombre_empresa?: string;
