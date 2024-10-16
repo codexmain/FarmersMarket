@@ -100,8 +100,6 @@
       La contraseña es obligatoria y debe tener al menos 10 caracteres.
     </div>
 
-    <br/>
-
     <ion-item>
       <ion-label>Región:</ion-label>
       <ion-select [(ngModel)]="region" name="region" #regionCtrl="ngModel" required (ionChange)="onRegionChange($event)">
@@ -120,16 +118,9 @@
     </ion-item>
     <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
       La comuna es obligatoria.
-    </div>  
-    <!-- Insrucciones sobre el input de direccion -->
-    <ion-item>
-      <p>Puede ingresar la dirección manualmente o seleccionarla en el mapa.</p>
-    </ion-item>
+    </div>      
 
-    <!-- Desplegar Mapa -->
-    <capacitor-google-map id="map"></capacitor-google-map>
-
-    <ion-item>
+  <ion-item>
       <ion-label position="floating">Dirección</ion-label>
       <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel"></ion-input>
     </ion-item>
@@ -140,12 +131,3 @@
   </form>
 </ion-card>
 </ion-content>
-
-
-<style>
-  capacitor-google-map {
-    display: inline-block;
-    width: 100%; /* Adjust as needed */
-    height: 300px; /* Set a height for the map */
-  }
-  </style>
