@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { MenuController, ModalController, AlertController, NavParams, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
+import { Geolocation } from '@capacitor/geolocation';
+import { GeocodingService } from 'src/app/services/geocoding.service';
+import { LocationValidationService } from 'src/app/services/location-validation.service';
+
 
 
 
@@ -50,7 +54,7 @@ export class AddUsuariosPage implements OnInit {
   empresaObligatoria: boolean = false;
   descEmpresaObligatoria: boolean = false;
 
-  constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
+  constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) { 
 
   }
 
@@ -265,6 +269,46 @@ export class AddUsuariosPage implements OnInit {
     console.log('Formulario válido, proceder con el registro.');
     this.modalController.dismiss();
   }
+
+
+  async useCurrentLocation() {
+    try {
+      const coordinates = await Geolocation.getCurrentPosition();
+      const lat = coordinates.coords.latitude;
+      const lng = coordinates.coords.longitude;
+  
+      if (this.comuna && this.locationValidationService.isWithinBoundary(this.comuna, lat, lng)) {
+        this.geocodingService.reverseGeocode(lat, lng)
+          .subscribe({
+            next: (response) => {
+              if (response.results.length > 0) {
+                this.direccion = response.results[0].formatted_address;
+              } else {
+                this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+              }
+            },
+            error: (error) => {
+              this.presentToast(`Error: ${error}`);
+            }
+          });
+      } else {
+        this.presentToast('Tu ubicación actual no coincide con la comuna seleccionada.');
+      }
+    } catch (error) {
+      this.presentToast(`Error al obtener la ubicación: ${error}`);
+    }
+  }
+
+  async reverseGeocode(lat: number, lng: number) {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=API DE GOOGLE MAPS`);
+    const data = await response.json();
+    if (data.results.length > 0) {
+      this.direccion = data.results[0].formatted_address;
+    } else {
+      this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+    }
+  }
+  
 
 
  
