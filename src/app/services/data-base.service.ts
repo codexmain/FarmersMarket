@@ -318,7 +318,7 @@ export class DataBaseService {
             (127, 'Timaukel', 16);`;
 
   registroUsuario: string = `INSERT OR IGNORE INTO usuario (id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id) VALUES
-            (1,'N/A','','N/A','N/A','N/A','123456',NULL,NULL,NULL,'deshabilitada','2024-10-04 22:41:12',1),
+            (1,'N/A','','N/A','N/A','N/A','123456','Empresa Inexistente','Empresa Inexistente',NULL,'deshabilitada','2024-10-04 22:41:12',1),
             (2,'Vicente',NULL,'Rivera','Álvarez','example.Client@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',1),
             (3,'Alvaro','Israel','Barrera','Silva','example.Seller1@gmail.com','123456','Las Cosechas de Don Barrera','Se venden hortalizas de estación. ',NULL,'activa','2024-10-04 22:41:12',2),
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
@@ -428,7 +428,7 @@ tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
     this.platform.ready().then(()=>{
       //crear la Base de Datos
       this.sqlite.create({
-        name: 'cutucox1.db',
+        name: 'cutucox11.db',
         location: 'default'
       }).then((db: SQLiteObject)=>{
         //capturar la conexion a la BD
@@ -762,7 +762,7 @@ JOIN
 //creacion de las queries para los combobox
 
 seleccionarCbmProveedores(){
-  return this.database.executeSql('SELECT id, nombre_empresa FROM usuario WHERE nombre_empresa NOTNULL', []).then(res=>{
+  return this.database.executeSql('SELECT id, nombre_empresa FROM usuario WHERE nombre_empresa NOTNULL AND id > 1', []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: CmbProveedores[] = [];
      //valido si trae al menos un registro
@@ -876,6 +876,7 @@ modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_pater
                     this.presentAlert("Modificar","Usuario Modificado");
                     this.seleccionarUsuarios(); //actualizar en su seccion en sí
                     this.seleccionarCbmProveedores();
+                    this.seleccionarProductos();
                   }).catch(e=>{
                     this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
                   })}
@@ -998,6 +999,7 @@ eliminarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_patern
               .then(() => {
                   this.presentAlert("Eliminar", "Usuario eliminado con éxito");
                   this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                  this.seleccionarProductos();
                   this.seleccionarCbmProveedores();
               })
               .catch(e => {
