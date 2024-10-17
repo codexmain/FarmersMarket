@@ -17,18 +17,15 @@
       </ion-card-header>
 
       <ion-card-content>
+        <ion-item> Foto de perfil/Logo empresa (opcional):  
+          <ion-button>
+            <ion-icon name="add-outline"></ion-icon>                        
+          </ion-button>       
+        </ion-item>  
         <form (ngSubmit)="registrarse()">
-
-          <ion-item> Foto de perfil/Logo empresa (opcional):
-            <ion-label>Foto</ion-label>
-            <ion-button (click)="tomarFoto()">Tomar Foto</ion-button>
-          </ion-item>
-          <img *ngIf="Imagen" [src]="Imagen" alt="Foto" />
-
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2"
-              #pNombreCtrl="ngModel"></ion-input>
+            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
           </ion-item>
           <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
             El primer nombre es obligatorio y debe tener al menos 2 caracteres.
@@ -36,8 +33,7 @@
 
           <ion-item>
             <ion-label position="floating">Apellido Paterno</ion-label>
-            <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2"
-              #aPaternoCtrl="ngModel"></ion-input>
+            <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2" #aPaternoCtrl="ngModel"></ion-input>
           </ion-item>
           <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
             El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
@@ -77,21 +73,19 @@
 
           <ion-item>
             <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" [(ngModel)]="password" name="password" required minlength="10"
-              #passwordCtrl="ngModel">
-              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            <ion-input type="password" [(ngModel)]="password" name="password" required minlength="10" #passwordCtrl="ngModel">
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
           <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
             La contraseña es obligatoria y debe tener al menos 10 caracteres.
           </div>
 
-          <br />
+          <br/> 
 
           <ion-item>
             <ion-label>Región</ion-label>
-            <ion-select [(ngModel)]="region" name="region" required #regionCtrl="ngModel"
-              (ionChange)="onRegionChange($event)">
+            <ion-select [(ngModel)]="region" name="region" required #regionCtrl="ngModel" (ionChange)="onRegionChange($event)">
               <ion-select-option value="arica">Región de Arica y Parinacota</ion-select-option>
               <ion-select-option value="tarapaca">Región de Tarapacá</ion-select-option>
               <ion-select-option value="antofagasta">Región de Antofagasta</ion-select-option>
@@ -113,7 +107,7 @@
           <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
             La región es obligatoria.
           </div>
-
+        
           <ion-item>
             <ion-label>Comuna</ion-label>
             <ion-select [(ngModel)]="comuna" name="comuna" required #comunaCtrl="ngModel" [disabled]="!selectedRegion">
@@ -122,9 +116,9 @@
           </ion-item>
           <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
             La comuna es obligatoria.
-          </div>
+          </div>      
 
-          <ion-item>
+        <ion-item>
             <ion-label position="floating">Dirección</ion-label>
             <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel"></ion-input>
           </ion-item>
