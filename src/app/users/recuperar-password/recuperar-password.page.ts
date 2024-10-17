@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
-import { ModalController, AlertController, NavParams  } from '@ionic/angular';
+import { DataBaseService } from 'src/app/services/data-base.service';
+import { MenuController, ModalController, AlertController } from '@ionic/angular';
 @Component({
   selector: 'app-recuperar-password',
   templateUrl: './recuperar-password.page.html',
@@ -8,96 +8,81 @@ import { ModalController, AlertController, NavParams  } from '@ionic/angular';
   
 })
 export class RecuperarPasswordPage implements OnInit {
-
-
-
-  constructor(private modalController: ModalController, public alertController: AlertController, private navParams: NavParams) {}
-
+  correo: string = '';
   isDesactivado: boolean = true;
-  correo : string = '';
-  emails: string[] = [];
 
-  async recuperarPassword() { 
-    this.emails = this.navParams.get('emails');
-    if (this.emails.includes(this.correo)) {
-      this.isDesactivado = false; // Habilita el botón si el correo existe en el arreglo
-    } 
-    else {
-      this.isDesactivado = true; // Deshabilita el botón si el correo no existe en el arreglo
-      
+
+  constructor(
+    private DataBase: DataBaseService,
+    private alertController: AlertController, 
+    private modalController: ModalController, 
+    private menu: MenuController
+  ) {}
+
+  // Verificar si el correo es válido para habilitar el botón
+  onInputChange() {
+    this.isDesactivado = !this.correo.includes('@');
+  }
+
+  // Lógica para recuperar la contraseña
+  async recuperarPassword() {
+    try {
+      const user = await this.DataBase.recuperarcon(this.correo);
+
+      if (user) {
+        await this.presentAlertPrompt();
+      }
+    } catch (error) {
+      this.presentAlert('Error', 'El correo ingresado no está registrado.');
     }
   }
 
-async presentAlertPrompt() {
-  const alert = await this.alertController.create({
-    header: 'Cambio de contraseña.',
-    subHeader: 'Ingrese los campos para restaurar la contraseña',
-    inputs: [
-      {
-        name: 'password',
-        type: 'password',
-        placeholder: 'Nueva Contraseña'
-      },
-      {
-        name: 'confirmPassword',
-        type: 'password',
-        placeholder: 'Vuelve a escribir la contraseña'
-      },
-    ],
-    buttons: [
-      {
-        text: 'Cancelar',
-        role: 'cancel',
-        cssClass: 'secondary',
-        handler: () => {
-          console.log('Confirm Cancel');
-        }
-      }, {
-        text: 'Ok',
-        handler: (data) => {
-          const password = data.password;
-          const confirmPassword = data.confirmPassword;
+  // Alert para ingresar nueva contraseña
+  async presentAlertPrompt() {
+    const alert = await this.alertController.create({
+      header: 'Recuperar Contraseña',
+      inputs: [
+        {
+          name: 'newPassword',
+          type: 'password',
+          placeholder: 'Ingrese nueva contraseña',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Operación cancelada');
+            return true; // Retornamos 'true' explícitamente
+          },
+        },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            if (data.newPassword.length < 10) {
+              await this.presentAlert('Error', 'La contraseña debe tener al menos 10 caracteres.');
+              return false; // Si la contraseña es inválida
+            }
+  
+            try {
+              await this.DataBase.actualizarcon(this.correo, data.newPassword);
+              await this.presentAlert('Éxito', 'Contraseña actualizada correctamente.');
+              this.dismiss();
+              return true; // Si todo va bien, retornamos 'true'
+            } catch (error) {
+              console.error('Error al actualizar la contraseña:', error);
+              await this.presentAlert('Error', 'No se pudo actualizar la contraseña.');
+              return false; // En caso de error, retornamos 'false'
+            }
+          },
+        },
+      ],
+    });
+  
+    await alert.present();
+  }
 
-          if (!password || !confirmPassword) {
-            this.presentAlert('Error', 'Los campos no pueden estar vacíos.');
-            return false;
-          }
-
-          if (password.length < 10 || password.length > 30) {
-            this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
-            return false;
-          }
-
-          if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-            this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
-            return false;
-          }
-
-          if (/(\d)\1/.test(password) || /([a-zA-Z])\1/.test(password)) {
-            this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
-            return false;
-          }
-          if (!/(?=.*[A-Z].*[A-Z])/.test(password)) {
-            this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-            return false;
-          }
-
-          if (password !== confirmPassword) {
-            this.presentAlert('Error', 'Las contraseñas no coinciden.');
-            return false;
-          }
-
-          this.presentAlert('Éxito', 'La contraseña ha sido cambiada exitosamente.');
-          console.log('Confirm Ok', data);
-          return true;
-
-        }
-      }
-    ]
-  });
-
-  await alert.present();
-}
 
 async presentAlert(header: string, message: string) {
   const alert = await this.alertController.create({
@@ -115,6 +100,5 @@ async presentAlert(header: string, message: string) {
   dismiss() {
     this.modalController.dismiss();
   }
-
 
 }

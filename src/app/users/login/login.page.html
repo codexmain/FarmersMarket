@@ -1,47 +1,78 @@
 <ion-header>
-    <ion-toolbar color="secondary">
-        <ion-title>¡Ingresa!</ion-title>
-    </ion-toolbar>
+  <ion-toolbar color="secondary">
+    <ion-title>¡Ingresa!</ion-title>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <div>
-        <ion-card><!--Logo-->
-            <div class="flex-center">
-                <ion-avatar slot="start" style="background-color: #8B4513">
-                    <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
-                </ion-avatar>
-            </div>
-            <ion-card-header class="ion-text-center"
-                style="border-top: 0.5px solid #0000003d; margin: 10px; padding-bottom: 10px;">
-                <ion-card-title color="primary">Inicio de Sesión</ion-card-title>
-            </ion-card-header>
+  <div>
+    <ion-card
+      ><!--Logo-->
+      <div class="flex-center">
+        <ion-avatar slot="start" style="background-color: #8b4513">
+          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+        </ion-avatar>
+      </div>
+      <ion-card-header
+        class="ion-text-center"
+        style="
+          border-top: 0.5px solid #0000003d;
+          margin: 10px;
+          padding-bottom: 10px;
+        "
+      >
+        <ion-card-title color="primary">Inicio de Sesión</ion-card-title>
+      </ion-card-header>
 
-            <ion-card-content>
-                <form (ngSubmit)="Logearse()">
-                    <ion-item>
-                        <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
-                        <ion-input label="Cuenta" type="email" [(ngModel)]="email" labelPlacement="stacked"
-                            placeholder="Ingresar Cuenta" name="email"></ion-input>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
-                        <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
-                            placeholder="Ingresar Contraseña" name="password">
-                        <ion-input-password-toggle slot="end" name="eye" ></ion-input-password-toggle></ion-input>
-                    </ion-item>
-                    <ion-button (click)="Ingresar()" fill="solid" expand="full">
-                        Entrar
-                    </ion-button>
-                </form>
+      <ion-card-content>
+        <form (ngSubmit)="Logearse()">
+          <ion-item>
+            <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
+            <ion-input
+              label="Cuenta"
+              type="email"
+              [(ngModel)]="email"
+              labelPlacement="stacked"
+              placeholder="Ingresar Cuenta"
+              name="email"
+              required
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-icon
+              slot="start"
+              name="lock-closed"
+              aria-hidden="true"
+            ></ion-icon>
+            <ion-input
+              label="Contraseña"
+              type="password"
+              [(ngModel)]="password"
+              labelPlacement="stacked"
+              placeholder="Ingresar Contraseña"
+              name="password"
+              required
+            >
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle
+            ></ion-input>
+          </ion-item>
+          <ion-button type="submit" fill="solid" expand="full">
+            Entrar
+          </ion-button>
+        </form>
 
-                <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px;">
-                    <p>¿Olvido la contraseña?</p>
-                </ion-button>
-                <ion-button fill="clear" expand="full">
-                    ¿No tienes cuenta? ¡Registrate!
-                </ion-button>
-            </ion-card-content>
-        </ion-card>
-    </div>
+        <ion-button
+          (click)="presentModal()"
+          fill="clear"
+          expand="full"
+          style="margin: 0px; padding: 0px"
+        >
+          <p>¿Olvido la contraseña?</p>
+        </ion-button>
+        <ion-button (click)="irRegister()" fill="clear" expand="full">
+          ¿No tienes cuenta? ¡Registrate!
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
