@@ -189,6 +189,34 @@ export class ModificarUsuarioPage implements OnInit {
       dismiss() {
         this.modalController.dismiss();
       }
+
+      clearPNombre(){
+        this.nombre = '';
+      }
+      clearSNombre(){
+        this.segundo_nombre = '';
+      }
+    
+      clearAPaterno(){
+        this.apellido_paterno = '';
+      }
+      clearAMaterno(){
+        this.apellido_materno = '';
+    
+      }
+      clearEmpresa(){
+        this.nombre_empresa = '';
+    
+      }
+      clearDescEmpresa(){
+        this.descripcion_corta = '';
+    
+      }
+      clearMail(){
+        this.email = '';
+      }
+
+        
       
     }
     

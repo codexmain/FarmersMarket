@@ -30,6 +30,9 @@
     <ion-item>
       <ion-label position="floating">Nombre Producto</ion-label>
       <ion-input type="text" [(ngModel)]="nombre_producto" name="nombre_producto" required minlength="3" required #productCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearProductName()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="productCtrl.invalid && (productCtrl.dirty || productCtrl.touched)" class="error-message">
       El nombre del Producto es obligatorio y debe tener al menos 3 caracteres y un maximo de 40.
@@ -38,6 +41,9 @@
     <ion-item>
       <ion-label position="floating">Descripción Producto</ion-label>
       <ion-input type="text" [(ngModel)]="descripcion_producto" name="descripcion_producto" required minlength="10" required #descProductCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearProductDesc()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="descProductCtrl.invalid && (descProductCtrl.dirty || descProductCtrl.touched)" class="error-message">
       La descripción del Producto es opcional, debe tener al menos 10 caracteres y un maximo de 255.

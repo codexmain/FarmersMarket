@@ -300,13 +300,48 @@ export class AddUsuariosPage implements OnInit {
   }
 
   async reverseGeocode(lat: number, lng: number) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=API DE GOOGLE MAPS`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAIgPwEuFwBdIDwnhX-3pa1fiaTVlSlfyg`);
     const data = await response.json();
     if (data.results.length > 0) {
       this.direccion = data.results[0].formatted_address;
     } else {
       this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
     }
+  }
+
+  clearPNombre(){
+    this.pNombre = '';
+  }
+  clearSNombre(){
+    this.sNombre = '';
+  }
+
+  clearAPaterno(){
+    this.aPaterno = '';
+  }
+  clearAMaterno(){
+    this.aMaterno = '';
+
+  }
+  clearEmpresa(){
+    this.empresa = '';
+
+  }
+  clearDescEmpresa(){
+    this.descEmpresa = '';
+
+  }
+  clearMail(){
+    this.email = '';
+
+  }
+  clearClave(){
+    this.password = '';
+
+  }
+  clearDirr(){
+    this.direccion = '';
+
   }
   
 

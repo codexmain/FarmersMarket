@@ -19,6 +19,9 @@
     <ion-item>
       <ion-label position="floating">Nombre Categoría</ion-label>
       <ion-input type="text" [(ngModel)]="nombre" name="nombre" minlength="5"  required #categoryCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearNombre()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
       El nombre de la Categoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.

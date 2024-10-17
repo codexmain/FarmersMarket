@@ -84,6 +84,9 @@ async modificarSubcategoria() {
     this.modalController.dismiss();
   }
 
+  clearNombre() {
+    this.nombre = '';
+  }
 
   }
 

@@ -319,8 +319,8 @@ export class DataBaseService {
 
   registroUsuario: string = `INSERT OR IGNORE INTO usuario (id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id) VALUES
             (1,'N/A','','N/A','N/A','N/A','123456','Empresa Inexistente','Empresa Inexistente',NULL,'deshabilitada','2024-10-04 22:41:12',1),
-            (2,'Vicente',NULL,'Rivera','Álvarez','example.Client@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',1),
-            (3,'Alvaro','Israel','Barrera','Silva','example.Seller1@gmail.com','123456','Las Cosechas de Don Barrera','Se venden hortalizas de estación. ',NULL,'activa','2024-10-04 22:41:12',2),
+            (2,'Alvaro','Israel','Barrera','Silva','example.Seller1@gmail.com','123456','Las Cosechas de Don Barrera','Se venden hortalizas de estación. ',NULL,'activa','2024-10-04 22:41:12',2),
+            (3,'Vicente',NULL,'Rivera','Álvarez','example.Client@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',1),            
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
             (5,'Ignacio','Javier','Fuenzalida','Chandia','example.Admin@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',3);`;
 
@@ -428,7 +428,7 @@ tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
     this.platform.ready().then(()=>{
       //crear la Base de Datos
       this.sqlite.create({
-        name: 'cutucox11.db',
+        name: 'cutucox12.db',
         location: 'default'
       }).then((db: SQLiteObject)=>{
         //capturar la conexion a la BD
@@ -551,9 +551,23 @@ tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
           await this.database.executeSql('DELETE FROM usuario WHERE id = ?', [usuario.id]);
         }
       }
+      // Eliminar direcciones iniciales
+      const direccionesIniciales = await this.database.executeSql('SELECT * FROM direccion', []);
+      for (let i = 0; i < direccionesIniciales.rows.length; i++) {
+        const direccion = direccionesIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_direccion WHERE id = ? AND usuario_id = ?', [direccion.id, direccion.usuario_id]);
+        const count = res.rows.item(0).count;
+
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM direccion WHERE id = ? AND usuario_id = ?', [direccion.id, direccion.usuario_id]);
+        }
+      }
+
     } catch (e) {
       this.presentAlert('Eliminar Datos Iniciales', 'Error: ' + JSON.stringify(e));
     }
+
+    
   }
 
 
@@ -620,7 +634,7 @@ u.nombre ||' '|| COALESCE (u.segundo_nombre,'') ||' ' || u.apellido_paterno ||' 
 u.email, u.contrasena, u.nombre_empresa, COALESCE (u.nombre_empresa, "Sin Empresa") empresaMostrarListar,u.descripcion_corta, COALESCE(u.descripcion_corta, "Sin Empresa") as descripcionMostrarListar, 
 u.foto_perfil, u.estado_cuenta, u.fecha_registro, u.tipo_usuario_id, tu.descripcion as descTipUser
 FROM usuario u
-JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id`, []).then(res=>{
+JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id WHERE u.id > 1`, []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: Usuarios[] = [];
      //valido si trae al menos un registro
@@ -727,7 +741,7 @@ JOIN
 JOIN 
     usuario u ON p.proveedor_id = u.id
 JOIN 
-    categoria c ON s.categoria_id = c.id`, []).then(res=>{
+    categoria c ON s.categoria_id = c.id WHERE p.id > 1;`, []).then(res=>{
      //variable para almacenar el resultado de la consulta
      let items: Productos[] = [];
      //valido si trae al menos un registro

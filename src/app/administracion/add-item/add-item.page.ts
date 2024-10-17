@@ -183,6 +183,14 @@ export class AddItemPage implements OnInit {
     this.modalController.dismiss();
   }
 
+  clearProductName(){
+    this.nombre_producto = '';
+  }
+
+  clearProductDesc(){
+    this.descripcion_producto = '';
+  }
+
   
   
   }
