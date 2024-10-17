@@ -1,7 +1,4 @@
 <ion-app>
-  <ion-router-outlet *ngIf="load"></ion-router-outlet>
-  <!-- Solo en web -->
-  <jeep-sqlite *ngIf="isWeb"></jeep-sqlite>
   <ion-menu-toggle>
     <ion-menu contentId="main-content">
       <ion-header>
@@ -39,7 +36,6 @@
             <ion-item (click)="Salir()" [routerDirection]="'root'" [routerLink]="'/login'">
               <ion-icon name="log-out"></ion-icon>
               <ion-label>Salir de la cuenta</ion-label>
-              <ion-button expand="full" >Cerrar Sesión</ion-button>
             </ion-item>
           </ion-list>
         </ion-card>

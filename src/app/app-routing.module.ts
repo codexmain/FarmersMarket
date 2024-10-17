@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'test-page-sql',
+    redirectTo: 'admin-page',
     pathMatch: 'full'
   },
   {
@@ -126,15 +126,11 @@ const routes: Routes = [
     path: 'view-usuario',
     loadChildren: () => import('./administracion/view-usuario/view-usuario.module').then( m => m.ViewUsuarioPageModule)
   },
-  {
-    path: 'test-page-sql',
-    loadChildren: () => import('./test-page-sql/test-page-sql.module').then( m => m.TestPageSqlPageModule)
-  },
+
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
-
 
 
 

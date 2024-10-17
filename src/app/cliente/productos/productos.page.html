@@ -6,99 +6,69 @@
     <ion-title>Menu de Productos</ion-title>
   </ion-toolbar>
 </ion-header>
-<!--ESTILIZAR PARA MOSTRAR CATEGORIA Y SUBCATEGORIA PENDIENTE-->
-<ion-content>
-  <ion-item>
-    <ion-label>Categoría</ion-label>
-    <ion-select (ionChange)="onCategoryChange($event.detail.value)">
-      <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
-        {{ categorias.name }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
 
-  <ion-list *ngIf="subcategorias.length > 0">
-    <ion-item *ngFor="let subcategoria of subcategorias">
-      <ion-label>{{ subcategorias.name }}</ion-label>
-    </ion-item>
-  </ion-list>
-</ion-content>
 
 <ion-content class="flex-center">
   <ion-card>
-    <ion-list>
-      <ion-searchbar animated="true" placeholder="Buscar Producto"></ion-searchbar>
-      
-      <!-- RANDOM PRODUCTOS VERIFICAR RESULTADO -->
-      <ion-item *ngFor="let producto of productos">
-        <ion-thumbnail slot="start">
-          <img [src]="producto.imageUrl" />
-        </ion-thumbnail>
-        <ion-label>
-          <h2>{{ producto.name }}</h2>
-          <p>Precio: {{ producto.price}}</p>
-          <p>{{ producto.description }}</p>
-          <ion-checkbox slot="end" [checked]="product.isOrganic"></ion-checkbox>
-        </ion-label>
-        <ion-button (click)="openProductDetails(product)">Detalles</ion-button>
-      </ion-item>
-      
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 1</b></strong><br>
-          <strong><b>Valor:</b> $10.00</strong>
-          <p><b>Descripción del producto 1</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Agregar
-        </ion-button>
-      </ion-item>
+  <ion-list>
+    <ion-searchbar animated="true" placeholder="Buscar Producto"></ion-searchbar>
 
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 2</b></strong><br>
-          <strong><b>Valor:</b> $12.00</strong>
-          <p><b>Descripción del producto 2</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Agregar
-        </ion-button>
-      </ion-item>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="../assets/icon/favicon.png" />
+      </ion-avatar>
+      <ion-label>
+        <strong><b>Producto 1</b></strong><br>
+        <strong><b>Valor:</b> $10.00</strong>
+        <p><b>Descripción del producto 1</b></p>
+      </ion-label>
+      <ion-button expand="block" fill="outline" slot="end">
+        Agregar
+      </ion-button>
+    </ion-item>
 
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 3</b></strong><br>
-          <strong><b>Valor:</b> $24.00</strong>
-          <p><b>Descripción del producto 3</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Agregar
-        </ion-button>
-      </ion-item>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="../assets/icon/favicon.png" />
+      </ion-avatar>
+      <ion-label>
+        <strong><b>Producto 2</b></strong><br>
+        <strong><b>Valor:</b> $12.00</strong>
+        <p><b>Descripción del producto 2</b></p>
+      </ion-label>
+      <ion-button expand="block" fill="outline" slot="end">
+        Agregar
+      </ion-button>
+    </ion-item>
 
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 4</b></strong><br>
-          <strong><b>Valor:</b> $35.00</strong>
-          <p><b>Descripción del producto 4</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Agregar
-        </ion-button>
-      </ion-item>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="../assets/icon/favicon.png" />
+      </ion-avatar>
+      <ion-label>
+        <strong><b>Producto 3</b></strong><br>
+        <strong><b>Valor:</b> $24.00</strong>
+        <p><b>Descripción del producto 3</b></p>
+      </ion-label>
+      <ion-button expand="block" fill="outline" slot="end">
+        Agregar
+      </ion-button>
+    </ion-item>
 
-    </ion-list>
-  </ion-card>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="../assets/icon/favicon.png" />
+      </ion-avatar>
+      <ion-label>
+        <strong><b>Producto 4</b></strong><br>
+        <strong><b>Valor:</b> $35.00</strong>
+        <p><b>Descripción del producto 4</b></p>
+      </ion-label>
+      <ion-button expand="block" fill="outline" slot="end">
+        Agregar
+      </ion-button>
+    </ion-item>
+
+  </ion-list>
+</ion-card>
 </ion-content>

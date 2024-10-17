@@ -1,61 +1,47 @@
 <ion-header>
-  <ion-toolbar color="secondary">
-    <ion-title>¡Ingresa!</ion-title>
-  </ion-toolbar>
+    <ion-toolbar color="secondary">
+        <ion-title>¡Ingresa!</ion-title>
+    </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div>
-    <ion-card><!--Logo-->
-      <div class="flex-center">
-        <ion-avatar slot="start" style="background-color: #8B4513">
-          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
-        </ion-avatar>
-      </div>
-      <ion-card-header class="ion-text-center"
-        style="border-top: 0.5px solid #0000003d; margin: 10px; padding-bottom: 10px;">
-        <ion-card-title color="primary">Inicio de Sesión</ion-card-title>
-      </ion-card-header>
+    <div>
+        <ion-card><!--Logo-->
+            <div class="flex-center">
+                <ion-avatar slot="start" style="background-color: #8B4513">
+                    <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+                </ion-avatar>
+            </div>
+            <ion-card-header class="ion-text-center"
+                style="border-top: 0.5px solid #0000003d; margin: 10px; padding-bottom: 10px;">
+                <ion-card-title color="primary">Inicio de Sesión</ion-card-title>
+            </ion-card-header>
 
-      <ion-card-content>
-        <form (ngSubmit)="Logearse()" #loginForm="ngForm">
-          <ion-item>
-            <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
-            <ion-label position="floating">Cuenta</ion-label>
-            <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"
-              placeholder="Ingresar Cuenta">
-            </ion-input>
-          </ion-item>
-          <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
-            <div *ngIf="emailCtrl.errors?.required">La cuenta es obligatoria.</div>
-            <div *ngIf="emailCtrl.errors?.email">Por favor, ingresa un correo válido.</div>
-          </div>
+            <ion-card-content>
+                <form (ngSubmit)="Logearse()">
+                    <ion-item>
+                        <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
+                        <ion-input label="Cuenta" type="email" [(ngModel)]="email" labelPlacement="stacked"
+                            placeholder="Ingresar Cuenta" name="email"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
+                        <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
+                            placeholder="Ingresar Contraseña" name="password">
+                        <ion-input-password-toggle slot="end" name="eye" ></ion-input-password-toggle></ion-input>
+                    </ion-item>
+                    <ion-button (click)="Ingresar()" fill="solid" expand="full">
+                        Entrar
+                    </ion-button>
+                </form>
 
-          <ion-item>
-            <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input type="password" [(ngModel)]="password" name="password" required minlength="6"
-              #passwordCtrl="ngModel" placeholder="Ingresar Contraseña">
-            </ion-input>
-            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-          </ion-item>
-          <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
-            <div *ngIf="passwordCtrl.errors?.required">La contraseña es obligatoria.</div>
-            <div *ngIf="passwordCtrl.errors?.minlength">La contraseña debe tener al menos 10 caracteres.</div>
-          </div>
-
-          <ion-button [disabled]="loginForm.invalid" type="submit" fill="solid" expand="full">
-            Entrar
-          </ion-button>
-        </form>
-
-        <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px;">
-          <p>¿Olvido la contraseña?</p>
-        </ion-button>
-        <ion-button fill="clear" expand="full" (click)="Registrar()">
-          ¿No tienes cuenta? ¡Registrate!
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-  </div>
+                <ion-button (click)="presentModal()" fill="clear" expand="full" style="margin: 0px; padding: 0px;">
+                    <p>¿Olvido la contraseña?</p>
+                </ion-button>
+                <ion-button fill="clear" expand="full">
+                    ¿No tienes cuenta? ¡Registrate!
+                </ion-button>
+            </ion-card-content>
+        </ion-card>
+    </div>
 </ion-content>
