@@ -100,8 +100,6 @@
       La contraseña es obligatoria y debe tener al menos 10 caracteres.
     </div>
 
-    <br/>
-
     <ion-item>
       <ion-label>Región:</ion-label>
       <ion-select [(ngModel)]="region" name="region" #regionCtrl="ngModel" required (ionChange)="onRegionChange($event)">
@@ -122,15 +120,20 @@
       La comuna es obligatoria.
     </div>      
 
-  <ion-item>
+
+
+    <ion-item>
       <ion-label position="floating">Dirección</ion-label>
-      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel"></ion-input>
+      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Ingrese su ubicación manual o con el marcador para hacerlo instantáneo"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="useCurrentLocation()">
+        <ion-icon name="location-outline"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">
       La dirección es obligatoria y debe tener un formato válido.
     </div>
+    
 
   </form>
 </ion-card>
 </ion-content>
-

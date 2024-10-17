@@ -5,6 +5,7 @@ import { ModificarSubcategoriaPage } from '../modificar-subcategoria/modificar-s
 import { ViewSubcategoriaPage } from '../view-subcategoria/view-subcategoria.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from 'src/app/services/data-base.service'
+import { Subcategorias } from 'src/app/services/subcategorias';
 
 
 
@@ -27,6 +28,18 @@ export class SubcategoriasPage implements OnInit {
     }
   ]
 
+  searchTerm: string = '';
+
+  filteredSubCategorias: any = [
+    {
+      id: '',
+      nombre: '',
+      categoria_id: '',
+      nombreCategoria: ''
+
+    }
+  ]
+
   ngOnInit() {
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
@@ -34,9 +47,24 @@ export class SubcategoriasPage implements OnInit {
         //subscribir al observable de la listaNoticias
         this.bd.fetchSubCategorias().subscribe(res=>{
           this.arraySubCategorias = res;
+          this.filteredSubCategorias = res;
+
         })
       }
     })
+  }
+
+    // Método para filtrar las categorías
+    searchSubcategorias() {
+    if (this.searchTerm.trim() === '') {
+      // Si el searchTerm está vacío, mostrar todas las categorías
+      this.filteredSubCategorias = this.arraySubCategorias;
+    } else {
+      // Filtrar las categorías
+      this.filteredSubCategorias = this.arraySubCategorias.filter((subcat: Subcategorias) => 
+        subcat.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
   
 
@@ -92,7 +120,7 @@ export class SubcategoriasPage implements OnInit {
   }
 
   eliminar(x: any) {
-    this.bd.eliminarSubcategoria(x.id)
+    this.bd.eliminarSubcategoria(x.id, x.nombre, x.categoria_id)
   }
   
   agregar() {

@@ -10,6 +10,7 @@ import { DataBaseService } from '../../services/data-base.service';
 })
 export class ModificarItemPage implements OnInit {
   producto: any //para la transferencia de argumentos de navParams
+  isDisabled = true;
 
   proveedor_id!: number;
   nombre_producto: string = '';

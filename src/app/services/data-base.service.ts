@@ -9,14 +9,9 @@ import { Productos } from './productos';
 import { CmbSubcategorias } from './cmb-subcategorias';
 import { CmbTipUsuario } from './cmb-tip-usuario';
 import { CmbProveedores } from './cmb-proveedores';
-import { HttpClient } from '@angular/common/http';
-import { CapacitorSQLite, capSQLiteChanges, capSQLiteValues } from '@capacitor-community/sqlite';
-import { Device } from '@capacitor/device';
-import { Preferences } from '@capacitor/preferences';
-import { JsonSQLite } from 'jeep-sqlite/dist/types/interfaces/interfaces';
+import { CmbRegion } from './cmb-region';
+import { CmbComuna } from './cmb-comuna';
 
-/*
-import { CartItem } from '../cliente/carrito/carrito.page';arreglar carrito*/
 
 @Injectable({
   providedIn: 'root',
@@ -25,24 +20,13 @@ export class DataBaseService {
   public database!: SQLiteObject;
 
 
-
-  // Atributos
-
-  // Observable para comprobar si la base de datos esta lista
-  public dbReady: BehaviorSubject<boolean>;
-  // Indica si estamos en web
-  public isWeb: boolean;
-  // Indica si estamos en IOS
-  public isIOS: boolean;
-  // Nombre de la base de datos
-  public dbName: string;
-
+  
 
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
-          )`;
+          );`;
 
   tblComuna: string = `CREATE TABLE IF NOT EXISTS comuna (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +57,7 @@ export class DataBaseService {
             FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
           );`;
 
-  tblDireccion: string = `CREATE TABLE direccion(
+  tblDireccion: string = `CREATE TABLE IF NOT EXISTS direccion(
             id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
             usuario_id INTEGER NOT NULL,
             comuna_id INTEGER NOT NULL,
@@ -334,7 +318,7 @@ export class DataBaseService {
             (127, 'Timaukel', 16);`;
 
   registroUsuario: string = `INSERT OR IGNORE INTO usuario (id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,fecha_registro,tipo_usuario_id) VALUES
-            (1,'N/A','','N/A','N/A','N/A','123456',NULL,NULL,NULL,'deshabilitada','2024-10-04 22:41:12',1),
+            (1,'N/A','','N/A','N/A','N/A','123456','Empresa Inexistente','Empresa Inexistente',NULL,'deshabilitada','2024-10-04 22:41:12',1),
             (2,'Vicente',NULL,'Rivera','Álvarez','example.Client@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',1),
             (3,'Alvaro','Israel','Barrera','Silva','example.Seller1@gmail.com','123456','Las Cosechas de Don Barrera','Se venden hortalizas de estación. ',NULL,'activa','2024-10-04 22:41:12',2),
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
@@ -363,222 +347,67 @@ export class DataBaseService {
             (20,4,'Semillas de Chía','Semillas de chía saludables (200g).',1000,20,1,NULL,34,'2024-10-04 20:20:28'),
             (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`;
 
+
+//declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
+
+tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_categoria (
+  id INTEGER PRIMARY KEY NOT NULL,
+  nombre TEXT NOT NULL UNIQUE
+);`;
+
+
+tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_subcategoria (
+  id INTEGER PRIMARY KEY NOT NULL,
+  nombre TEXT NOT NULL,
+  categoria_id INTEGER NOT NULL
+);`;
+
+tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS respaldo_usuario (
+  id INTEGER PRIMARY KEY NOT NULL,
+  nombre TEXT NOT NULL,
+  segundo_nombre TEXT,
+  apellido_paterno TEXT NOT NULL,
+  apellido_materno TEXT,
+  email TEXT UNIQUE NOT NULL,
+  contrasena TEXT NOT NULL,
+  nombre_empresa TEXT,
+  descripcion_corta TEXT, 
+  foto_perfil TEXT,
+  estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
+  fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
+  tipo_usuario_id INTEGER NOT NULL
+);`;
+
+tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS respaldo_producto (
+  id INTEGER PRIMARY KEY NOT NULL,
+  proveedor_id INTEGER NOT NULL,
+  nombre TEXT NOT NULL,
+  descripcion TEXT,
+  precio INTEGER NOT NULL,
+  stock INTEGER NOT NULL,
+  organico INTEGER NOT NULL CHECK(organico IN (0, 1)),
+  foto_producto TEXT,
+  subcategoria_id INTEGER NOT NULL,
+  fecha_agregado TEXT DEFAULT(datetime('now'))
+);`;
+
+tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
+  id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
+  usuario_id INTEGER NOT NULL,
+  comuna_id INTEGER NOT NULL,
+  direccion TEXT NOT NULL,
+  PRIMARY KEY (id, usuario_id)  -- Llave compuesta
+);`;
+
+
   //variable para el status de la Base de datos
-  private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);            
 
-  constructor(
-    private http: HttpClient,
-    private sqlite: SQLite,
-    private platform: Platform,
-    private alertController: AlertController
-  ) {
+  constructor(private sqlite: SQLite, private platform: Platform, private alertController: AlertController) { 
     this.createBD();
-    this.dbReady = new BehaviorSubject(false);
-    this.isWeb = false;
-    this.isIOS = false;
-    this.dbName = '';
   }
 
-  async init() {
-
-    const info = await Device.getInfo();
-    // CapacitorSQLite no tiene disponible el metodo requestPermissions pero si existe y es llamable
-    const sqlite = CapacitorSQLite as any;
-
-    // Si estamos en android, pedimos permiso
-    if (info.platform == 'android') {
-      try {
-        await sqlite.requestPermissions();
-      } catch (error) {
-        console.error("Esta app necesita permisos para funcionar")
-      }
-      // Si estamos en web, iniciamos la web store
-    } else if (info.platform == 'web') {
-      this.isWeb = true;
-      await sqlite.initWebStore();
-    } else if (info.platform == 'ios') {
-      this.isIOS = true;
-    }
-
-    // Arrancamos la base de datos
-    this.setupDatabase();
-
-  }
-  async setupDatabase() {
-
-    // Obtenemos si ya hemos creado la base de datos
-    const dbSetup = await Preferences.get({ key: 'first_setup_key' })
-
-    // Sino la hemos creado, descargamos y creamos la base de datos
-    if (!dbSetup.value) {
-      this.downloadDatabase();
-    } else {
-      // Nos volvemos a conectar
-      this.dbName = await this.getDbName();
-      await CapacitorSQLite.createConnection({ database: this.dbName });
-      await CapacitorSQLite.open({ database: this.dbName })
-      this.dbReady.next(true);
-    }
-
-
-  }
-  downloadDatabase() {
-
-    // Obtenemos el fichero assets/db/db.json
-    this.http.get('assets/db/db.json').subscribe(async (jsonExport: JsonSQLite) => {
-
-
-      const jsonstring = JSON.stringify(jsonExport);
-      // Validamos el objeto
-      const isValid = await CapacitorSQLite.isJsonValid({ jsonstring });
-
-      // Si es valido
-      if (isValid.result) {
-
-        // Obtengo el nombre de la base de datos
-        this.dbName = jsonExport.database;
-        // Lo importo a la base de datos
-        await CapacitorSQLite.importFromJson({ jsonstring });
-        // Creo y abro una conexion a sqlite
-        await CapacitorSQLite.createConnection({ database: this.dbName });
-        await CapacitorSQLite.open({ database: this.dbName })
-
-        // Marco que ya hemos descargado la base de datos
-        await Preferences.set({ key: 'first_setup_key', value: '1' })
-        // Guardo el nombre de la base de datos
-        await Preferences.set({ key: 'dbname', value: this.dbName })
-
-        // Indico que la base de datos esta lista
-        this.dbReady.next(true);
-
-      }
-
-    })
-
-  }
-
-  async getDbName() {
-
-    if (!this.dbName) {
-      const dbname = await Preferences.get({ key: 'dbname' })
-      if (dbname.value) {
-        this.dbName = dbname.value
-      }
-    }
-    return this.dbName;
-  }
-
-//TestPageSql
-
-async create(language: string) {
-  // Sentencia para insertar un registro
-  let sql = 'INSERT INTO languages VALUES(?)';
-  // Obtengo la base de datos
-  const dbName = await this.getDbName();
-  // Ejecutamos la sentencia
-  return CapacitorSQLite.executeSet({
-    database: dbName,
-    set: [
-      {
-        statement: sql,
-        values: [
-          language
-        ]
-      }
-    ]
-  }).then((changes: capSQLiteChanges) => {
-    // Si es web, debemos guardar el cambio en la webstore manualmente
-    if (this.isWeb) {
-      CapacitorSQLite.saveToStore({ database: dbName });
-    }
-    return changes;
-  }).catch(err => Promise.reject(err))
-}
-
-async read() {
-  // Sentencia para leer todos los registros
-  let sql = 'SELECT * FROM languages';
-  // Obtengo la base de datos
-  const dbName = await this.getDbName();
-  // Ejecutamos la sentencia
-  return CapacitorSQLite.query({
-    database: dbName,
-    statement: sql,
-    values: [] // necesario para android
-  }).then((response: capSQLiteValues) => {
-    let languages: string[] = [];
-
-    // Si es IOS y hay datos, elimino la primera fila
-    // Esto se debe a que la primera fila es informacion de las tablas
-    if (this.isIOS && response.values.length > 0) {
-      response.values.shift();
-    }
-
-    // recorremos los datos
-    for (let index = 0; index < response.values.length; index++) {
-      const language = response.values[index];
-      languages.push(language.name);
-    }
-    return languages;
-
-  }).catch(err => Promise.reject(err))
-}
-
-async update(newLanguage: string, originalLanguage: string) {
-  // Sentencia para actualizar un registro
-  let sql = 'UPDATE languages SET name=? WHERE name=?';
-  // Obtengo la base de datos
-  const dbName = await this.getDbName();
-  // Ejecutamos la sentencia
-  return CapacitorSQLite.executeSet({
-    database: dbName,
-    set: [
-      {
-        statement: sql,
-        values: [
-          newLanguage,
-          originalLanguage
-        ]
-      }
-    ]
-  }).then((changes: capSQLiteChanges) => {
-    // Si es web, debemos guardar el cambio en la webstore manualmente
-    if (this.isWeb) {
-      CapacitorSQLite.saveToStore({ database: dbName });
-    }
-    return changes;
-  }).catch(err => Promise.reject(err))
-}
-
-async delete(language: string) {
-  // Sentencia para eliminar un registro
-  let sql = 'DELETE FROM languages WHERE name=?';
-  // Obtengo la base de datos
-  const dbName = await this.getDbName();
-  // Ejecutamos la sentencia
-  return CapacitorSQLite.executeSet({
-    database: dbName,
-    set: [
-      {
-        statement: sql,
-        values: [
-          language
-        ]
-      }
-    ]
-  }).then((changes: capSQLiteChanges) => {
-    // Si es web, debemos guardar el cambio en la webstore manualmente
-    if (this.isWeb) {
-      CapacitorSQLite.saveToStore({ database: dbName });
-    }
-    return changes;
-  }).catch(err => Promise.reject(err))
-}
-
-
-
-
-  async presentAlert(titulo: string, msj: string) {
+  async presentAlert(titulo: string, msj:string) {
     const alert = await this.alertController.create({
       header: titulo,
       message: msj,
@@ -588,62 +417,33 @@ async delete(language: string) {
     await alert.present();
   }
 
-  dbState() {
+  dbState(){
     return this.isDBReady.asObservable();
-  }
+  }  
 
-  // Método para validar las credenciales del usuario
-  async validarCredenciales(
-    correo: string,
-    contrasena: string
-  ): Promise<boolean> {
-    return this.database
-      .executeSql('SELECT * FROM usuario WHERE email = ?', [correo])
-      .then(async (res) => {
-        if (res.rows.length > 0) {
-          const usuario = res.rows.item(0);
-
-          // Aquí puedes usar una función de comparación de contraseñas si las contraseñas están encriptadas
-          const contrasenaCorrecta = usuario.contrasena === contrasena; // Este es un ejemplo simple. Usa bcrypt o similar en producción.
-
-          return contrasenaCorrecta; // Retorna true si la contraseña es correcta, de lo contrario, false.
-        } else {
-          return false; // El correo no existe
-        }
-      })
-      .catch((e) => {
-        console.error('Error al consultar la base de datos', e);
-        return false; // Manejo de errores
-      });
-  }
 
   //Funciones tablas se activa al ingresar al login (Faltan algunas y por corregir)
-  createBD() {
+  createBD(){
     //varificar si la plataforma esta disponible
-    this.platform.ready().then(() => {
+    this.platform.ready().then(()=>{
       //crear la Base de Datos
-      this.sqlite
-        .create({
-          name: 'cutuco.db',
-          location: 'default',
-        })
-        .then((db: SQLiteObject) => {
-          //capturar la conexion a la BD
-          this.database = db;
-          //llamamos a la función para crear las tablas
-          this.crearTablas();
-        })
-        .catch((e) => {
-          this.presentAlert(
-            'Base de Datos',
-            'Error en crear la BD: ' + JSON.stringify(e)
-          );
-        });
-    });
+      this.sqlite.create({
+        name: 'cutucox11.db',
+        location: 'default'
+      }).then((db: SQLiteObject)=>{
+        //capturar la conexion a la BD
+        this.database = db;
+        //llamamos a la función para crear las tablas
+        this.crearTablas();
+      }).catch(e=>{
+        this.presentAlert('Base de Datos', 'Error en crear la BD: ' + JSON.stringify(e));
+      })
+    })
+
   }
 
-  async crearTablas() {
-    try {
+  async crearTablas(){
+    try{
       //ejecuto la creación de Tablas
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
@@ -656,602 +456,694 @@ async delete(language: string) {
       await this.database.executeSql(this.tblCarroCompra, []);
       await this.database.executeSql(this.tblDetalleCarroCompra, []);
 
+      //creacion de las tablas de respaldo
+      await this.database.executeSql(this.tblRespaldoCategoria, []);
+      await this.database.executeSql(this.tblRespaldoSubcategoria, []);
+      await this.database.executeSql(this.tblRespaldoUsuario, []);
+      await this.database.executeSql(this.tblRespaldoProducto, []);
+      await this.database.executeSql(this.tblRespaldoDirecciones, []);
+
+
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
+      await this.seleccionarCategorias();
       await this.database.executeSql(this.registroSubcategoria, []);
+      await this.seleccionarSubCategorias();
       await this.database.executeSql(this.registroTipoUsuario, []);
+      await this.seleccionarCmbTipUsuario();
+      
+
       await this.database.executeSql(this.registroRegion, []);
+      await this.seleccionarCmbRegiones();
+
       await this.database.executeSql(this.registroComuna, []);
+
+
       await this.database.executeSql(this.registroUsuario, []);
+      await this.seleccionarUsuarios();
+      await this.seleccionarCbmProveedores();
+
       await this.database.executeSql(this.registroProducto, []);
+      await this.seleccionarProductos();
+
+      await this.eliminarDatosIniciales(); //y ahora como se modifican deben actualizarse todos los observables afectados
+      await this.seleccionarUsuarios();
+      await this.seleccionarCbmProveedores();
+      await this.seleccionarCategorias();
+      await this.seleccionarSubCategorias();
+      await this.seleccionarProductos();
+
+
 
       this.isDBReady.next(true);
-    } catch (e) {
-      this.presentAlert(
-        'Creación de Tablas',
-        'Error en crear las tablas: ' + JSON.stringify(e)
-      );
+
+    }catch(e){
+      this.presentAlert('Creación de Tablas', 'Error en crear las tablas: ' + JSON.stringify(e));
     }
   }
 
-  //Guardar usuarios en la base de datos (pendiente ingreso de productos y otros)
-  registrarUsuarios(
-    pNombre: string,
-    sNombre: string,
-    aPaterno: string,
-    aMaterno: string,
-    email: string,
-    password: string,
-    empresa: string,
-    region: string,
-    comuna: string,
-    direccion: string,
-    //faltan estos datos creo(corregir de ser necesario)
-    Imagen: string,
-    tipo_usuario_id: number
-  ) {
-    this.sqlite
-      .create({
-        name: 'data.db',
-        location: 'default',
-      })
-      .then((db: SQLiteObject) => {
-        // Insertar el usuario en la tabla Usuarios
-        db.executeSql(
-          `INSERT INTO Usuarios(primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa,foto_perfil,tipo_usuario_id) 
-       VALUES(?,?,?,?,?,?,?,?,?,?)`,
-          [pNombre, sNombre, aPaterno, aMaterno, email, password, empresa]
-        )
-          .then((res) => {
-            console.log('Mensaje: Cuenta usuario creada');
-
-            // Obtener el ID del usuario recién creado
-            const usuarioId = res.insertId;
-
-            // Insertar la dirección del usuario en la tabla Direcciones, ahora con region_id
-            db.executeSql(
-              `INSERT INTO Direcciones(usuario_id, comuna_id, region_id, direccion) 
-         VALUES(?, (SELECT id FROM Comunas WHERE nombre = ?), (SELECT id FROM Regiones WHERE nombre = ?), ?)`,
-              [usuarioId, comuna, region, direccion]
-            )
-              .then(() => {
-                console.log('Mensaje: Dirección registrada');
-              })
-              .catch((e) => {
-                console.log(
-                  'Mensaje: ERROR al guardar Dirección: ' + JSON.stringify(e)
-                );
-              });
-          })
-          .catch((e) => {
-            console.log(
-              'Mensaje: ERROR al guardar Usuario: ' + JSON.stringify(e)
-            );
-          });
-      })
-      .catch((e) => {
-        console.log('Mensaje: ERROR al crear o abrir DB: ' + JSON.stringify(e));
-      });
-  }
-
-  //Funcion para CRUDs pendiente modulo de administración
-
-  //variables para guardar los datos de las consultas en las tablas: datos imparciales
-  listadoUsuarios = new BehaviorSubject([]);
-  listadoCategorias = new BehaviorSubject([]);
-  listadoSubCategorias = new BehaviorSubject([]);
-  listadoProductos = new BehaviorSubject([]);
-
-  //variables para guardar los datos de las consultas en las tablas: Variables para hacer tranferencia de llaves por combobox
-  listadoCmbSubCategorias = new BehaviorSubject([]);
-  listadoCmbTipUsuario = new BehaviorSubject([]);
-  listadoCmbProveedores = new BehaviorSubject([]);
-
-  //Declaracion de los observables para la manipulación de la data: fetch generales
-  fetchUsuarios(): Observable<Usuarios[]> {
-    return this.listadoUsuarios.asObservable();
-  }
-  fetchUsuarioPorId(id: number): Promise<Usuarios> {
-    return this.database
-      .executeSql('SELECT * FROM usuario WHERE id = ?', [id])
-      .then((res) => {
-        //esto es para ver el detalle de un usuario en especifico
-        if (res.rows.length > 0) {
-          return {
-            id: res.rows.item(0).id,
-            nombre: res.rows.item(0).nombre,
-            segundo_nombre: res.rows.item(0).segundo_nombre,
-            apellido_paterno: res.rows.item(0).apellido_paterno,
-            apellido_materno: res.rows.item(0).apellido_materno,
-            email: res.rows.item(0).email,
-            contrasena: res.rows.item(0).contrasena,
-            nombre_empresa: res.rows.item(0).nombre_empresa,
-            descripcion_corta: res.rows.item(0).descripcion_corta,
-            foto_perfil: res.rows.item(0).foto_perfil,
-            estado_cuenta: res.rows.item(0).estado_cuenta,
-            fecha_registro: res.rows.item(0).fecha_registro,
-            tipo_usuario_id: res.rows.item(0).tipo_usuario_id,
-          };
-        } else {
-          throw new Error('Producto no encontrado');
-        }
-      });
-  }
-
-  fetchCategorias(): Observable<Categorias[]> {
-    return this.listadoCategorias.asObservable();
-  }
-
-  fetchCategoriaPorId(id: number): Promise<Categorias> {
-    //esto es para ver el detalle de un categoria en especifico
-    return this.database
-      .executeSql('SELECT * FROM categoria WHERE id = ?', [id])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          return {
-            id: res.rows.item(0).id,
-            nombre: res.rows.item(0).nombre,
-          };
-        } else {
-          throw new Error('Producto no encontrado');
-        }
-      });
-  }
-
-  fetchSubCategorias(): Observable<Subcategorias[]> {
-    return this.listadoSubCategorias.asObservable();
-  }
-
-  fetchSubCategoriaPorId(id: number): Promise<Subcategorias> {
-    //esto es para ver el detalle de una subcategoria en especifico
-    return this.database
-      .executeSql('SELECT * FROM subcategoria WHERE id = ?', [id])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          return {
-            id: res.rows.item(0).id,
-            nombre: res.rows.item(0).nombre,
-            categoria_id: res.rows.item(0).categoria_id,
-          };
-        } else {
-          throw new Error('Producto no encontrado');
-        }
-      });
-  }
-
-  fetchProductos(): Observable<Productos[]> {
-    return this.listadoProductos.asObservable();
-  }
-
-  fetchProductoPorId(id: number): Promise<Productos> {
-    //esto es para ver el detalle de un producto en especifico
-    return this.database
-      .executeSql('SELECT * FROM producto WHERE id = ?', [id])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          return {
-            id: res.rows.item(0).id,
-            proveedor_id: res.rows.item(0).proveedor_id,
-            nombre: res.rows.item(0).nombre,
-            descripcion: res.rows.item(0).descripcion,
-            precio: res.rows.item(0).precio,
-            stock: res.rows.item(0).stock,
-            organico: res.rows.item(0).organico,
-            foto_producto: res.rows.item(0).foto_producto,
-            subcategoria_id: res.rows.item(0).subcategoria_id,
-            fecha_agregado: res.rows.item(0).fecha_agregado,
-          };
-        } else {
-          throw new Error('Producto no encontrado');
-        }
-      });
-  }
-
-  //Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
-
-  fetchCmbSubCategorias(): Observable<CmbSubcategorias[]> {
-    return this.listadoCmbSubCategorias.asObservable();
-  }
-  fetchCmbTipUsuario(): Observable<CmbTipUsuario[]> {
-    return this.listadoCmbTipUsuario.asObservable();
-  }
-
-  fetchCmbProveedores(): Observable<CmbProveedores[]> {
-    return this.listadoCmbProveedores.asObservable();
-  }
-
-  //CRUD USUARIOS, parte administración. Todos los SELECTS
-  seleccionarUsuarios() {
-    return this.database.executeSql('SELECT * FROM usuario', []).then((res) => {
-      //variable para almacenar el resultado de la consulta
-      let items: Usuarios[] = [];
-      //valido si trae al menos un registro
-      if (res.rows.length > 0) {
-        //recorro mi resultado
-        for (var i = 0; i < res.rows.length; i++) {
-          //agrego los registros a mi lista
-          items.push({
-            id: res.rows.item(i).id,
-            nombre: res.rows.item(i).nombre,
-            segundo_nombre: res.rows.item(i).segundo_nombre,
-            apellido_paterno: res.rows.item(i).apellido_paterno,
-            apellido_materno: res.rows.item(i).apellido_materno,
-            email: res.rows.item(i).email,
-            contrasena: res.rows.item(i).contrasena,
-            nombre_empresa: res.rows.item(i).nombre_empresa,
-            descripcion_corta: res.rows.item(i).descripcion_corta,
-            foto_perfil: res.rows.item(i).foto_perfil,
-            estado_cuenta: res.rows.item(i).estado_cuenta,
-            fecha_registro: res.rows.item(i).fecha_registro,
-            tipo_usuario_id: res.rows.item(i).tipo_usuario_id,
-          });
+  async eliminarDatosIniciales() {
+    try {
+      // Eliminar categorías iniciales
+      const categoriasIniciales = await this.database.executeSql('SELECT * FROM categoria', []);
+      for (let i = 0; i < categoriasIniciales.rows.length; i++) {
+        const categoria = categoriasIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_categoria WHERE id = ?', [categoria.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM categoria WHERE id = ?', [categoria.id]);
         }
       }
-      //actualizar el observable de usuarios
-      this.listadoUsuarios.next(items as any);
-    });
-  }
-
-  seleccionarCategorias() {
-    return this.database
-      .executeSql('SELECT * FROM categoria', [])
-      .then((res) => {
-        //variable para almacenar el resultado de la consulta
-        let items: Categorias[] = [];
-        //valido si trae al menos un registro
-        if (res.rows.length > 0) {
-          //recorro mi resultado
-          for (var i = 0; i < res.rows.length; i++) {
-            //agrego los registros a mi lista
-            items.push({
-              id: res.rows.item(i).id,
-              nombre: res.rows.item(i).nombre,
-            });
-          }
-        }
-        //actualizar el observable de usuarios
-        this.listadoCategorias.next(items as any);
-      });
-  }
-
-  seleccionarSubCategorias() {
-    return this.database
-      .executeSql('SELECT * FROM subcategoria', [])
-      .then((res) => {
-        //variable para almacenar el resultado de la consulta
-        let items: Subcategorias[] = [];
-        //valido si trae al menos un registro
-        if (res.rows.length > 0) {
-          //recorro mi resultado
-          for (var i = 0; i < res.rows.length; i++) {
-            //agrego los registros a mi lista
-            items.push({
-              id: res.rows.item(i).id,
-              nombre: res.rows.item(i).nombre,
-              categoria_id: res.rows.item(i).categoria_id,
-            });
-          }
-        }
-        //actualizar el observable de usuarios
-        this.listadoSubCategorias.next(items as any);
-      });
-  }
-
-  seleccionarProductos() {
-    return this.database.executeSql('SELECT * FROM producto', []).then((res) => {
-      //variable para almacenar el resultado de la consulta
-      let items: Productos[] = [];
-      //valido si trae al menos un registro
-      if (res.rows.length > 0) {
-        //recorro mi resultado
-        for (var i = 0; i < res.rows.length; i++) {
-          //agrego los registros a mi lista
-          items.push({
-            id: res.rows.item(i).id,
-            proveedor_id: res.rows.item(i).proveedor_id,
-            nombre: res.rows.item(i).nombre,
-            descripcion: res.rows.item(i).descripcion,
-            precio: res.rows.item(i).precio,
-            stock: res.rows.item(i).stock,
-            organico: res.rows.item(i).organico,
-            foto_producto: res.rows.item(i).foto_producto,
-            subcategoria_id: res.rows.item(i).subcategoria_id,
-            fecha_agregado: res.rows.item(i).fecha_agregado,
-          });
+  
+      // Eliminar subcategorías iniciales
+      const subcategoriasIniciales = await this.database.executeSql('SELECT * FROM subcategoria', []);
+      for (let i = 0; i < subcategoriasIniciales.rows.length; i++) {
+        const subcategoria = subcategoriasIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_subcategoria WHERE id = ?', [subcategoria.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM subcategoria WHERE id = ?', [subcategoria.id]);
         }
       }
-      //actualizar el observable de usuarios
-      this.listadoProductos.next(items as any);
-    });
-  }
-
-  //todos los modificares
-
-  modificarUsuario(
-    id: number,
-    nombre: string,
-    segundo_nombre: string,
-    apellido_paterno: string,
-    apellido_materno: string,
-    email: string,
-    contrasena: string,
-    nombre_empresa: string,
-    descripcion_corta: string,
-    foto_perfil: string,
-    estado_cuenta: string,
-    fecha_registro: string,
-    tipo_usuario_id: number
-  ) {
-    this.presentAlert('service', 'ID: ' + id);
-    return this.database
-      .executeSql(
-        'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, contrasena = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, fecha_registro = ?, tipo_usuario_id = ?  WHERE id = ?',
-        [
-          nombre,
-          segundo_nombre,
-          apellido_paterno,
-          apellido_materno,
-          email,
-          contrasena,
-          nombre_empresa,
-          descripcion_corta,
-          foto_perfil,
-          estado_cuenta,
-          fecha_registro,
-          tipo_usuario_id,
-          id,
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Usuario Modificado');
-        this.seleccionarUsuarios();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
-      });
-  }
-
-  modificarCategoria(id: number, nombre: string) {
-    this.presentAlert('service', 'ID: ' + id);
-    return this.database
-      .executeSql('UPDATE categoria SET nombre = ? WHERE id = ?', [nombre, id])
-      .then((res) => {
-        this.presentAlert('Modificar', 'Categoría Modificada');
-        this.seleccionarCategorias();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
-      });
-  }
-
-  modificarSubCategoria(id: number, nombre: string, categoria_id: number) {
-    this.presentAlert('service', 'ID: ' + id);
-    return this.database
-      .executeSql(
-        'UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',
-        [nombre, categoria_id, id]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'SubCategoría Modificada');
-        this.seleccionarSubCategorias();
-      })
-      .catch((e) => {
-        this.presentAlert(
-          'Modificar SubCategoría',
-          'Error: ' + JSON.stringify(e)
-        );
-      });
-  }
-
-  modificarProducto(
-    id: number,
-    proveedor_id: number,
-    nombre: string,
-    descripcion: string,
-    precio: number,
-    stock: number,
-    organico: number,
-    foto_producto: string,
-    subcategoria_id: number,
-    fecha_agregado: string
-  ) {
-    this.presentAlert('service', 'ID: ' + id);
-    return this.database
-      .executeSql(
-        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, fecha_agregado = ? WHERE id = ?',
-        [
-          proveedor_id,
-          nombre,
-          descripcion,
-          precio,
-          stock,
-          organico,
-          foto_producto,
-          subcategoria_id,
-          fecha_agregado,
-          id,
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Producto Modificado');
-        this.seleccionarProductos();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
-      });
-  }
-
-  //================================
-  //eliminarUsuario{ }
-
-  //insertarUsuario { }
-
-  //eliminarCategoria { }
-
-  //insertarCategoria { }
-
-  //CRUD SUBCATEGORIA, parte administración
-
-  //eliminarSubCategoria { }
-
-  //insertarSubCategoria{ }
-
-  //CRUD Producto, parte administración
-
-  //eliminarProducto { }
-
-  //modificarProducto { }
-
-  //insertarProducto { }
-
-  //queries para los combobo
-
-  //Validar usuario
-  async validateUser(email: string, password: string): Promise<boolean> {
-    const query = 'SELECT * FROM usuario WHERE email = ? AND contrasena = ?';
-    const result = await this.database.executeSql(query, [email, password]);
-    return result.rows.length > 0;
-  }
-
-  //Recuperar contraseña y comprobar email existente
-  async emailExists(email: string): Promise<boolean> {
-    const query = 'SELECT * FROM usuario WHERE email = ?';
-    const result = await this.database.executeSql(query, [email]);
-    return result.rows.length > 0;
-  }
-
-  //actualizar contrasena
-  async updatePassword(email: string, newPassword: string) {
-    const query = 'UPDATE usuario SET contrasena = ? WHERE email = ?';
-    await this.database.executeSql(query, [newPassword, email]);
-  }
-
-  //OBTENER PRODUCTOS
-  getProducts(): Observable<Productos[]> {
-    return new Observable((observer) => {
-      this.database
-        .executeSql('SELECT * FROM producto', [])
-        .then((res) => {
-          let productos: Productos[] = [];
-          for (let i = 0; i < res.rows.length; i++) {
-            productos.push(res.rows.item(i));
-          }
-          observer.next(productos);
-          observer.complete();
-        })
-        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
-    });
-  }
-
-  //OBTENER CATEGORIA
-  getCategories(): Observable<Categorias[]> {
-    return new Observable((observer) => {
-      this.database
-        .executeSql('SELECT * FROM categoria', [])
-        .then((res) => {
-          let categorias: Categorias[] = [];
-          for (let i = 0; i < res.rows.length; i++) {
-            categorias.push(res.rows.item(i));
-          }
-          observer.next(categorias);
-          observer.complete();
-        })
-        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
-    });
-  }
-  //OBTENER SUBCATEGORIA
-  getSubcategories(categoryId: number): Observable<Subcategorias[]> {
-    return new Observable((observer) => {
-      this.database
-        .executeSql('SELECT * FROM subcategoria WHERE categoria_id = ?', [
-          categoryId,
-        ])
-        .then((res) => {
-          let subcategorias: Subcategorias[] = [];
-          for (let i = 0; i < res.rows.length; i++) {
-            subcategorias.push(res.rows.item(i));
-          }
-          observer.next(subcategorias);
-          observer.complete();
-        })
-        .catch((e) => observer.error('Error: ' + JSON.stringify(e)));
-    });
-  }
-
-//OBTENER PRODUCTOS POR REGION
-  getRandomProductsByRegion(regionId: number): Observable<Productos[]> {
-    return new Observable(observer => {
-      //CAMBIAR POR GPS DEL MAPA O NOSE
-      this.database.executeSql('SELECT * FROM productos WHERE regionId = ? ORDER BY RANDOM()', [regionId]).then(res => {
-        let productos: Productos[] = [];
-        for (let i = 0; i < res.rows.length; i++) {
-          productos.push(res.rows.item(i));
+  
+      // Eliminar productos iniciales
+      const productosIniciales = await this.database.executeSql('SELECT * FROM producto', []);
+      for (let i = 0; i < productosIniciales.rows.length; i++) {
+        const producto = productosIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_producto WHERE id = ?', [producto.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM producto WHERE id = ?', [producto.id]);
         }
-        observer.next(productos);
-        observer.complete();
-      }).catch(e => observer.error(e));
-    });
+      }
+  
+      // Eliminar usuarios iniciales
+      const usuariosIniciales = await this.database.executeSql('SELECT * FROM usuario', []);
+      for (let i = 0; i < usuariosIniciales.rows.length; i++) {
+        const usuario = usuariosIniciales.rows.item(i);
+        const res = await this.database.executeSql('SELECT COUNT(*) as count FROM respaldo_usuario WHERE id = ?', [usuario.id]);
+        const count = res.rows.item(0).count;
+  
+        if (count > 0) {
+          await this.database.executeSql('DELETE FROM usuario WHERE id = ?', [usuario.id]);
+        }
+      }
+    } catch (e) {
+      this.presentAlert('Eliminar Datos Iniciales', 'Error: ' + JSON.stringify(e));
+    }
   }
 
 
- //FUNCIONES CARRITOR DE COMPRAS (crear tabla carrito o otra forma)
- /*export interface CartItem {
-  productId: number;
-  quantity: number;
+
+//Funcion para CRUDs pendiente modulo de administración
+
+//variables para guardar los datos de las consultas en las tablas: 
+listadoUsuarios = new BehaviorSubject([]);
+listadoCategorias = new BehaviorSubject([]);
+listadoSubCategorias = new BehaviorSubject([]);
+listadoProductos = new BehaviorSubject([]);
+
+//variables para guardar los datos de las consultas en las tablas: Variables para hacer tranferencia de llaves por combobox
+listadoCmbSubCategorias = new BehaviorSubject([]);
+listadoCmbTipUsuario = new BehaviorSubject([]);
+listadoCmbProveedores = new BehaviorSubject([]);
+
+listadoCmbRegiones = new BehaviorSubject([]);
+listadoCmbComunas = new BehaviorSubject([]);
+
+//Declaracion de los observables para la manipulación de la data: fetch generales
+fetchUsuarios(): Observable<Usuarios[]>{
+  return this.listadoUsuarios.asObservable();
 }
 
-export interface Cart {
-  id: number; // Composite key
-  items: CartItem[];
-  totalAmount: number;
-}pendiente en el carrito.ts
-  ddToCart(cartId: number, productId: number, quantity: number): Observable<void> {
-    return new Observable(observer => {
-      const query = 'INSERT INTO Detalles_Carro_Compras (cartId, productId, quantity) VALUES (?, ?, ?)';
-      this.database.executeSql(query, [cartId, productId, quantity]).then(() => {
-        observer.next();
-        observer.complete();
-      }).catch(e => observer.error(e));
-    });
+fetchCategorias(): Observable<Categorias[]>{
+  return this.listadoCategorias.asObservable();
+}
+
+fetchSubCategorias(): Observable<Subcategorias[]>{
+  return this.listadoSubCategorias.asObservable();
+}
+
+fetchProductos(): Observable<Productos[]>{
+  return this.listadoProductos.asObservable();
+}
+
+//Declaracion de los observables para la manipulación de la data: fetch para comboboxs para transferencia de llave
+
+fetchCmbSubCategorias(): Observable<CmbSubcategorias[]>{
+  return this.listadoCmbSubCategorias.asObservable();
+}
+fetchCmbTipUsuario(): Observable<CmbTipUsuario[]>{
+  return this.listadoCmbTipUsuario.asObservable();
+}
+
+fetchCmbProveedores(): Observable<CmbProveedores[]>{
+  return this.listadoCmbProveedores.asObservable();
+}
+
+fetchCmbRegiones(): Observable<CmbRegion[]>{
+  return this.listadoCmbRegiones.asObservable();
+}
+
+fetchCmbComuna(): Observable<CmbComuna[]>{
+  return this.listadoCmbComunas.asObservable();
+}
+
+
+//CRUD USUARIOS, parte administración. Todos los SELECTS
+seleccionarUsuarios(){
+  return this.database.executeSql(`SELECT u.id, u.nombre, u.segundo_nombre, u.apellido_paterno, u.apellido_materno,
+u.nombre ||' '|| COALESCE (u.segundo_nombre,'') ||' ' || u.apellido_paterno ||' '|| COALESCE (u.apellido_materno,'') as nombreCompleto, 
+u.email, u.contrasena, u.nombre_empresa, COALESCE (u.nombre_empresa, "Sin Empresa") empresaMostrarListar,u.descripcion_corta, COALESCE(u.descripcion_corta, "Sin Empresa") as descripcionMostrarListar, 
+u.foto_perfil, u.estado_cuenta, u.fecha_registro, u.tipo_usuario_id, tu.descripcion as descTipUser
+FROM usuario u
+JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id`, []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Usuarios[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre,
+          segundo_nombre: res.rows.item(i).segundo_nombre,
+          apellido_paterno: res.rows.item(i).apellido_paterno,
+          apellido_materno: res.rows.item(i).apellido_materno,
+          nombreCompleto: res.rows.item(i).nombreCompleto,
+          email: res.rows.item(i).email,
+          contrasena: res.rows.item(i).contrasena,
+          nombre_empresa: res.rows.item(i).nombre_empresa,
+          empresaMostrarListar: res.rows.item(i).empresaMostrarListar,
+          descripcion_corta: res.rows.item(i).descripcion_corta,
+          descripcionMostrarListar: res.rows.item(i).descripcionMostrarListar,
+          foto_perfil: res.rows.item(i).foto_perfil,
+          estado_cuenta: res.rows.item(i).estado_cuenta,
+          fecha_registro: res.rows.item(i).fecha_registro,
+          tipo_usuario_id: res.rows.item(i).tipo_usuario_id,
+          descTipUser: res.rows.item(i).descTipUser
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoUsuarios.next(items as any);
+  })
+}
+
+
+seleccionarCategorias(){
+  return this.database.executeSql('SELECT * FROM categoria', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Categorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCategorias.next(items as any);
+  })
+}
+
+seleccionarSubCategorias(){
+  return this.database.executeSql(`SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria
+FROM subcategoria sbct
+JOIN categoria ct  ON sbct.categoria_id = ct.id`, []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Subcategorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre,
+          categoria_id: res.rows.item(i).categoria_id,
+          nombreCategoria: res.rows.item(i).nombreCategoria
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoSubCategorias.next(items as any);
+  })
+}
+
+
+seleccionarProductos(){
+  return this.database.executeSql(`SELECT 
+    p.id,
+    p.proveedor_id,
+    p.nombre AS nombre_producto,
+    p.descripcion AS descripcion_producto,
+    p.precio,
+    p.stock,
+    p.organico,
+    CASE 
+        WHEN p.organico = 1 THEN 'Verdadero'
+        ELSE 'Falso'
+    END AS organicoEnTexto,
+    p.foto_producto,
+    p.subcategoria_id,
+    p.fecha_agregado,
+    s.nombre AS nombre_subcategoria,
+    s.categoria_id AS categoria_id, -- ID de la categoría desde la subcategoría
+    u.nombre_empresa AS nombre_proveedor,
+    c.nombre AS nombre_categoria
+FROM 
+    producto p
+JOIN 
+    subcategoria s ON p.subcategoria_id = s.id
+JOIN 
+    usuario u ON p.proveedor_id = u.id
+JOIN 
+    categoria c ON s.categoria_id = c.id`, []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: Productos[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          proveedor_id: res.rows.item(i).proveedor_id,
+          nombre_producto: res.rows.item(i).nombre_producto,
+          descripcion_producto: res.rows.item(i).descripcion_producto,
+          precio: res.rows.item(i).precio,
+          stock: res.rows.item(i).stock,
+          organico: res.rows.item(i).organico,
+          organicoEnTexto: res.rows.item(i).organicoEnTexto,
+          foto_producto: res.rows.item(i).foto_producto,
+          subcategoria_id: res.rows.item(i).subcategoria_id,
+          fecha_agregado: res.rows.item(i).fecha_agregado,
+          nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
+          categoria_id: res.rows.item(i).categoria_id,
+          nombre_proveedor: res.rows.item(i).nombre_proveedor,
+          nombre_categoria: res.rows.item(i).nombre_categoria
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoProductos.next(items as any);
+  })
+}
+
+//creacion de las queries para los combobox
+
+seleccionarCbmProveedores(){
+  return this.database.executeSql('SELECT id, nombre_empresa FROM usuario WHERE nombre_empresa NOTNULL AND id > 1', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbProveedores[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre_empresa: res.rows.item(i).nombre_empresa
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbProveedores.next(items as any);
+  })
+}
+
+
+seleccionarCmbSubCategorias(id: number){
+  return this.database.executeSql('SELECT id, nombre FROM subcategoria WHERE categoria_id = ?', [id]).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbSubcategorias[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbSubCategorias.next(items as any);
+  })
+}
+
+
+
+seleccionarCmbTipUsuario(){
+  return this.database.executeSql('SELECT * FROM tipo_usuario', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbTipUsuario[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          descripcion: res.rows.item(i).descripcion
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbTipUsuario.next(items as any);
+  })
+}
+
+seleccionarCmbRegiones(){
+  return this.database.executeSql('SELECT * FROM region', []).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbRegion[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbRegiones.next(items as any);
+  })
+}
+
+seleccionarCmbComunas(id: number){
+  return this.database.executeSql('SELECT id, nombre FROM comuna WHERE region_id = ?', [id]).then(res=>{
+     //variable para almacenar el resultado de la consulta
+     let items: CmbComuna[] = [];
+     //valido si trae al menos un registro
+     if(res.rows.length > 0){
+      //recorro mi resultado
+      for(var i=0; i < res.rows.length; i++){
+        //agrego los registros a mi lista
+        items.push({
+          id: res.rows.item(i).id,
+          nombre: res.rows.item(i).nombre
+        })
+      }
+     }
+     //actualizar el observable de usuarios
+     this.listadoCmbComunas.next(items as any);
+  })
+}
+
+
+
+//todos los modificares
+
+modificarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
+                apellido_materno:string, email:string, nombre_empresa:string, 
+                descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+                tipo_usuario_id:number){
+                  return this.database.executeSql('UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id,id]).then(res=>{
+                    this.presentAlert("Modificar","Usuario Modificado");
+                    this.seleccionarUsuarios(); //actualizar en su seccion en sí
+                    this.seleccionarCbmProveedores();
+                    this.seleccionarProductos();
+                  }).catch(e=>{
+                    this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+                  })}
+
+
+
+modificarCategoria(id:number, nombre:string){
+  return this.database.executeSql('UPDATE categoria SET nombre = ? WHERE id = ?',[nombre,id]).then(res=>{
+    this.presentAlert("Modificar","Categoría Modificada");
+    this.seleccionarCategorias(); //actualizar en su seccion en sí
+    this.seleccionarSubCategorias();
+  }).catch(e=>{
+    this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+modificarSubCategoria(id:number, nombre:string, categoria_id:number){
+  return this.database.executeSql('UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',[nombre,categoria_id,id]).then(res=>{
+    this.presentAlert("Modificar","SubCategoría Modificada");
+    this.seleccionarSubCategorias(); //actualizar en su seccion en sí
+    this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
+
+
+  }).catch(e=>{
+    this.presentAlert('Modificar SubCategoría', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+modificarProducto(id:number, proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number){
+  return this.database.executeSql('UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',[proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,id]).then(res=>{
+    this.presentAlert("Modificar","Producto Modificado");
+    this.seleccionarProductos(); //actualizar en su seccion en sí
+    
+  }).catch(e=>{
+    this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+
+//todos los inserts.
+
+insertarUsuario(nombre:string, segundo_nombre:string, apellido_paterno:string,
+                apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+                descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+                tipo_usuario_id:number, comuna_id:number, direccion: string){
+                  return this.database.executeSql('INSERT INTO usuario(nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)',[nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id]).then(res => {
+                    const usuarioId = res.insertId; // Obtener el ID del nuevo usuario
+            
+                    // Ahora insertar la dirección asociada al usuario
+                    return this.database.executeSql(
+                        'INSERT INTO direccion(id, usuario_id, comuna_id, direccion) VALUES (?,?,?,?)',
+                        [1, usuarioId, comuna_id, direccion]
+                    );
+                }).then(() => {
+                    this.presentAlert("Insertar", "Usuario y dirección registrados con éxito"); //despues al llegar a la parte de direcciones se hace la query, observador de direcciones no hay
+                    this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                    this.seleccionarCbmProveedores(); //actualizar el combobox de proveedores
+                }).catch(e => {
+                    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+                });
+            }
+
+insertarCategoria(nombre:string){
+  return this.database.executeSql('INSERT INTO categoria(nombre) VALUES (?)',[nombre]).then(res=>{
+    this.presentAlert("Insertar","Categoría Registrada");
+    this.seleccionarCategorias();
+  }).catch(e=>{
+    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+insertarSubCategoria(nombre:string, categoria_id:number){
+  return this.database.executeSql('INSERT INTO subcategoria(nombre,categoria_id) VALUES (?,?)',[nombre, categoria_id]).then(res=>{
+    this.presentAlert("Insertar","Subcategoría Registrada");
+    this.seleccionarSubCategorias();
+  }).catch(e=>{
+    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+  })
+}
+
+insertarProducto(proveedor_id:number, nombre:string, descripcion:string, precio:number, stock:number, 
+                organico:number, foto_producto:string, subcategoria_id:number){
+                  return this.database.executeSql('INSERT INTO producto(proveedor_id,nombre,descripcion,precio,stock, organico, foto_producto, subcategoria_id) VALUES (?,?,?,?,?,?,?,?)',[proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id]).then(res=>{
+                    this.presentAlert("Insertar","Producto Registrado");
+                    this.seleccionarProductos();
+                  }).catch(e=>{
+                    this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+                  })
+                }
+
+
+
+//================================
+
+//accion de eliminar de todos los cruds de la parte de administracion
+eliminarUsuario(id:number, nombre:string, segundo_nombre:string, apellido_paterno:string,
+  apellido_materno:string, email:string, contrasena:string, nombre_empresa:string, 
+  descripcion_corta:string, foto_perfil:string, estado_cuenta:string, 
+  tipo_usuario_id:number) {
+  this.esRegistroProtegido('usuario', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar este usuario porque es un registro protegido.");
+      } else {
+          // Actualizar registros en las tablas que dependen de usuario
+          this.database.executeSql('UPDATE producto SET proveedor_id = 1 WHERE proveedor_id = ?', [id])
+              .then(() => {
+                  return this.database.executeSql('UPDATE direccion SET usuario_id = 1 WHERE usuario_id = ?', [id]);
+              })
+              .then(() => {
+                  return this.database.executeSql('UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?', [id]);
+              })
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_usuario(id, nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',[id,nombre,segundo_nombre,apellido_paterno,apellido_materno,email,contrasena,nombre_empresa,descripcion_corta,foto_perfil,estado_cuenta,tipo_usuario_id]);
+              })
+              .then(() => {
+                  // Finalmente, eliminar el usuario
+                  return this.database.executeSql('DELETE FROM usuario WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Usuario eliminado con éxito");
+                  this.seleccionarUsuarios(); // Actualizar la lista de usuarios
+                  this.seleccionarProductos();
+                  this.seleccionarCbmProveedores();
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
+
+
+
+eliminarCategoria(id:number, nombre:string) {
+  this.esRegistroProtegido('categoria', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar esta categoría porque es un registro protegido.");
+      } else {
+          // Actualizar subcategorías para establecer valor por defecto
+          this.database.executeSql('UPDATE subcategoria SET categoria_id = 1 WHERE categoria_id = ?', [id])
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_categoria (id, nombre) VALUES (?, ?)', 
+                  [id, nombre]);
+              })
+              .then(() => {
+                  // Luego, eliminar la categoría
+                  
+                  return this.database.executeSql('DELETE FROM categoria WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Categoría eliminada con éxito");
+                  this.seleccionarCategorias(); // Actualizar la lista de categorías
+                  this.seleccionarSubCategorias();
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
+
+
+eliminarSubcategoria(id:number, nombre:string, categoria_id:number) {
+  this.esRegistroProtegido('subcategoria', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar esta subcategoría porque es un registro protegido.");
+      } else {
+          // Actualizar registros en la tabla de productos
+          this.database.executeSql('UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?', [id])
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_subcategoria (id, nombre, categoria_id) VALUES (?, ?, ?)', 
+                  [id, nombre, categoria_id]);
+              })
+
+              .then(() => {
+                  // Finalmente, eliminar la subcategoría
+                  return this.database.executeSql('DELETE FROM subcategoria WHERE id = ?', [id]);
+              })
+              .then(() => {
+                  this.presentAlert("Eliminar", "Subcategoría eliminada con éxito");
+                  this.seleccionarSubCategorias(); // Actualizar la lista de subcategorías
+                  this.seleccionarProductos();
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
+
+
+eliminarProducto(id:number, proveedor_id:number, nombre_producto:string, descripcion_producto:string, precio:number, stock:number, organico:number, foto_producto:string, subcategoria_id:number) {
+  this.esRegistroProtegido('producto', id).then(esProtegido => {
+      if (esProtegido) {
+          this.presentAlert("Eliminar", "No se puede eliminar este producto porque es un registro protegido.");
+      } else {
+          // Actualizar registros en la tabla de detalle_carro_compra
+          this.database.executeSql('UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?', [id])
+              .then(() => {
+                // Insertar en la tabla de respaldo antes de eliminar
+                return this.database.executeSql('INSERT INTO respaldo_producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                  [id, proveedor_id, nombre_producto, descripcion_producto, precio, stock, organico, foto_producto, subcategoria_id]);
+              })
+
+              .then(() => {
+                  // Finalmente, eliminar el producto
+                  return this.database.executeSql('DELETE FROM producto WHERE id = ?', [id]);
+              })
+              
+              .then(() => {
+                  this.presentAlert("Eliminar", "Producto eliminado con éxito");
+                  this.seleccionarProductos(); // Actualizar la lista de productos
+              })
+              .catch(e => {
+                  this.presentAlert('Eliminar', 'Error: ' + JSON.stringify(e));
+              });
+      }
+  }).catch(e => {
+      this.presentAlert('Eliminar', 'Error al verificar el registro: ' + JSON.stringify(e));
+  });
+}
+
+
+
+
+
+//===============================
+//validaciones necesarios para formularios
+
+verificarCorreoExistente(email: string): Promise<boolean> {
+  return this.database.executeSql('SELECT COUNT(*) AS count FROM usuario WHERE email = ?', [email]).then(res => {
+      return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+  });
+}
+
+
+esRegistroProtegido(tipo: string, id: number): Promise<boolean> {
+  let query: string;
+  let params: any[];
+
+  if (tipo === 'categoria') {
+      query = 'SELECT COUNT(*) AS count FROM categoria WHERE id = ? AND nombre = "Sin Categoría"';
+      params = [id];
+  } else if (tipo === 'subcategoria') {
+      query = 'SELECT COUNT(*) AS count FROM subcategoria WHERE id = ? AND nombre = "Sin Subcategoría"';
+      params = [id];
+  } else if (tipo === 'usuario') {
+      query = 'SELECT COUNT(*) AS count FROM usuario WHERE id = ? AND nombre = "N/A"';
+      params = [id];
+  } else if (tipo === 'producto') {
+      query = 'SELECT COUNT(*) AS count FROM producto WHERE id = ? AND nombre = "Producto Desconocido"';
+      params = [id];
+  } else {
+      return Promise.resolve(false); // Registro no protegido
   }
 
-  createNewCart(): Observable<number> {
-    return new Observable(observer => {
-      const query = 'INSERT INTO Carro_Compras DEFAULT VALUES';
-      this.database.executeSql(query, []).then(res => {
-        const newCartId = res.insertId; // Assuming insertId is returned
-        observer.next(newCartId);
-        observer.complete();
-      }).catch(e => observer.error(e));
-    });
-  }
-
-  getCartItems(cartId: number): Observable<CartItem[]> {
-    return new Observable(observer => {
-      const query = 'SELECT * FROM Detalles_Carro_Compras WHERE cartId = ?';
-      this.database.executeSql(query, [cartId]).then(res => {
-        let items: CartItem[] = [];
-        for (let i = 0; i < res.rows.length; i++) {
-          items.push(res.rows.item(i));
-        }
-        observer.next(items);
-        observer.complete();
-      }).catch(e => observer.error(e));
-    });
-  }
-//eliminar carrito al salir usuario
-  deleteCart(cartId: number): Observable<void> {
-    return new Observable(observer => {
-      const deleteDetailsQuery = 'DELETE FROM Detalles_Carro_Compras WHERE cartId = ?';
-      const deleteCartQuery = 'DELETE FROM Carro_Compras WHERE id = ?';
-  
-      this.database.executeSql(deleteDetailsQuery, [cartId]).then(() => {
-        return this.database.executeSql(deleteCartQuery, [cartId]);
-      }).then(() => {
-        observer.next();
-        observer.complete();
-      }).catch(e => observer.error(e));
-    });
-  }*/
-
+  return this.database.executeSql(query, params).then(res => {
+      return res.rows.item(0).count > 0; // Devuelve true si es un registro protegido
+  });
+}
 }
