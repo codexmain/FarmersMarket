@@ -1160,4 +1160,188 @@ esRegistroProtegido(tipo: string, id: number): Promise<boolean> {
       return res.rows.item(0).count > 0; // Devuelve true si es un registro protegido
   });
 }
+
+
+  //LOGIN
+  async login(email: string, contrasena: string): Promise<any> {
+    try {
+      // Verificar si el email existe
+      const emailResult = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ?',
+        [email]
+      );
+
+      if (emailResult.rows.length === 0) {
+        // Si no se encuentra el email
+        await this.presentAlert('Error', 'El email ingresado no existe.');
+        return null;
+      }
+
+      // Verificar si la contraseña es correcta
+      const passwordResult = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ? AND contrasena = ?',
+        [email, contrasena]
+      );
+
+      if (passwordResult.rows.length === 0) {
+        // Si la contraseña es incorrecta
+        await this.presentAlert('Error', 'Contraseña incorrecta.');
+        return null;
+      }
+
+      // Si email y contraseña son correctos, devolver los datos del usuario
+      const usuario = passwordResult.rows.item(0); // Obtener el usuario del resultado
+      await this.presentAlert('¡Éxito!', `Bienvenido, ${usuario.nombre}.`);
+
+      return usuario; // Devolver el usuario
+    } catch (error) {
+      console.error('Error en el login:', JSON.stringify(error));
+      await this.presentAlert(
+        'Error',
+        'Hubo un problema al verificar las credenciales.'
+      );
+      return null;
+    }
+  }
+
+  //RECUPERAR-PASSWORD
+  // Recuperar contraseña por correo
+  async recuperarcon(correo: string): Promise<any> {
+    try {
+      const result = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ?',
+        [correo]
+      );
+
+      if (result.rows.length === 0) {
+        await this.presentAlert('Error', 'El email ingresado no existe.');
+      }
+
+      const user = result.rows.item(0);
+      return user; // Retornar el usuario si se encuentra
+    } catch (error) {
+      console.error('Error al recuperar contraseña:', error);
+      throw error;
+    }
+  }
+
+  // Actualizar la contraseña del usuario
+  async actualizarcon(correo: string, nuevaPassword: string): Promise<void> {
+    try {
+      await this.database.executeSql(
+        'UPDATE usuario SET contrasena = ? WHERE email = ?',
+        [nuevaPassword, correo]
+      );
+      await this.presentAlert('¡Éxito!', `Contraseña actualizada.`);
+    } catch (error) {
+      console.error('Error al actualizar la contraseña:', error);
+      throw error;
+    }
+  }
+
+  //REGISTER
+  async Regiones(): Promise<any[]> {
+    try {
+      const result = await this.database.executeSql('SELECT * FROM region', []);
+      const regiones = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        regiones.push(result.rows.item(i));
+      }
+      return regiones;
+    } catch (error) {
+      console.error('Error al obtener las regiones:', error);
+      return [];
+    }
+  }
+
+  async Comunas(regionId: number): Promise<any[]> {
+    try {
+      const result = await this.database.executeSql(
+        'SELECT * FROM comuna WHERE region_id = ?',
+        [regionId]
+      );
+      const comunas = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        comunas.push(result.rows.item(i));
+      }
+      return comunas;
+    } catch (error) {
+      console.error('Error al obtener las comunas:', error);
+      return [];
+    }
+  }
+
+  async registrarUsuario(usuario: any): Promise<boolean> {
+    try {
+      const sqlUsuario = `
+        INSERT INTO usuario(
+          nombre, segundo_nombre, apellido_paterno, apellido_materno, 
+          email, contrasena, nombre_empresa, descripcion_corta, 
+          foto_perfil, estado_cuenta, tipo_usuario_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', 1)`;
+
+      const result = await this.database.executeSql(sqlUsuario, [
+        usuario.nombre,
+        usuario.segundo_nombre || null,
+        usuario.apellido_paterno,
+        usuario.apellido_materno || null,
+        usuario.email,
+        usuario.contrasena,
+        usuario.nombre_empresa || null,
+        usuario.descripcion_corta || null,
+        usuario.foto_perfil || null,
+      ]);
+
+      const usuarioId = result.insertId; // Obtener el ID del usuario recién insertado
+
+      // Query para insertar dirección asociada al usuario
+      const sqlDireccion = `
+        INSERT INTO direccion(id, usuario_id, comuna_id, direccion) 
+        VALUES (?, ?, ?, ?)`;
+
+      await this.database.executeSql(sqlDireccion, [
+        1,
+        usuarioId,
+        usuario.comuna_id,
+        usuario.direccion,
+      ]);
+
+      // Mostrar alerta de éxito
+      this.presentAlert(
+        'Insertar',
+        'Usuario y dirección registrados con éxito'
+      );
+
+      // Actualizar la lista de usuarios y proveedores
+      this.seleccionarUsuarios();
+      this.seleccionarCbmProveedores();
+
+      return true; // Retorna true si todo se insertó correctamente
+    } catch (error) {
+      console.error('Error al registrar el usuario:', error);
+      this.presentAlert('Insertar', 'Error: ' + JSON.stringify(error));
+      return false; // Retorna false en caso de error
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
