@@ -753,6 +753,66 @@ export class DataBaseService {
   }
 
   //PROVENTAS
+
+  // Método para agregar un producto
+  async agregarProducto(producto: any) {
+    const sql = `
+    INSERT INTO producto (
+      nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id, proveedor_id
+    ) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT id FROM usuario WHERE email = ?))
+  `;
+    const params = [
+      producto.nombre,
+      producto.descripcion,
+      producto.precio,
+      producto.stock,
+      producto.organico,
+      producto.foto_producto,
+      producto.subcategoria_id,
+      producto.proveedor_email,
+    ];
+
+    try {
+      return await this.database.executeSql(sql, params);
+    } catch (error) {
+      console.error('Error al agregar el producto:', error);
+      throw error;
+    }
+  }
+
+  // Método para agregar una categoría
+  async agregarCategoria(categoria: any) {
+    const sql = `
+    INSERT INTO categoria (nombre)
+    VALUES (?)
+  `;
+    const params = [categoria.nombre];
+
+    try {
+      return await this.database.executeSql(sql, params);
+    } catch (error) {
+      console.error('Error al agregar la categoría:', error);
+      throw error;
+    }
+  }
+
+  // Método para agregar una subcategoría
+  async agregarSubcategoria(subcategoria: any) {
+    const sql = `
+    INSERT INTO subcategoria (nombre, categoria_id)
+    VALUES (?, ?)
+  `;
+    const params = [subcategoria.nombre, subcategoria.categoria_id];
+
+    try {
+      return await this.database.executeSql(sql, params);
+    } catch (error) {
+      console.error('Error al agregar la subcategoría:', error);
+      throw error;
+    }
+  }
+
   // Método para obtener las categorías desde la base de datos
   async obtenerCategorias(): Promise<any[]> {
     try {
@@ -789,7 +849,8 @@ export class DataBaseService {
     }
   }
 
-  async mostrarProductos(email: string): Promise<Productos[]> {
+  // Método para mostrar los productos de un proveedor
+  async mostrarProductos(email: string): Promise<any[]> {
     return this.database
       .executeSql(
         `SELECT 
@@ -824,7 +885,7 @@ export class DataBaseService {
         [email]
       )
       .then((res) => {
-        let items: Productos[] = [];
+        let items: any[] = [];
         for (let i = 0; i < res.rows.length; i++) {
           items.push({
             id: res.rows.item(i).id,
@@ -848,6 +909,7 @@ export class DataBaseService {
       });
   }
 
+  // Método para obtener el proveedor_id por email
   async obtenerProveedorIdPorEmail(email: string): Promise<number | null> {
     return this.database
       .executeSql(
@@ -945,8 +1007,6 @@ export class DataBaseService {
     await this.database.executeSql(updateQuery, [carro_id]);
   }
 
-  // En DataBaseService
-
   async obtenerCompras(usuario_id: number): Promise<any[]> {
     const query = `SELECT * FROM carro_compra WHERE usuario_id = ?`;
     const result = await this.database.executeSql(query, [usuario_id]);
@@ -1000,43 +1060,6 @@ export class DataBaseService {
         });
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
   //Funcion para CRUDs pendiente modulo de administración
 
