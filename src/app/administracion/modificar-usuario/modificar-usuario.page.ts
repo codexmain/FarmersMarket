@@ -29,7 +29,7 @@ export class ModificarUsuarioPage implements OnInit {
   arrayCmbTipoUsuario: any = [
     {
       id: '',
-      descripcion: '',
+      descripcion: ''
     }
   ]
 
@@ -77,8 +77,12 @@ export class ModificarUsuarioPage implements OnInit {
       this.descEmpresaObligatoria = false;
     }
 
-    // Actualizar el tipo de usuario
-    this.tipo_usuario_id = (this.empresaObligatoria && this.descEmpresaObligatoria) ? 2 : 1;
+    // Actualizar el tipo de usuario según los campos
+    if (this.empresaObligatoria && this.descEmpresaObligatoria) {
+      this.tipo_usuario_id = 2; // Proveedor/Vendedor
+    } else {
+      this.tipo_usuario_id = 1; // Usuario regular
+    }
   }
 
   async presentToast(message: string) {
@@ -189,6 +193,34 @@ export class ModificarUsuarioPage implements OnInit {
       dismiss() {
         this.modalController.dismiss();
       }
+
+      clearPNombre(){
+        this.nombre = '';
+      }
+      clearSNombre(){
+        this.segundo_nombre = '';
+      }
+    
+      clearAPaterno(){
+        this.apellido_paterno = '';
+      }
+      clearAMaterno(){
+        this.apellido_materno = '';
+    
+      }
+      clearEmpresa(){
+        this.nombre_empresa = '';
+    
+      }
+      clearDescEmpresa(){
+        this.descripcion_corta = '';
+    
+      }
+      clearMail(){
+        this.email = '';
+      }
+
+        
       
     }
     

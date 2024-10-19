@@ -64,4 +64,8 @@ export class ModificarCategoriaPage implements OnInit {
     this.modalController.dismiss();
   }  
 
+  clearNombre() {
+    this.nombre = '';
+  }
+
 }
