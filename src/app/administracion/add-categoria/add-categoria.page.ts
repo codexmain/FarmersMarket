@@ -59,4 +59,8 @@ export class AddCategoriaPage implements OnInit {
     this.modalController.dismiss();
   }
 
+  clearNombre() {
+    this.nombre = '';
+  }
+
 }

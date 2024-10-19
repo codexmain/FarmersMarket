@@ -75,5 +75,9 @@ export class AddSubcategoriaPage implements OnInit {
   dismiss() {
     this.modalController.dismiss();
   }
+  
+  clearNombre() {
+    this.nombre = '';
+  }
 
 }

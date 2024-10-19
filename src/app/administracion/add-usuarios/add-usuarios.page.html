@@ -18,6 +18,9 @@
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
       <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearPNombre()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
       El primer nombre es obligatorio y debe tener al menos 2 caracteres.
@@ -26,6 +29,9 @@
     <ion-item>
       <ion-label position="floating">Apellido Paterno</ion-label>
       <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2" #aPaternoCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearAPaterno()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
       El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
@@ -34,6 +40,9 @@
     <ion-item>
       <ion-label position="floating">Segundo Nombre (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="sNombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearSNombre()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
       El segundo nombre debe tener al menos 2 caracteres y no contener números.
@@ -42,6 +51,9 @@
     <ion-item>
       <ion-label position="floating">Apellido Materno (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="aMaterno" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearAMaterno()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
       El apellido materno debe tener al menos 2 caracteres y no contener números.
@@ -50,6 +62,9 @@
     <ion-item>
       <ion-label position="floating">Empresa (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()" #empresaCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearEmpresa()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
       El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
@@ -58,6 +73,9 @@
     <ion-item>
       <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="descEmpresa" name="descEmpresa" (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
       La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
@@ -87,6 +105,9 @@
     <ion-item>
       <ion-label position="floating">Correo Electrónico</ion-label>
       <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearMail()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
       El correo es obligatorio y debe tener un formato válido.
@@ -95,6 +116,9 @@
     <ion-item>
       <ion-label position="floating">Contraseña</ion-label>
       <ion-input type="password" [(ngModel)]="password" name="password" required minlength="10" #passwordCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearClave()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
       La contraseña es obligatoria y debe tener al menos 10 caracteres.
@@ -124,9 +148,12 @@
 
     <ion-item>
       <ion-label position="floating">Dirección</ion-label>
-      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Ingrese su ubicación manual o con el marcador para hacerlo instantáneo"></ion-input>
+      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Ubicación manual o el marcador (automatico)"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearDirr()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
       <ion-button fill="outline" slot="end" (click)="useCurrentLocation()">
-        <ion-icon name="location-outline"></ion-icon>
+        <ion-icon name="location-sharp"></ion-icon>
       </ion-button>
     </ion-item>
     <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">

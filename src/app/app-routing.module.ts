@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'admin-page',
     pathMatch: 'full'
   },
   {
@@ -126,19 +126,11 @@ const routes: Routes = [
     path: 'view-usuario',
     loadChildren: () => import('./administracion/view-usuario/view-usuario.module').then( m => m.ViewUsuarioPageModule)
   },
-  {
-    path: 'pro-mod',
-    loadChildren: () => import('./vendedor/pro-mod/pro-mod.module').then( m => m.ProModPageModule)
-  },
-  {
-    path: 'pro-add',
-    loadChildren: () => import('./vendedor/pro-add/pro-add.module').then( m => m.ProAddPageModule)
-  },
+
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
-
 
 
 

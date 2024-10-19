@@ -121,9 +121,12 @@ export class AddUsuariosPage implements OnInit {
       this.empresaObligatoria = false;
       this.descEmpresaObligatoria = false;
     }
-  
-    // Actualizar el tipo de usuario basado en la obligación de los campos
-    this.tipoUsuario = (this.empresaObligatoria && this.descEmpresaObligatoria) ? 2 : 1;
+    // Actualizar el tipo de usuario según los campos
+    if (this.empresaObligatoria && this.descEmpresaObligatoria) {
+      this.tipoUsuario = 2; // Proveedor/Vendedor
+    } else {
+      this.tipoUsuario = 1; // Usuario regular
+    }
   }
 
   dismiss() {
@@ -300,13 +303,48 @@ export class AddUsuariosPage implements OnInit {
   }
 
   async reverseGeocode(lat: number, lng: number) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=API DE GOOGLE MAPS`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIKEY`);
     const data = await response.json();
     if (data.results.length > 0) {
       this.direccion = data.results[0].formatted_address;
     } else {
       this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
     }
+  }
+
+  clearPNombre(){
+    this.pNombre = '';
+  }
+  clearSNombre(){
+    this.sNombre = '';
+  }
+
+  clearAPaterno(){
+    this.aPaterno = '';
+  }
+  clearAMaterno(){
+    this.aMaterno = '';
+
+  }
+  clearEmpresa(){
+    this.empresa = '';
+
+  }
+  clearDescEmpresa(){
+    this.descEmpresa = '';
+
+  }
+  clearMail(){
+    this.email = '';
+
+  }
+  clearClave(){
+    this.password = '';
+
+  }
+  clearDirr(){
+    this.direccion = '';
+
   }
   
 

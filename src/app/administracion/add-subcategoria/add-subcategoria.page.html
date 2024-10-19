@@ -20,6 +20,9 @@
     <ion-item>
       <ion-label position="floating">Nombre SubCategoría</ion-label>
       <ion-input type="text" [(ngModel)]="nombre" name="nombre" required minlength="5" required #subCategoryCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearNombre()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="subCategoryCtrl.invalid && (subCategoryCtrl.dirty || subCategoryCtrl.touched)" class="error-message">
       El nombre de la SubCategoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.
