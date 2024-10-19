@@ -126,17 +126,17 @@ const routes: Routes = [
     path: 'view-usuario',
     loadChildren: () => import('./administracion/view-usuario/view-usuario.module').then( m => m.ViewUsuarioPageModule)
   },
-
   {
-    path: '**',
-    loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
-  },  {
     path: 'pro-mod',
     loadChildren: () => import('./vendedor/pro-mod/pro-mod.module').then( m => m.ProModPageModule)
   },
   {
     path: 'pro-add',
     loadChildren: () => import('./vendedor/pro-add/pro-add.module').then( m => m.ProAddPageModule)
+  },
+  {
+    path: '**',
+    loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
 
 

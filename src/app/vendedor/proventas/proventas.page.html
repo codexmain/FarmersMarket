@@ -8,34 +8,27 @@
 </ion-header>
 
 <ion-content>
-  <!-- Botón para agregar un producto -->
-  <ion-grid>
-    <ion-button expand="full" fill="outline" (click)="presentAgregarProductoAlert()">Agregar producto</ion-button>
-  </ion-grid>
+  <!-- Barra de búsqueda -->
+  <ion-searchbar [(ngModel)]="searchQuery" placeholder="Buscar productos"></ion-searchbar>
 
-  <!-- Productos Publicados -->
-  <ion-grid>
-    <ion-grid>
-      <ion-searchbar placeholder="Buscar productos" (ionInput)="buscarProducto($event)"
-        showCancelButton="focus"></ion-searchbar>
-    </ion-grid>
-    <ion-list>
-      <ion-item *ngFor="let producto of productosFiltrados">
-        <ion-thumbnail slot="start">
-          <img [src]="producto.foto_producto || '../assets/icon/favicon.png'" /> <!-- Cambiado aquí -->
-        </ion-thumbnail>
-        <ion-label>
-          <strong>{{ producto.titulo }}</strong><br>
-          <p><b>Valor:</b> {{ producto.valor | currency:'USD' }}</p>
-          <p><b>Descripción:</b> {{ producto.descripcion_producto }}</p> <!-- Cambiado aquí -->
-          <p><b>Stock:</b> {{ producto.stock }}</p>
+  <!-- Lista de productos -->
+  <ion-list>
+    <ion-item *ngFor="let producto of getProductosFiltrados()">
+      <ion-label>
+        <h2>{{ producto.nombre_producto }}</h2>
+        <p>{{ producto.descripcion_producto }}</p>
+        <p>Precio: {{ producto.precio }} | Stock: {{ producto.stock }}</p>
+        <p>Orgánico: {{ producto.organicoEnTexto }}</p>
+      </ion-label>
+      <!-- Botón para modificar producto -->
+      <ion-button color="primary" (click)="mostrarAlertaModificar(producto)">Modificar</ion-button>
+    </ion-item>
+  </ion-list>
 
-          <!-- Botón para eliminar con alerta de modificación -->
-          <ion-button slot="end" color="danger" fill="solid" (click)="presentModificarProductoAlert(producto)">
-            <ion-icon name="create-outline"></ion-icon> Modificar
-          </ion-button>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-grid>
+  <!-- Botón flotante para agregar nuevo producto -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="mostrarAlertaAgregar()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
