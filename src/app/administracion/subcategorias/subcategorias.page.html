@@ -4,17 +4,42 @@
       <ion-button [routerDirection]="'back'" [routerLink]="'/admin-page'">Cancelar</ion-button>
     </ion-buttons>
     <ion-title>SubCategorías</ion-title>  
-    <ion-button slot="end" (click)="presentModal()">
+    <ion-button slot="end" (click)="agregar()">
       <ion-icon name="add-outline">  </ion-icon>
     </ion-button>  
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content [fullscreen]="true">
-  <ion-grid><ion-searchbar placeholder="Buscar SubCategorías"></ion-searchbar></ion-grid>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">subcategorias</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid>
+    <ion-searchbar 
+      placeholder="Buscar SubCategoría(s)"
+      [(ngModel)]="searchTerm" 
+      (ionInput)="searchSubcategorias()">
+    </ion-searchbar>
+  </ion-grid>
+  <ion-list>
+    <ion-item *ngFor="let subcat of filteredSubCategorias">
+      <ion-label>
+        <h5>ID SubCategoría: {{ subcat.id }}</h5>
+        <p>Nombre SubCategoría: {{ subcat.nombre }}</p>
+        <p>Categoria relacionada: {{ subcat.nombreCategoria }}</p>
+      </ion-label>
+      <ion-button 
+        fill="solid" 
+        color="warning" 
+        slot="end" 
+        (click)="presentActionSheet(subcat)" 
+        style="padding: 0; margin: 0;">
+        Más Acciones
+      </ion-button>
+    </ion-item>
+    <ion-item *ngIf="filteredSubCategorias.length === 0">
+      <ion-label>
+        <h5>Ups... SubCategoría(s) no encontrada(s).</h5>
+        <P>Deje la barra de búsqueda vacía o busque nuevamente lo que desea.</P>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

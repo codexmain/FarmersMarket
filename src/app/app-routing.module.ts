@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'admin-page',
     pathMatch: 'full'
   },
   {
@@ -94,11 +94,44 @@ const routes: Routes = [
     path: 'add-subcategoria',
     loadChildren: () => import('./administracion/add-subcategoria/add-subcategoria.module').then( m => m.AddSubcategoriaPageModule)
   },
+  {
+    path: 'modificar-usuario',
+    loadChildren: () => import('./administracion/modificar-usuario/modificar-usuario.module').then( m => m.ModificarUsuarioPageModule)
+  },
+  {
+    path: 'modificar-categoria',
+    loadChildren: () => import('./administracion/modificar-categoria/modificar-categoria.module').then( m => m.ModificarCategoriaPageModule)
+  },
+  {
+    path: 'modificar-subcategoria',
+    loadChildren: () => import('./administracion/modificar-subcategoria/modificar-subcategoria.module').then( m => m.ModificarSubcategoriaPageModule)
+  },
+  {
+    path: 'modificar-item',
+    loadChildren: () => import('./administracion/modificar-item/modificar-item.module').then( m => m.ModificarItemPageModule)
+  },
+  {
+    path: 'view-item',
+    loadChildren: () => import('./administracion/view-item/view-item.module').then( m => m.ViewItemPageModule)
+  },
+  {
+    path: 'view-categoria',
+    loadChildren: () => import('./administracion/view-categoria/view-categoria.module').then( m => m.ViewCategoriaPageModule)
+  },
+  {
+    path: 'view-subcategoria',
+    loadChildren: () => import('./administracion/view-subcategoria/view-subcategoria.module').then( m => m.ViewSubcategoriaPageModule)
+  },
+  {
+    path: 'view-usuario',
+    loadChildren: () => import('./administracion/view-usuario/view-usuario.module').then( m => m.ViewUsuarioPageModule)
+  },
 
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
+
 
 
 ];

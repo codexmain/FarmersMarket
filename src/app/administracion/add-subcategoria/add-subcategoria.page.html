@@ -14,23 +14,24 @@
 
 <ion-content [fullscreen]="false">
   <ion-card>
-    <ion-card-header class="ion-text-center" color="primary">Formulario SubCategorías</ion-card-header>
+    <ion-card-header class="custom-card-header">Formulario SubCategorías</ion-card-header>
   <form id="addSubCategoryForm" (ngSubmit)="agregarSubCategoria()">
 
     <ion-item>
       <ion-label position="floating">Nombre SubCategoría</ion-label>
-      <ion-input type="text" [(ngModel)]="subCategoryName" name="subCategoryName" required minlength="5" required #subCategoryCtrl="ngModel">
-  
-      </ion-input>
+      <ion-input type="text" [(ngModel)]="nombre" name="nombre" required minlength="5" required #subCategoryCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearNombre()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
     </ion-item>
     <div *ngIf="subCategoryCtrl.invalid && (subCategoryCtrl.dirty || subCategoryCtrl.touched)" class="error-message">
       El nombre de la SubCategoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.
     </div>
 
     <ion-item>
-      <ion-label>Seleccionar Categoría</ion-label>
-      <ion-select [(ngModel)]="category" name="category" required #categoryCtrl="ngModel" >
-        <ion-select-option value=1>Ejemplo 1</ion-select-option>
+      <ion-label>Seleccionar Categoría:</ion-label>
+      <ion-select [(ngModel)]="categoria_id" name="categoria_id" required #categoryCtrl="ngModel" >
+        <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
