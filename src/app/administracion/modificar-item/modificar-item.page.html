@@ -1,0 +1,96 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>    
+    <ion-buttons slot="end">
+      <ion-button type="submit" form="editProductForm" fill="clear" expand="full">
+        Modificar
+      </ion-button>
+    </ion-buttons>  
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false">
+  <ion-card>
+    <ion-card-header class="custom-card-header">Modificar Producto</ion-card-header>
+  <form id="editProductForm" (ngSubmit)="modificarProducto()">
+
+    <ion-item>
+      <ion-label>Seleccionar Vendedor:</ion-label>
+      <ion-select [(ngModel)]="proveedor_id" name="proveedor_id"  #sellerCtrl="ngModel" required>
+        <ion-select-option *ngFor="let vendedor of arrayCmbProvedores" [value]="vendedor.id">{{ vendedor.nombre_empresa }}</ion-select-option> <!--esto hay que conectarlo a la base de datos  --> 
+      </ion-select>
+    </ion-item>
+    <div *ngIf="sellerCtrl.invalid && (sellerCtrl.dirty || sellerCtrl.touched)" class="error-message">
+      Vendedor es obligatorio.
+    </div>     
+
+    <ion-item>
+      <ion-label position="floating">Nombre Producto</ion-label>
+      <ion-input type="text" [(ngModel)]="nombre_producto" name="nombre_producto" required minlength="3" required #productCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearProductName()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <div *ngIf="productCtrl.invalid && (productCtrl.dirty || productCtrl.touched)" class="error-message">
+      El nombre del Producto es obligatorio y debe tener al menos 3 caracteres y un maximo de 40.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Descripción Producto</ion-label>
+      <ion-input type="text" [(ngModel)]="descripcion_producto" name="descripcion_producto" required minlength="10" required #descProductCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearProductDesc()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <div *ngIf="descProductCtrl.invalid && (descProductCtrl.dirty || descProductCtrl.touched)" class="error-message">
+      La descripción del Producto es opcional, debe tener al menos 10 caracteres y un maximo de 255.
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Precio Producto (CLP)</ion-label>
+      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="precio" name="precio"></ion-input>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label position="floating">Stock/Existencias del Producto</ion-label>
+      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="stock" name="stock"></ion-input>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label>¿Producto Orgánico?:</ion-label>
+      <ion-select [(ngModel)]="organico" name="organico" required #orgCtrl="ngModel" >
+        <ion-select-option value=0>No es Orgánico</ion-select-option>
+        <ion-select-option value=1>Es Orgánico</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="orgCtrl.invalid && (orgCtrl.dirty || orgCtrl.touched)" class="error-message">
+      La procedencia del producto es obligatoria.
+    </div>    
+    
+
+    <ion-item>
+      <ion-label>Seleccionar Categoría:</ion-label>
+      <ion-select [(ngModel)]="categoria_id" name="categoria_id" #categoryCtrl="ngModel" required (ionChange)="onCategoriaChange($event)">
+        <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
+      La Categoría es obligatoria.
+    </div>      
+
+    <ion-item>
+      <ion-label>Seleccionar SubCategoría:</ion-label>
+      <ion-select [(ngModel)]="subcategoria_id" name="subcategoria_id" #subCategoryCtrl="ngModel" required [disabled]="!categoria_id">
+        <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="subCategoryCtrl.invalid && (subCategoryCtrl.dirty || subCategoryCtrl.touched)" class="error-message">
+      La SubCategoría es obligatoria.
+    </div>      
+  </form>
+</ion-card>
+</ion-content>
