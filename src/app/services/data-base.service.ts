@@ -684,7 +684,10 @@ export class DataBaseService {
 
   async Comunas(regionId: number): Promise<any[]> {
     try {
-      const result = await this.database.executeSql('SELECT * FROM comuna WHERE region_id = ?', [regionId]);
+      const result = await this.database.executeSql(
+        'SELECT * FROM comuna WHERE region_id = ?',
+        [regionId]
+      );
       const comunas = [];
       for (let i = 0; i < result.rows.length; i++) {
         comunas.push(result.rows.item(i));
@@ -704,7 +707,7 @@ export class DataBaseService {
           email, contrasena, nombre_empresa, descripcion_corta, 
           foto_perfil, estado_cuenta, tipo_usuario_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', 1)`;
-  
+
       const result = await this.database.executeSql(sqlUsuario, [
         usuario.nombre,
         usuario.segundo_nombre || null,
@@ -714,30 +717,33 @@ export class DataBaseService {
         usuario.contrasena,
         usuario.nombre_empresa || null,
         usuario.descripcion_corta || null,
-        usuario.foto_perfil || null
+        usuario.foto_perfil || null,
       ]);
-  
+
       const usuarioId = result.insertId; // Obtener el ID del usuario recién insertado
-  
+
       // Query para insertar dirección asociada al usuario
       const sqlDireccion = `
         INSERT INTO direccion(id, usuario_id, comuna_id, direccion) 
         VALUES (?, ?, ?, ?)`;
-  
+
       await this.database.executeSql(sqlDireccion, [
         1,
         usuarioId,
         usuario.comuna_id,
-        usuario.direccion
+        usuario.direccion,
       ]);
-  
+
       // Mostrar alerta de éxito
-      this.presentAlert('Insertar', 'Usuario y dirección registrados con éxito');
-  
+      this.presentAlert(
+        'Insertar',
+        'Usuario y dirección registrados con éxito'
+      );
+
       // Actualizar la lista de usuarios y proveedores
       this.seleccionarUsuarios();
       this.seleccionarCbmProveedores();
-  
+
       return true; // Retorna true si todo se insertó correctamente
     } catch (error) {
       console.error('Error al registrar el usuario:', error);
@@ -745,35 +751,292 @@ export class DataBaseService {
       return false; // Retorna false en caso de error
     }
   }
+
+  //PROVENTAS
+  // Método para obtener las categorías desde la base de datos
+  async obtenerCategorias(): Promise<any[]> {
+    try {
+      const result = await this.database.executeSql(
+        'SELECT * FROM categoria',
+        []
+      );
+      const categorias: any[] = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        categorias.push(result.rows.item(i));
+      }
+      return categorias;
+    } catch (error) {
+      console.error('Error al obtener las categorías:', error);
+      return [];
+    }
+  }
+
+  // Método para obtener las subcategorías basadas en el id de la categoría
+  async obtenerSubcategorias(categoriaId: number): Promise<any[]> {
+    try {
+      const result = await this.database.executeSql(
+        'SELECT * FROM subcategoria WHERE categoria_id = ?',
+        [categoriaId]
+      );
+      const subcategorias: any[] = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        subcategorias.push(result.rows.item(i));
+      }
+      return subcategorias;
+    } catch (error) {
+      console.error('Error al obtener las subcategorías:', error);
+      return [];
+    }
+  }
+
+  async mostrarProductos(email: string): Promise<Productos[]> {
+    return this.database
+      .executeSql(
+        `SELECT 
+        p.id,
+        p.proveedor_id,
+        p.nombre AS nombre_producto,
+        p.descripcion AS descripcion_producto,
+        p.precio,
+        p.stock,
+        p.organico,
+        CASE 
+            WHEN p.organico = 1 THEN 'Verdadero'
+            ELSE 'Falso'
+        END AS organicoEnTexto,
+        p.foto_producto,
+        p.subcategoria_id,
+        p.fecha_agregado,
+        s.nombre AS nombre_subcategoria,
+        s.categoria_id AS categoria_id,
+        u.nombre_empresa AS nombre_proveedor,
+        c.nombre AS nombre_categoria
+      FROM 
+        producto p
+      JOIN 
+        subcategoria s ON p.subcategoria_id = s.id
+      JOIN 
+        usuario u ON p.proveedor_id = u.id
+      JOIN 
+        categoria c ON s.categoria_id = c.id
+      WHERE 
+        u.email = ?`,
+        [email]
+      )
+      .then((res) => {
+        let items: Productos[] = [];
+        for (let i = 0; i < res.rows.length; i++) {
+          items.push({
+            id: res.rows.item(i).id,
+            proveedor_id: res.rows.item(i).proveedor_id,
+            nombre_producto: res.rows.item(i).nombre_producto,
+            descripcion_producto: res.rows.item(i).descripcion_producto,
+            precio: res.rows.item(i).precio,
+            stock: res.rows.item(i).stock,
+            organico: res.rows.item(i).organico,
+            organicoEnTexto: res.rows.item(i).organicoEnTexto,
+            foto_producto: res.rows.item(i).foto_producto,
+            subcategoria_id: res.rows.item(i).subcategoria_id,
+            fecha_agregado: res.rows.item(i).fecha_agregado,
+            nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
+            categoria_id: res.rows.item(i).categoria_id,
+            nombre_proveedor: res.rows.item(i).nombre_proveedor,
+            nombre_categoria: res.rows.item(i).nombre_categoria,
+          });
+        }
+        return items;
+      });
+  }
+
+  async obtenerProveedorIdPorEmail(email: string): Promise<number | null> {
+    return this.database
+      .executeSql(
+        `SELECT u.id AS proveedor_id
+       FROM usuario u
+       WHERE u.email = ?`,
+        [email]
+      )
+      .then((res) => {
+        if (res.rows.length > 0) {
+          return res.rows.item(0).proveedor_id; // Devuelve el proveedor_id si se encuentra
+        } else {
+          return null; // Devuelve null si no se encuentra
+        }
+      })
+      .catch((error) => {
+        console.error('Error al obtener proveedor_id:', error);
+        return null; // En caso de error devuelve null
+      });
+  }
+
+  //CARRITO
+  // Método para agregar producto al carro
+  async agregarProductoAlCarro(
+    carro_id: number,
+    producto_id: number,
+    cantidad: number,
+    subtotal: number
+  ) {
+    const query = `INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal) VALUES (?, ?, ?, ?)`;
+    try {
+      await this.database.executeSql(query, [
+        carro_id,
+        producto_id,
+        cantidad,
+        subtotal,
+      ]);
+      console.log('Producto agregado al carro de compra');
+    } catch (error) {
+      console.error('Error al agregar producto al carro:', error);
+    }
+  }
+
+  // Método para obtener todos los productos del detalle del carro
+  async obtenerProductosDelCarro(carro_id: number): Promise<any[]> {
+    const query = `SELECT * FROM detalle_carro_compra WHERE carro_id = ?`;
+    const result = await this.database.executeSql(query, [carro_id]);
+    const productos = [];
+
+    for (let i = 0; i < result.rows.length; i++) {
+      productos.push(result.rows.item(i));
+    }
+    return productos;
+  }
+
+  // Método para eliminar un producto del carro
+  async eliminarProductoDelCarro(carro_id: number, producto_id: number) {
+    const query = `DELETE FROM detalle_carro_compra WHERE carro_id = ? AND producto_id = ?`;
+    try {
+      await this.database.executeSql(query, [carro_id, producto_id]);
+      console.log('Producto eliminado del carro de compra');
+    } catch (error) {
+      console.error('Error al eliminar producto del carro:', error);
+    }
+  }
+
+  // Método para crear un nuevo carro de compra
+  async crearCarroCompra(usuario_id: number): Promise<number> {
+    const query = `INSERT INTO carro_compra (usuario_id) VALUES (?)`;
+    const result = await this.database.executeSql(query, [usuario_id]);
+    return result.insertId; // Devuelve el ID del nuevo carro de compra
+  }
+
+  // Método para mover productos del detalle del carro a un nuevo carro de compra
+  async confirmarCompra(carro_id: number, usuario_id: number) {
+    // Crear un nuevo carro de compra
+    const nuevoCarroId = await this.crearCarroCompra(usuario_id);
+
+    // Obtener productos del carro actual
+    const productos = await this.obtenerProductosDelCarro(carro_id);
+
+    // Insertar productos en la nueva tabla detalle_carro_compra
+    for (const producto of productos) {
+      const insertQuery = `INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal) VALUES (?, ?, ?, ?)`;
+      await this.database.executeSql(insertQuery, [
+        nuevoCarroId,
+        producto.producto_id,
+        producto.cantidad,
+        producto.subtotal,
+      ]);
+    }
+
+    // Aquí puedes actualizar el estado del carro original si es necesario
+    const updateQuery = `UPDATE carro_compra SET estado = 'pagado' WHERE id = ?`;
+    await this.database.executeSql(updateQuery, [carro_id]);
+  }
+
+  // En DataBaseService
+
+  async obtenerCompras(usuario_id: number): Promise<any[]> {
+    const query = `SELECT * FROM carro_compra WHERE usuario_id = ?`;
+    const result = await this.database.executeSql(query, [usuario_id]);
+    let compras = [];
+
+    for (let i = 0; i < result.rows.length; i++) {
+      compras.push(result.rows.item(i));
+    }
+
+    return compras;
+  }
+
+  async obtenerDetallesCompra(carro_id: number): Promise<any[]> {
+    const query = `SELECT dc.producto_id, dc.cantidad, dc.subtotal, p.nombre_producto, p.precio 
+                 FROM detalle_carro_compra dc 
+                 JOIN producto p ON dc.producto_id = p.id 
+                 WHERE dc.carro_id = ?`;
+    const result = await this.database.executeSql(query, [carro_id]);
+    let detalles = [];
+
+    for (let i = 0; i < result.rows.length; i++) {
+      detalles.push(result.rows.item(i));
+    }
+
+    return detalles;
+  }
+
+  async obtenerComprasPorEmail(email: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT c.id, c.fecha_creacion, c.total, c.estado
+                     FROM carro_compra c
+                     JOIN usuario u ON c.usuario_id = u.id
+                     WHERE u.email = ?`;
+
+      this.database
+        .executeSql(sql, [email])
+        .then((res) => {
+          const compras = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            compras.push({
+              id: res.rows.item(i).id,
+              fecha_creacion: res.rows.item(i).fecha_creacion,
+              total: res.rows.item(i).total,
+              estado: res.rows.item(i).estado,
+            });
+          }
+          resolve(compras);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   //Funcion para CRUDs pendiente modulo de administración
 

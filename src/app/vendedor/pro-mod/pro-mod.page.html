@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Modificar Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="productForm">
+    <ion-card>
+      <ion-list>
+
+        <!-- Proveedor ID (no editable) -->
+        <ion-item>
+          <ion-label position="floating">Proveedor ID</ion-label>
+          <ion-input formControlName="proveedor_id" type="number" placeholder="Ingresa ID del proveedor" [value]="proveedor_id" disabled></ion-input>
+        </ion-item>
+
+        <!-- Imagen del Producto -->
+        <ion-item>
+          <ion-button (click)="takePicture()">Tomar Foto</ion-button>
+          <img *ngIf="imagen" [src]="imagen" alt="Sin imagen" style="width: 250px; height: 250px;" />
+        </ion-item>
+
+        <!-- Título del Producto -->
+        <ion-item>
+          <ion-label position="floating">Título</ion-label>
+          <ion-input formControlName="titulo" type="text" placeholder="Ingresa el título"></ion-input>
+        </ion-item>
+
+        <!-- Valor del Producto -->
+        <ion-item>
+          <ion-label position="floating">Valor</ion-label>
+          <ion-input formControlName="valor" type="number" placeholder="Ingresa el valor"></ion-input>
+        </ion-item>
+
+        <!-- Descripción del Producto -->
+        <ion-item>
+          <ion-label position="floating">Descripción</ion-label>
+          <ion-textarea formControlName="descripcion" placeholder="Ingresa la descripción"></ion-textarea>
+        </ion-item>
+
+        <!-- Stock del Producto -->
+        <ion-item>
+          <ion-label position="floating">Stock</ion-label>
+          <ion-input formControlName="stock" type="number" min="1" max="99" placeholder="Cantidad disponible"></ion-input>
+        </ion-item>
+
+        <!-- Orgánico (checkbox) -->
+        <ion-item>
+          <ion-label>¿Es orgánico?</ion-label>
+          <ion-toggle formControlName="organico" color="success"></ion-toggle>
+        </ion-item>
+
+        <!-- Selección de Categoría -->
+        <ion-item>
+          <ion-label>Categoría</ion-label>
+          <ion-select formControlName="categoria_id" (ionChange)="cargarSubcategorias($event)">
+            <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
+              {{ categoria.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Selección de Subcategoría -->
+        <ion-item>
+          <ion-label>Subcategoría</ion-label>
+          <ion-select formControlName="subcategoria_id">
+            <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id">
+              {{ subcategoria.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+      </ion-list>
+
+      <ion-button expand="full" (click)="onSubmit()">Modificar Producto</ion-button>
+    </ion-card>
+  </form>
+</ion-content>

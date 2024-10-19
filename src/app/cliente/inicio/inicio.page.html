@@ -3,32 +3,33 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-button fill="solid" slot="end" (click)="navigateToUserDetail()">
-      Cuenta</ion-button>
-
-    <ion-title>Menu de Socios</ion-title>
+    <ion-title>Menu de Usuarios</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content>
+
+<ion-content class="flex-center">
   <ion-card>
     <ion-list>
-      <ion-searchbar animated="true" placeholder="Buscar Vendedor"></ion-searchbar>
-      <ion-item *ngFor="let item of items; let index">
+      <ion-searchbar 
+        animated="true" 
+        placeholder="Buscar Usuario" 
+        (ionInput)="buscarUsuario($event)" 
+        [(ngModel)]="searchTerm">
+      </ion-searchbar>
+
+      <ion-item *ngFor="let usuario of filteredUsuarios">
         <ion-avatar slot="start">
-          <img [src]="'https://picsum.photos/80/80?random=' + index" alt="avatar" />
+          <img [src]="usuario.foto_perfil || '../assets/icon/default-avatar.png'" />
         </ion-avatar>
-        <ion-label class="ion-text-wrap">
-          <div [innerHTML]="item"></div>
-          <div class="ion-text-end">
-            <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" slot="start">Productos
-              <ion-icon name="bag"></ion-icon>
-            </ion-button>
-          </div>
+        <ion-label>
+          <strong><b>{{ usuario.nombreCompleto }}</b></strong><br>
+          <strong><b>Email:</b> {{ usuario.email }}</strong>
+          <p><b>Descripción:</b> {{ usuario.descripcionMostrarListar }}</p>
         </ion-label>
+        <ion-button expand="block" fill="outline" slot="end">
+          Detalles
+        </ion-button>
       </ion-item>
     </ion-list>
-    <ion-infinite-scroll>
-      <ion-infinite-scroll-content loadingText="Cargando" loadingSpinner="bubbles"></ion-infinite-scroll-content>
-    </ion-infinite-scroll>
   </ion-card>
 </ion-content>

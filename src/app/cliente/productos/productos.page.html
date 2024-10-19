@@ -7,68 +7,30 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content class="flex-center">
   <ion-card>
-  <ion-list>
-    <ion-searchbar animated="true" placeholder="Buscar Producto"></ion-searchbar>
+    <ion-list>
+      <ion-searchbar 
+        animated="true" 
+        placeholder="Buscar Producto" 
+        (ionInput)="filterProducts($event)" 
+        [(ngModel)]="searchTerm">
+      </ion-searchbar>
 
-    <ion-item>
-      <ion-avatar slot="start">
-        <img src="../assets/icon/favicon.png" />
-      </ion-avatar>
-      <ion-label>
-        <strong><b>Producto 1</b></strong><br>
-        <strong><b>Valor:</b> $10.00</strong>
-        <p><b>Descripción del producto 1</b></p>
-      </ion-label>
-      <ion-button expand="block" fill="outline" slot="end">
-        Agregar
-      </ion-button>
-    </ion-item>
+      <ion-item *ngFor="let producto of filteredProducts">
+        <ion-avatar slot="start">
+          <img [src]="producto.foto_producto || '../assets/icon/favicon.png'" />
+        </ion-avatar>
+        <ion-label>
+          <strong><b>{{ producto.nombre_producto }}</b></strong><br>
+          <strong><b>Valor:</b> ${{ producto.precio.toFixed(2) }}</strong>
+          <p><b>{{ producto.descripcion_producto }}</b></p>
+        </ion-label>
+        <ion-button expand="block" fill="outline" slot="end" (click)="agregarAlCarro(producto)">
+          Agregar
+        </ion-button>
+      </ion-item>
 
-    <ion-item>
-      <ion-avatar slot="start">
-        <img src="../assets/icon/favicon.png" />
-      </ion-avatar>
-      <ion-label>
-        <strong><b>Producto 2</b></strong><br>
-        <strong><b>Valor:</b> $12.00</strong>
-        <p><b>Descripción del producto 2</b></p>
-      </ion-label>
-      <ion-button expand="block" fill="outline" slot="end">
-        Agregar
-      </ion-button>
-    </ion-item>
-
-    <ion-item>
-      <ion-avatar slot="start">
-        <img src="../assets/icon/favicon.png" />
-      </ion-avatar>
-      <ion-label>
-        <strong><b>Producto 3</b></strong><br>
-        <strong><b>Valor:</b> $24.00</strong>
-        <p><b>Descripción del producto 3</b></p>
-      </ion-label>
-      <ion-button expand="block" fill="outline" slot="end">
-        Agregar
-      </ion-button>
-    </ion-item>
-
-    <ion-item>
-      <ion-avatar slot="start">
-        <img src="../assets/icon/favicon.png" />
-      </ion-avatar>
-      <ion-label>
-        <strong><b>Producto 4</b></strong><br>
-        <strong><b>Valor:</b> $35.00</strong>
-        <p><b>Descripción del producto 4</b></p>
-      </ion-label>
-      <ion-button expand="block" fill="outline" slot="end">
-        Agregar
-      </ion-button>
-    </ion-item>
-
-  </ion-list>
-</ion-card>
+    </ion-list>
+  </ion-card>
 </ion-content>

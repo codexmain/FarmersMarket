@@ -9,7 +9,7 @@
     <ion-card>
       <div class="flex-center">
         <ion-avatar slot="start" style="background-color: #8b4513;">
-          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+          <img src="../../assets/icon/Logo_name_out.png" alt="avatar" />
         </ion-avatar>
       </div>
 
@@ -19,19 +19,20 @@
       </ion-card-header>
 
       <ion-card-content>
-        <ion-item>
-          Foto de perfil/Logo empresa (opcional):
-          <ion-button>
-            <ion-icon name="add-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
+
 
         <form (ngSubmit)="registrarse()">
+          <!-- Foto -->
+          <ion-item>
+            <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
+            <img *ngIf="foto_perfil" [src]="foto_perfil" alt="Sin imagen" style="width: 250px;height: 250px;" />
+          </ion-item>
+
           <!-- Nombre -->
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2"
-              #pNombreCtrl="ngModel"></ion-input>
+            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel">
+            </ion-input>
           </ion-item>
           <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
             El primer nombre es obligatorio y debe tener al menos 2 caracteres.
@@ -41,7 +42,8 @@
           <ion-item>
             <ion-label position="floating">Apellido Paterno</ion-label>
             <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2"
-              #aPaternoCtrl="ngModel"></ion-input>
+              #aPaternoCtrl="ngModel">
+            </ion-input>
           </ion-item>
           <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
             El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
@@ -73,8 +75,8 @@
 
           <!-- Email -->
           <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" [(ngModel)]="email" name="email" required email #emailCtrl="ngModel"></ion-input>
+            <ion-input label="Correo" type="email" [(ngModel)]="email" labelPlacement="stacked" name="email"
+              placeholder="Ingresar Correo" required email #emailCtrl="ngModel"></ion-input>
           </ion-item>
           <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
             El email es obligatorio y debe tener un formato válido.
@@ -83,9 +85,11 @@
           <!-- Contraseña -->
           <ion-item>
             <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
-              placeholder="Ingresar Contraseña" name="password" required minlength="10"
-              #passwordCtrl="ngModel">
-              <ion-input-password-toggle slot="end"></ion-input-password-toggle></ion-input>
+              placeholder="Ingresar Contraseña" name="password" required minlength="10" #passwordCtrl="ngModel">
+              <div slot="end">
+                <ion-input-password-toggle></ion-input-password-toggle>
+              </div>
+            </ion-input>
           </ion-item>
           <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
             La contraseña es obligatoria y debe tener al menos 10 caracteres.
@@ -94,42 +98,32 @@
           <!-- Región -->
           <ion-item>
             <ion-label>Región</ion-label>
-            <ion-select [(ngModel)]="selectedRegion" (ionChange)="cargarcomunas($event)" name="region" required
-              #regionCtrl="ngModel">
-              <ion-select-option *ngFor="let region of regiones" [value]="region.id">{{ region.nombre
-                }}</ion-select-option>
+            <ion-select [(ngModel)]="selectedRegion" (ionChange)="cargarcomunas($event)" name="region" required>
+              <ion-select-option *ngFor="let region of regiones" [value]="region.id">
+                {{ region.nombre }}
+              </ion-select-option>
             </ion-select>
           </ion-item>
-          <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
-            La región es obligatoria.
-          </div>
 
           <!-- Comuna -->
           <ion-item>
             <ion-label>Comuna</ion-label>
-            <ion-select [(ngModel)]="selectedComuna" name="comuna" required #comunaCtrl="ngModel">
-              <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">{{ comuna.nombre
-                }}</ion-select-option>
+            <ion-select [(ngModel)]="selectedComuna" name="comuna" required>
+              <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
+                {{ comuna.nombre }}
+              </ion-select-option>
             </ion-select>
           </ion-item>
-          <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
-            La comuna es obligatoria.
-          </div>
 
           <!-- Dirección -->
           <ion-item>
             <ion-label position="floating">Dirección</ion-label>
             <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel"></ion-input>
           </ion-item>
-          <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">
-            La dirección es obligatoria y debe tener un formato válido.
-          </div>
 
-          <!-- Botón Registrarse -->
           <ion-button type="submit" fill="solid" expand="full">Registrarse</ion-button>
         </form>
 
-        <!-- Enlace al Login -->
         <ion-button fill="clear" expand="full" routerLink="/login">¿Ya tienes cuenta? ¡Ingresa!</ion-button>
       </ion-card-content>
     </ion-card>

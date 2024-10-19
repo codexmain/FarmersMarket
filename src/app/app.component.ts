@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
   // Método para salir y eliminar el email del almacenamiento
   async salir() {
     try {
-      await this.nativeStorage.remove('userEmail');
+      await this.nativeStorage.clear();
       console.log('Correo eliminado de Native Storage');
       this.router.navigate(['/login'], { replaceUrl: true }); // Redirigir al login
     } catch (error) {
