@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MenuController, ModalController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from 'src/app/services/data-base.service';
+import { Camera, CameraResultType } from '@capacitor/camera';
 
 interface RegionesComunas {
   [key: string]: string[];
@@ -27,13 +28,15 @@ export class RegisterPage implements OnInit {
   foto_perfil: string = '';
   estado_cuenta: string = 'activa';
   tipo_usuario_id: number = 1;
+  imagen: any;
 
   selectedRegion: number | null = null;
   selectedComuna: number | null = null;
   regiones: any[] = [];
   comunas: any[] = [];
   
-  emails: string[] = []; // Lista de emails existentes
+  emails: string[] = [];
+  
 
   constructor(
     private modalController: ModalController,
@@ -190,4 +193,18 @@ export class RegisterPage implements OnInit {
   dismiss() {
     this.modalController.dismiss();
   }
+
+  async takePicture() { 
+		const image = await Camera.getPhoto({
+			quality: 90,
+			allowEditing: false,
+			resultType: CameraResultType.Uri
+		});
+
+		if (image && image.webPath) { 
+			this.foto_perfil = image.webPath;
+      this.imagen = image.webPath;
+		}
+	}
+
 }

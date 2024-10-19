@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, ActionSheetController} from '@ionic/angular';
-import { AddItemPage } from '../add-item/add-item.page'
+import { ModalController, ActionSheetController } from '@ionic/angular';
+import { AddItemPage } from '../add-item/add-item.page';
 import { ModificarItemPage } from '../modificar-item/modificar-item.page';
 import { ViewItemPage } from '../view-item/view-item.page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
 import { Productos } from 'src/app/services/productos';
-
-
 
 @Component({
   selector: 'app-items',
@@ -15,8 +13,13 @@ import { Productos } from 'src/app/services/productos';
   styleUrls: ['./items.page.scss'],
 })
 export class ItemsPage implements OnInit {
-
-  constructor(private bd: DataBaseService, private actionSheetController: ActionSheetController,private modalController: ModalController, private route: ActivatedRoute, private router: Router) { }
+  constructor(
+    private bd: DataBaseService,
+    private actionSheetController: ActionSheetController,
+    private modalController: ModalController,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   arrayProductos: any = [
     {
@@ -34,9 +37,9 @@ export class ItemsPage implements OnInit {
       nombre_subcategoria: '',
       categoria_id: '',
       nombre_proveedor: '',
-      nombre_categoria: ''
-    }
-  ]
+      nombre_categoria: '',
+    },
+  ];
 
   searchTerm: string = '';
 
@@ -56,37 +59,38 @@ export class ItemsPage implements OnInit {
       nombre_subcategoria: '',
       categoria_id: '',
       nombre_proveedor: '',
-      nombre_categoria: ''
-    }
-  ]
-
+      nombre_categoria: '',
+    },
+  ];
 
   ngOnInit() {
-    this.bd.dbState().subscribe(data=>{
+    this.bd.dbState().subscribe((data) => {
       //validar si la bd esta lista
-      if(data){
+      if (data) {
         //subscribir al observable de la listaNoticias
-        this.bd.fetchProductos().subscribe(res=>{
+        this.bd.fetchProductos().subscribe((res) => {
           this.arrayProductos = res;
           this.filteredProductos = res;
-
-        })
+        });
       }
-    })
+    });
   }
 
-    // Método para filtrar las categorías
-    searchItems() {
+  // Método para filtrar las categorías
+  searchItems() {
     if (this.searchTerm.trim() === '') {
       // Si el searchTerm está vacío, mostrar todas las categorías
       this.filteredProductos = this.arrayProductos;
     } else {
       // Filtrar las categorías
-      this.filteredProductos = this.arrayProductos.filter((product: Productos) => 
-        product.nombre_producto.toLowerCase().includes(this.searchTerm.toLowerCase())
+      this.filteredProductos = this.arrayProductos.filter(
+        (product: Productos) =>
+          product.nombre_producto
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
       );
     }
-  }  
+  }
 
   async presentActionSheet(x: any) {
     const actionSheet = await this.actionSheetController.create({
@@ -94,57 +98,67 @@ export class ItemsPage implements OnInit {
       buttons: [
         {
           text: 'Modificar',
-          handler: () => this.modificar(x)
+          handler: () => this.modificar(x),
         },
         {
           text: 'Visualizar',
-          handler: () => this.visualizar(x)
+          handler: () => this.visualizar(x),
         },
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminar(x)
+          handler: () => this.eliminar(x),
         },
         {
           text: 'Cancelar',
-          role: 'cancel'
-        }
-      ]
+          role: 'cancel',
+        },
+      ],
     });
     await actionSheet.present();
   }
 
-  async presentModal() { //este present modal es para 
+  async presentModal() {
+    //este present modal es para
     const modal = await this.modalController.create({
       component: AddItemPage,
     });
 
-    return await modal.present();}
+    return await modal.present();
+  }
 
   async modificar(x: any) {
     const modal = await this.modalController.create({
       component: ModificarItemPage, //crear la pagina de edicio
-      componentProps: { producto: x }
+      componentProps: { producto: x },
     });
-    modal.onDidDismiss().then(() => {
-    });
+    modal.onDidDismiss().then(() => {});
     return await modal.present();
   }
 
   async visualizar(x: any) {
     const modal = await this.modalController.create({
       component: ViewItemPage, //crear la pagina de visualizacion
-      componentProps: { producto: x }
+      componentProps: { producto: x },
     });
     return await modal.present();
   }
 
   eliminar(x: any) {
-    this.bd.eliminarProducto(x.id, x.proveedor_id, x.nombre_producto, x.descripcion_producto, x.precio, x.stock, x.organico, x.foto_producto, x.subcategoria_id)
+    this.bd.eliminarProducto(
+      x.id,
+      x.proveedor_id,
+      x.nombre_producto,
+      x.descripcion_producto,
+      x.precio,
+      x.stock,
+      x.organico,
+      x.foto_producto,
+      x.subcategoria_id
+    );
   }
-  
+
   agregar() {
     this.presentModal(); // Mostrar modal para agregar usuario
   }
-
 }

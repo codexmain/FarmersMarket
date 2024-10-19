@@ -32,9 +32,6 @@ export class LoginPage implements OnInit {
   ngOnInit() {}
 
   async Logearse() {
-    // Guardar el email en Native Storage
-    await this.enviarEmail();
-
     if (!this.email || !this.password) {
       await this.showAlert('Error', 'Por favor, completa todos los campos.');
       return;
@@ -58,23 +55,27 @@ export class LoginPage implements OnInit {
           return;
         }
 
-        this.intentoLogin = 0; // Reiniciar intentos en caso de éxito
+        this.intentoLogin = 0;
+
+        
+        await this.nativeStorage.setItem('userEmail', this.email);
 
         const navigationExtras: NavigationExtras = {
-          state: { ...usuario }, // Pasar directamente el objeto del usuario
+          state: { ...usuario }, 
         };
 
         switch (usuario.tipo_usuario_id) {
           case 1:
             this.router.navigate(['/productos'], navigationExtras);
-            // Guardar el email en Native Storage
             this.enviarEmail();
             break;
           case 2:
             this.router.navigate(['/vendedor-page'], navigationExtras);
+            this.enviarEmail();
             break;
           case 3:
             this.router.navigate(['/admin-page'], navigationExtras);
+            this.enviarEmail();
             break;
           default:
             await this.showAlert('Error', 'Tipo de usuario no reconocido.');
@@ -130,6 +131,7 @@ export class LoginPage implements OnInit {
   }
 
   enviarEmail() {
+    this.nativeStorage.clear();
     this.nativeStorage.setItem('userEmail', this.email);
   }
 

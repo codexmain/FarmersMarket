@@ -3,82 +3,20 @@
     <ion-buttons slot="start">
       <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
     </ion-buttons>
-    <ion-title>Registro de ventas</ion-title>
+    <ion-title>Registro de Ventas</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="flex-center">
-  <ion-card>
-    <ion-list>
-      <ion-searchbar animated="true" placeholder="Buscar Producto Boleta"></ion-searchbar>
-
-      <!-- Producto 1 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 1</b></strong><br>
-          <strong><b>Valor:</b> $10.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 1</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 10:00 AM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 2 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 2</b></strong><br>
-          <strong><b>Valor:</b> $12.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 2</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 11:30 AM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 3 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 3</b></strong><br>
-          <strong><b>Valor:</b> $24.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 3</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 1:00 PM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-
-      <!-- Producto 4 -->
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 4</b></strong><br>
-          <strong><b>Valor:</b> $35.00</strong>
-          <p><b>Descripción:</b> Descripción del producto 4</p>
-          <p><b>Fecha:</b> 29/08/2024</p>
-          <p><b>Hora:</b> 3:30 PM</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Resumen
-        </ion-button>
-      </ion-item>
-    </ion-list>
-  </ion-card>
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let compra of compras">
+      <ion-label>
+        <h2>Compra ID: {{ compra.id }}</h2>
+        <p>Fecha: {{ compra.fecha_creacion }}</p>
+        <p>Total: ${{ compra.total }}</p>
+        <p>Estado: {{ compra.estado }}</p>
+      </ion-label>
+      <ion-button (click)="mostrarDetalles(compra.id)">Detalles</ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

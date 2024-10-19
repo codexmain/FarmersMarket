@@ -1,22 +1,207 @@
-import { ɵnormalizeQueryParams } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ModalController, NavParams, ToastController, AlertController } from '@ionic/angular';
+import { DataBaseService } from 'src/app/services/data-base.service';
+
 @Component({
-  selector: 'app-cuenta',
-  templateUrl: './cuenta.page.html',
-  styleUrls: ['./cuenta.page.scss'],
+  selector: 'app-modificar-usuario',
+  templateUrl: './modificar-usuario.page.html',
+  styleUrls: ['./modificar-usuario.page.scss'],
 })
-export class CuentaPage implements OnInit {
-  userData: any;
+export class ModificarUsuarioPage implements OnInit {
+  // Datos del usuario
+  isDisabled = true;
+  usuario: any;
 
+  // Campos del formulario
+  nombre: string = '';
+  apellido_paterno: string = '';
+  segundo_nombre: string = '';
+  apellido_materno: string = '';
+  email: string = '';
+  contrasena: string = '';
+  nombre_empresa: string = '';
+  descripcion_corta: string = '';
+  estado_cuenta: string = '';
+  tipo_usuario_id!: number;
+  empresaObligatoria: boolean = false;
+  descEmpresaObligatoria: boolean = false;
 
-  constructor(private route: Router, private activerouter: ActivatedRoute) {
-    this.userData = this.route.getCurrentNavigation()?.extras?.state;
-    
+  arrayCmbTipoUsuario: any = [
+    {
+      id: '',
+      descripcion: '',
+    }
+  ];
+
+  constructor(
+    private modalController: ModalController, 
+    private navParams: NavParams, 
+    private bd: DataBaseService, 
+    private toastController: ToastController, 
+    public alertController: AlertController
+  ) {
+    // Obtener el usuario desde NavParams
+    this.usuario = this.navParams.get('usuario'); 
   }
-
 
   ngOnInit() {
+    // Carga de los datos al formulario
+    this.nombre = this.usuario.nombre;
+    this.apellido_paterno = this.usuario.apellido_paterno;
+    this.segundo_nombre = this.usuario.segundo_nombre;
+    this.apellido_materno = this.usuario.apellido_materno;
+    this.email = this.usuario.email; // Inicializar con el email actual
+    this.contrasena = this.usuario.contrasena;
+    this.nombre_empresa = this.usuario.nombre_empresa;
+    this.descripcion_corta = this.usuario.descripcion_corta;
+    this.estado_cuenta = this.usuario.estado_cuenta;
+    this.tipo_usuario_id = this.usuario.tipo_usuario_id;
+
+    // Actualiza la obligatoriedad de los campos al cargar
+    this.onFieldsChange();
+
+    // Carga de los combobox correspondientes
+    this.bd.dbState().subscribe(data => {
+      // Validar si la BD está lista
+      if (data) {
+        this.bd.fetchCmbTipUsuario().subscribe(res => {
+          this.arrayCmbTipoUsuario = res;
+        });     
+      }
+    });
   }
 
+  onFieldsChange() {
+    // Lógica para determinar si los campos son obligatorios
+    if (this.nombre_empresa.length > 0 || this.descripcion_corta.length > 0) {
+      this.empresaObligatoria = true;
+      this.descEmpresaObligatoria = true;
+      this.presentToast('Los campos "Empresa" y "Descripción Empresa" son ahora obligatorios y la cuenta será Proveedor/Vendedor.');
+    } else {
+      this.empresaObligatoria = false;
+      this.descEmpresaObligatoria = false;
+    }
+
+    // Actualizar el tipo de usuario
+    this.tipo_usuario_id = (this.empresaObligatoria && this.descEmpresaObligatoria) ? 2 : 1;
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+
+  async modificarUser() {
+    // Realiza validaciones
+    const isValid = await this.validateFields();
+    if (!isValid) {
+      return; // Si hay errores, salimos
+    }
+
+    // Procede a actualizar el usuario en la base de datos
+    await this.bd.modificarUsuario(
+      this.usuario.id, 
+      this.nombre,
+      this.segundo_nombre, 
+      this.apellido_paterno, 
+      this.apellido_materno, 
+      this.email, // Permitir el mismo email
+      this.nombre_empresa, 
+      this.descripcion_corta, 
+      '', 
+      this.estado_cuenta, 
+      this.tipo_usuario_id
+    );
+
+    this.modalController.dismiss({ success: true });
+  }
+
+  async validateFields() {
+    // Aquí van las validaciones
+    if (!this.nombre || this.nombre.length < 2) {
+      this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    if (!this.apellido_paterno || this.apellido_paterno.length < 2) {
+      this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    // Validar empresa y descEmpresa si se han marcado como obligatorios
+    if ((this.empresaObligatoria && !this.nombre_empresa) || (this.descEmpresaObligatoria && !this.descripcion_corta)) {
+      this.presentAlert('Error', 'Los campos "Empresa" y "Descripción Empresa" son obligatorios.');
+      return false;
+    }
+
+    // Validación tipo usuario
+    if (!this.tipo_usuario_id) {
+      this.presentAlert('Error', 'El tipo de usuario es obligatorio.');
+      return false;
+    }
+
+    // Validación estado de cuenta
+    if (!this.estado_cuenta) {
+      this.presentAlert('Error', 'El Estado del usuario es obligatorio.');
+      return false;
+    }
+
+    // Validar nombres y apellidos
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
+    if (!namePattern.test(this.nombre) || !namePattern.test(this.apellido_paterno) ||
+        (this.segundo_nombre && !namePattern.test(this.segundo_nombre)) ||
+        (this.apellido_materno && !namePattern.test(this.apellido_materno))) {
+      this.presentAlert('Error', 'Los nombres y apellidos deben tener al menos 2 caracteres y no contener números.');
+      return false;
+    }
+
+    // Validar nombre de la empresa
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
+    if (this.nombre_empresa && !empresaPattern.test(this.nombre_empresa)) {
+      this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
+      return false;
+    }
+
+    // Validar descripción de la empresa
+    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
+    if (this.descripcion_corta && !descEmpresaPattern.test(this.descripcion_corta)) {
+      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
+      return false;
+    }        
+
+    // Validar email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(this.email)) {
+      this.presentAlert('Error', 'El formato del email no es válido.');
+      return false;
+    }
+
+    // No verificar existencia del correo si es el mismo que el actual
+    if (this.email !== this.usuario.email) {
+      const correoExistente = await this.bd.verificarCorreoExistente(this.email);
+      if (correoExistente) {
+        this.presentAlert('Error', 'El correo ingresado ya está asociado a otra cuenta.');
+        return false;
+      }
+    }
+
+    return true; // Si todas las validaciones pasan
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+  dismiss() {
+    this.modalController.dismiss();
+  }
 }
