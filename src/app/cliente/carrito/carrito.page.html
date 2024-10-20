@@ -7,117 +7,30 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div>
-    <ion-card>
-      <ion-row>
-        <ion-col>
-          <ion-list>
+<ion-content [fullscreen]="true">
+  <ion-list *ngIf="detalles.length > 0">
+    <ion-item *ngFor="let detalle of detalles">
+      <ion-label>
+        <h2>{{ detalle.nombre }}</h2>
+        <p>Cantidad: {{ detalle.cantidad }}</p>
+        <p>Subtotal: ${{ detalle.subtotal }}</p>
+      </ion-label>
+      <ion-button color="danger" (click)="eliminarProducto(detalle.id)">
+        Eliminar
+      </ion-button>
+    </ion-item>
+  </ion-list>
 
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 1</b></strong><br>
-                  <ion-button style="float: right; padding: 0px; margin: 0px;"fill="solid" color="danger" slot="end">
-                    <ion-icon name="trash"></ion-icon>
-                  </ion-button>
-                <strong><b>Valor:</b> $10.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 1</p>
-                <p><b>Calificación:</b></p>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon><br>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;" fill="clear"><b>Unidades: 2 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
+  <ion-text *ngIf="detalles.length === 0" color="danger">
+    <h2>No hay productos en el carrito.</h2>
+  </ion-text>
 
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 2</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;"fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $12.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 2</p>
-                <p><b>Calificación:</b></p>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon><br>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;" fill="clear"><b>Unidades: 5 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
+  <ion-item>
+    <ion-label>Total:</ion-label>
+    <ion-label>$ {{ totalCompra }}</ion-label>
+  </ion-item>
 
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 3</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;"fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $15.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 3</p>
-                <p><b>Calificación:</b></p>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon><br>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;" fill="clear"><b>Unidades: 1 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
-
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 4</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;"fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $35.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 4</p>
-                <p><b>Calificación:</b></p>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon>
-                <ion-icon name="leaf-outline"></ion-icon><br>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;" fill="clear"><b>Unidades: 3 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
-            <ion-item>
-              <ion-card-title>Total Compras:</ion-card-title><ion-card-subtitle slot="end">$72.00</ion-card-subtitle>
-            </ion-item>
-
-            <ion-button type="submit" fill="solid" expand="full" (click)="confirmarCompra()">
-              Confirmar compra
-            </ion-button>
-
-
-
-          </ion-list>
-        </ion-col>
-      </ion-row>
-    </ion-card>
-  </div>
+  <ion-button expand="full" (click)="confirmarCompra()" color="success">
+    Confirmar Compra
+  </ion-button>
 </ion-content>

@@ -3,104 +3,35 @@
     <ion-buttons slot="start">
       <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
     </ion-buttons>
-    <ion-title>Publicar Productos</ion-title>
+    <ion-title>Productos en tienda</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="agregarProducto()">
+        Agregar
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div [formGroup]="productForm">
-    <ion-card>
-      <ion-row>
-        <ion-col>
-          <ion-list>
+<ion-content *ngIf="productos && productos.length > 0">
+  <ion-list>
+    <ion-item *ngFor="let producto of productos">
+      <ion-label>
+        <h2>{{ producto.nombre }}</h2>
+        <p>{{ producto.descripcion }}</p>
+        <p>Precio: {{ producto.precio | currency }}</p>
+      </ion-label>
+      <ion-button color="primary" (click)="verDetalle(producto.id)">
+        Detalle
+      </ion-button>
+      <ion-button color="secondary" (click)="modificarProducto(producto.id)">
+        Modificar
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
 
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              
-              <ion-label>
-                <ion-input type="imagen" label="Sube la imagen referencial" labelPlacement="floating"
-                  placeholder="" name="imagen"></ion-input>
-
-
-                <ion-input formControlName="titulo" type="text" label="Ingresa Titulo" labelPlacement="floating"
-                  placeholder="Titulo" name="titulo"></ion-input>
-                  
-                <ion-input formControlName="valor" type="number" label="Ingresa Valor" labelPlacement="floating"
-                  placeholder="Valor" name="valor"></ion-input>
-                <ion-input formControlName="descripcion" type="text" label="Ingresa Descripcion"
-                  labelPlacement="floating" placeholder="Descripcion" name="descripcion"></ion-input>
-                <ion-input formControlName="stock" type="number" label="Ingresa Stock" labelPlacement="floating"
-                  placeholder="Stock" name="stock" min="0" max="99"></ion-input>
-              </ion-label>
-              <div class="button-container">
-                <ion-button fill="solid" color="success" (click)="agregarProducto()">
-                  <ion-icon name="add-outline"></ion-icon>
-                </ion-button>
-              </div>
-            </ion-item>
-
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 1</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $12.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 1</p>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;"
-                    fill="clear"><b>Stock: 5 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
-
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 2</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $15.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 2</p>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;"
-                    fill="clear"><b>Stock: 1 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
-
-            <ion-item>
-              <ion-thumbnail slot="start">
-                <img src="../assets/icon/favicon.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <strong><b>Producto 3</b></strong><br>
-                <ion-button style="float: right; padding: 0px; margin: 0px;" fill="solid" color="danger" slot="end">
-                  <ion-icon name="trash"></ion-icon>
-                </ion-button>
-                <strong><b>Valor:</b> $35.00</strong>
-                <p><b>Descripción:</b> Descripción del producto 3</p>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> - </ion-button>
-                <h5 style="display: inline"><ion-button style="float: left; padding: 0px; margin: 0px;"
-                    fill="clear"><b>Stock: 3 </b></ion-button></h5>
-                <ion-button style="float: left; padding: 0px; margin: 0px;" fill="outline"> + </ion-button>
-              </ion-label>
-            </ion-item>
-
-            <ion-button type="button" fill="solid" expand="full" (click)="onSubmit()">
-              Publicar Nuevos Productos
-            </ion-button>
-          </ion-list>
-        </ion-col>
-      </ion-row>
-    </ion-card>
-  </div>
+<ion-content *ngIf="!productos || productos.length === 0">
+  <ion-text color="danger">
+    <h2>No hay productos disponibles.</h2>
+  </ion-text>
 </ion-content>

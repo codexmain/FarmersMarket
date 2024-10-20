@@ -1,0 +1,37 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Detalle del Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngIf="producto">
+    <img [src]="producto.foto_producto" alt="{{ producto.nombre }}" />
+    <ion-card-header>
+      <ion-card-title>{{ producto.nombre }}</ion-card-title>
+      <ion-card-subtitle>{{ producto.precio | currency }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ producto.descripcion }}</p>
+      <ion-item>
+        <ion-label>Cantidad</ion-label>
+        <ion-input type="number" [(ngModel)]="cantidad" min="1" [max]="producto.stock" (ionInput)="actualizarSubtotal()"></ion-input>
+      </ion-item>
+      <ion-text>
+        <h3>Subtotal: {{ subtotal | currency }}</h3>
+      </ion-text>
+      <ion-button expand="full" color="primary" (click)="agregarAlCarrito()" [disabled]="cantidad > producto.stock || cantidad < 1">Agregar al Carrito</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-alert
+    [isOpen]="alertOpen"
+    header="Éxito"
+    message="El producto ha sido agregado al carrito."
+    [buttons]="['OK']"
+    (ionAlertDidDismiss)="alertOpen = false"
+  ></ion-alert>
+</ion-content>

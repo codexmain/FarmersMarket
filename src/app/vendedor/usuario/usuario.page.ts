@@ -1,21 +1,34 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { DataBaseService } from '../../services/data-base.service';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-usuario',
   templateUrl: './usuario.page.html',
   styleUrls: ['./usuario.page.scss'],
 })
-export class UsuarioPage implements OnInit {//! es obligatoria, ? es opcional
-  userData: any;
+export class UsuarioPage implements OnInit {
+  usuario: any;
 
+  constructor(
+    private dbService: DataBaseService,
+    private nativeStorage: NativeStorage,
+    private router: Router
+  ) {}
 
-  constructor(private route: Router, private activerouter: ActivatedRoute) {
-    this.userData = this.route.getCurrentNavigation()?.extras?.state;
-    
+  async ngOnInit() {
+    try {
+      const email = await this.nativeStorage.getItem('userEmail');
+      if (email) {
+        this.usuario = await this.dbService.getUsuarioByEmail(email);
+      }
+    } catch (error) {
+      console.error('Error al obtener los datos del usuario:', error);
+    }
   }
-  ngOnInit() {
 
+  irAModUsuario() {
+    this.router.navigate(['/mod-usuario']);
   }
-
 }

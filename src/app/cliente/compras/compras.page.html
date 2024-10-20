@@ -7,26 +7,19 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="flex-center">
-  <ion-card>
-    <ion-list>
-      <ion-searchbar animated="true" placeholder="Buscar Producto Boleta"></ion-searchbar>
+<ion-content>
+  <ion-list *ngIf="productosComprados.length > 0">
+    <ion-item *ngFor="let producto of productosComprados">
+      <ion-label>
+        <h2>{{ producto.nombre }}</h2>
+        <p>Precio: {{ producto.precio | currency }}</p>
+        <p>Cantidad: {{ producto.cantidad }}</p>
+        <p>Subtotal: {{ producto.subtotal | currency }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
-      <ion-item *ngFor="let producto of productos">
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>{{ producto.nombre }}</b></strong><br>
-          <strong><b>Valor:</b> {{ producto.valor }}</strong>
-          <p><b>Descripción:</b> {{ producto.descripcion }}</p>
-          <p><b>Fecha:</b> {{ producto.fecha }}</p>
-          <p><b>Hora:</b> {{ producto.hora }}</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end" (click)="mostrarResumen(producto)">
-          Resumen
-        </ion-button>
-      </ion-item>
-    </ion-list>
-  </ion-card>
+  <ion-text *ngIf="productosComprados.length === 0" color="danger">
+    <h2>No has realizado compras.</h2>
+  </ion-text>
 </ion-content>

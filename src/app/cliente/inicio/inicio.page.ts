@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { Router } from '@angular/router';
+import { DataBaseService } from '../../services/data-base.service';
 
 @Component({
   selector: 'app-inicio',
@@ -7,25 +8,15 @@ import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
   styleUrls: ['./inicio.page.scss'],
 })
 export class InicioPage implements OnInit {
-  userData: any;
+  vendedores: any[] = []; // Lista para almacenar los vendedores
 
+  constructor(private db: DataBaseService, private router: Router) { }
 
-  items: string[] = [];
-
-  constructor(private route: Router, private activerouter: ActivatedRoute) { 
-    this.userData = this.route.getCurrentNavigation()?.extras?.state;
+  async ngOnInit() {
+    this.vendedores = await this.db.getVendedores();
   }
 
-  ngOnInit() {
-    for (let i = 1; i <= 50; i++) { 
-      this.items.push(`<b>Vendedor asociado:</b> ${i}<br><b>Correo</b> ${i}`);
-    }
-  }
-
-  navigateToUserDetail() {
-    let navigationextras: NavigationExtras = {
-      state: this.userData
-    };
-    this.route.navigate(['/cuenta'], navigationextras);
+  acceder(proveedorId: number) {
+    this.router.navigate([`/pro-inicio`, { id: proveedorId }]);
   }
 }

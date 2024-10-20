@@ -1,95 +1,37 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
-
+      <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Gestion de mi tienda</ion-title>
+    <ion-title>Usuario</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-grid>
-    <ion-item>
-      <ion-thumbnail slot="start">
-        <img src="../assets/icon/favicon.png" />
-      </ion-thumbnail>
-      <ion-label>
-        <strong class="custom-strong">Empresa: {{userData.company}} <br> 
-          Correo: {{userData.mail}} <br> 
-          Usuario: {{ userData.fstName }} {{ userData.fstSurname }}</strong>
-      </ion-label>
-      <div class="button-container">
-        <ion-button fill="clear" color="primary">
-          <b>Editar</b>
-          <ion-icon name="create-outline"></ion-icon>
-        </ion-button>
-      </div>
-    </ion-item>
-  </ion-grid>
-
-
+<ion-content *ngIf="usuario">
   <ion-card>
-    <ion-list>
-      <ion-searchbar animated="true" placeholder="Buscar en mis Productos"></ion-searchbar>
-  
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 1</b></strong><br>
-          <strong><b>Valor:</b> $10.00</strong>
-          <p><b>Descripción del producto 1</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Editar
-        </ion-button>
-      </ion-item>
-  
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 2</b></strong><br>
-          <strong><b>Valor:</b> $12.00</strong>
-          <p><b>Descripción del producto 2</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Editar
-        </ion-button>
-      </ion-item>
-  
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 3</b></strong><br>
-          <strong><b>Valor:</b> $24.00</strong>
-          <p><b>Descripción del producto 3</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Editar
-        </ion-button>
-      </ion-item>
-  
-      <ion-item>
-        <ion-avatar slot="start">
-          <img src="../assets/icon/favicon.png" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>Producto 4</b></strong><br>
-          <strong><b>Valor:</b> $35.00</strong>
-          <p><b>Descripción del producto 4</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Editar
-        </ion-button>
-      </ion-item>
-  
-    </ion-list>
+    <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="Foto de perfil" />
+    <ion-card-header>
+      <ion-card-title>{{ usuario.nombre }} {{ usuario.apellido_paterno }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Email:</strong> {{ usuario.email }}</p>
+      <p><strong>Empresa:</strong> {{ usuario.nombre_empresa || 'N/A' }}</p>
+      <p><strong>Descripción:</strong> {{ usuario.descripcion_corta || 'N/A' }}</p>
+      <p><strong>Estado:</strong> {{ usuario.estado_cuenta }}</p>
+      <p><strong>Fecha de Registro:</strong> {{ usuario.fecha_registro }}</p>
+      <p><strong>Comuna:</strong> {{ usuario.comuna || 'N/A' }}</p>
+      <p><strong>Región:</strong> {{ usuario.region || 'N/A' }}</p>
+    </ion-card-content>
   </ion-card>
 
+  <!-- Botón para modificar usuario -->
+  <ion-button expand="full" color="primary" (click)="irAModUsuario()">
+    Modificar Usuario
+  </ion-button>
+</ion-content>
+
+<ion-content *ngIf="!usuario">
+  <ion-text color="danger">
+    <h2>No se encontró información del usuario.</h2>
+  </ion-text>
 </ion-content>

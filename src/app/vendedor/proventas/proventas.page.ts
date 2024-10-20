@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DataBaseService } from '../../services/data-base.service';
 import { AlertController } from '@ionic/angular';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 
 @Component({
   selector: 'app-proventas',
@@ -8,52 +10,52 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./proventas.page.scss'],
 })
 export class ProventasPage implements OnInit {
-  productForm!: FormGroup;
+  productos: any[] = [];
+  proveedorId: number = 0;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private alertController: AlertController
-  ) { }
+    private router: Router,
+    private db: DataBaseService,
+    private alertController: AlertController,
+    private nativeStorage: NativeStorage
+  ) {}
 
-
-  ngOnInit() {
-    this.productForm = this.formBuilder.group({
-      titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), Validators.pattern('^[a-zA-Z0-9\\s]+$')]],
-      valor: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$'), Validators.min(1), Validators.max(999999)]],
-      descripcion: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(500), Validators.pattern('^[a-zA-Z0-9\\s.,!?]+$')]],
-      stock: ['', [Validators.required, Validators.pattern('^[1-9][0-9]*$'), Validators.min(1), Validators.max(99)]],
-    });
-  }
-
-  async onSubmit() {
-    if (this.productForm.valid) {
-      // Lógica para publicar los productos
-      console.log('Formulario válido:', this.productForm.value);
-      await this.presentAlert('Éxito', 'Los productos han sido publicados correctamente.');
-    } else {
-      // Mensaje de error
-      console.log('Formulario no válido');
-      await this.presentAlert('Error', 'Por favor, complete todos los campos correctamente.');
+  async ngOnInit() {
+    try {
+      const email = await this.nativeStorage.getItem('userEmail');
+      const usuario = await this.db.getUserEmail(email);
+      if (usuario) {
+        this.proveedorId = usuario.id;
+        this.productos = await this.db.getProductosProveedor(this.proveedorId);
+      } else {
+        throw new Error('Usuario no encontrado');
+      }
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+      this.mostrarAlertaError();
     }
   }
 
-  async agregarProducto() {
-    if (this.productForm.valid) {
-      // Aquí puedes agregar la lógica para agregar el producto a la lista
-      console.log('Producto agregado:', this.productForm.value);
-      await this.presentAlert('Producto Agregado', 'El producto ha sido agregado a la lista.');
-    } else {
-      await this.presentAlert('Error', 'Por favor, complete todos los campos correctamente antes de agregar.');
-    }
+  verDetalle(productoId: number) {
+    // Redirigir a la página de detalles del producto
+    this.router.navigate([`/view-proventas`, { productoId }]);
   }
 
-  async presentAlert(header: string, message: string) {
+  modificarProducto(productoId: number) {
+    // Redirigir a la página de modificación del producto
+    this.router.navigate([`/mod-proventas`, { productoId }]);
+  }
+
+  agregarProducto() {
+    this.router.navigate(['/add-proventas', { proveedorId: this.proveedorId }]);
+  }
+
+  async mostrarAlertaError() {
     const alert = await this.alertController.create({
-      header: header,
-      message: message,
-      buttons: ['OK']
+      header: 'Error',
+      message: 'No se pudo cargar los productos.',
+      buttons: ['OK'],
     });
-
     await alert.present();
   }
 }

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { DataBaseService } from '../../services/data-base.service'; 
 
 @Component({
   selector: 'app-productos',
@@ -6,10 +8,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./productos.page.scss'],
 })
 export class ProductosPage implements OnInit {
+  productos: any[] = [];
 
-  constructor() { }
+  constructor(private router: Router, private dbService: DataBaseService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.productos = await this.dbService.getAllProductos();
   }
 
+  verDetalle(productoId: number) {
+    this.router.navigate([`/pro-detalle`, productoId]);
+  }
 }
