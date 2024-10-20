@@ -25,18 +25,20 @@ export class LoginPage implements OnInit {
     private alertController: AlertController,
     private modalController: ModalController,
     private menu: MenuController,
-    private DataBase: DataBaseService,
+    private dataBase: DataBaseService,
     private nativeStorage: NativeStorage
   ) {}
 
   ngOnInit() {}
 
   async Logearse() {
+    // Validar campos vacíos
     if (!this.email || !this.password) {
       await this.showAlert('Error', 'Por favor, completa todos los campos.');
       return;
     }
-
+  
+    // Verificar cooldown
     if (this.isCooldown) {
       await this.showAlert(
         'Error',
@@ -44,44 +46,47 @@ export class LoginPage implements OnInit {
       );
       return;
     }
-
+  
     try {
-      const usuario = await this.DataBase.login(this.email, this.password);
-
+      const usuario = await this.dataBase.login(this.email, this.password);
+  
+      // Verificar si el usuario fue encontrado
       if (usuario) {
-        // Verificamos si se obtuvo un usuario válido
         if (usuario.estado_cuenta !== 'activa') {
           await this.showAlert('Error', 'Tu cuenta no está activa.');
           return;
         }
-
-        this.intentoLogin = 0;
-
-        
-        await this.nativeStorage.setItem('userEmail', this.email);
-
+  
+        // Validar que el email no esté vacío ni contenga solo espacios
+        if (!this.email.trim()) {
+          await this.showAlert('Error', 'El email no puede estar vacío o solo contener espacios.');
+          return;
+        }
+  
+        // Actualizar email en NativeStorage
+        await this.actualizarEmail();
+  
         const navigationExtras: NavigationExtras = {
           state: { ...usuario }, 
         };
-
+  
+        // Redirigir según el tipo de usuario
         switch (usuario.tipo_usuario_id) {
           case 1:
             this.router.navigate(['/productos'], navigationExtras);
-            this.enviarEmail();
             break;
           case 2:
             this.router.navigate(['/vendedor-page'], navigationExtras);
-            this.enviarEmail();
             break;
           case 3:
             this.router.navigate(['/admin-page'], navigationExtras);
-            this.enviarEmail();
             break;
           default:
             await this.showAlert('Error', 'Tipo de usuario no reconocido.');
         }
       } else {
         this.intentoLogin++;
+        // Manejo de intentos fallidos
         if (this.intentoLogin >= 3) {
           this.isCooldown = true;
           setTimeout(() => {
@@ -102,6 +107,21 @@ export class LoginPage implements OnInit {
     } catch (error) {
       console.error('Error en el inicio de sesión:', JSON.stringify(error));
       await this.showAlert('Error', 'Hubo un problema al iniciar sesión.');
+    }
+  }
+
+  async actualizarEmail() {
+    try {
+      // Limpiar todo el NativeStorage
+      await this.nativeStorage.clear().catch(() => {
+        console.warn('No se pudo limpiar el NativeStorage.');
+      });
+
+      // Guardar el nuevo email
+      await this.nativeStorage.setItem('userEmail', this.email);
+      console.log('Email actualizado en NativeStorage:', this.email);
+    } catch (error) {
+      console.error('Error al actualizar el email:', error);
     }
   }
 
@@ -128,11 +148,6 @@ export class LoginPage implements OnInit {
 
   ionViewWillLeave() {
     this.menu.enable(true);
-  }
-
-  enviarEmail() {
-    this.nativeStorage.clear();
-    this.nativeStorage.setItem('userEmail', this.email);
   }
 
   irRegister() {
