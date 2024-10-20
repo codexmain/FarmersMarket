@@ -1682,12 +1682,12 @@ JOIN
          JOIN subcategoria s ON p.subcategoria_id = s.id;`,
         []
       );
-
+  
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-
+  
       console.log('Productos obtenidos:', productos);
       return productos;
     } catch (error) {
