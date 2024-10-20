@@ -112,11 +112,11 @@ export class LoginPage implements OnInit {
 
   async actualizarEmail() {
     try {
-      // Limpiar todo el NativeStorage
-      await this.nativeStorage.clear().catch(() => {
-        console.warn('No se pudo limpiar el NativeStorage.');
-      });
-
+      // Eliminar el email anterior
+      await this.nativeStorage.remove('userEmail')
+        .then(() => console.log('Email anterior eliminado de NativeStorage.'))
+        .catch(error => console.error('Error al eliminar el email:', error));
+  
       // Guardar el nuevo email
       await this.nativeStorage.setItem('userEmail', this.email);
       console.log('Email actualizado en NativeStorage:', this.email);

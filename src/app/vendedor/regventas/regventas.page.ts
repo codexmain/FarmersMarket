@@ -18,9 +18,16 @@ export class RegventasPage implements OnInit {
 
   async ngOnInit() {
     try {
-      this.emailVendedor = await this.nativeStorage.getItem('userEmail');
+      // Obtener el email del Native Storage
+      const storedEmail = await this.nativeStorage.getItem('userEmail');
+      this.emailVendedor = storedEmail;
+
+      // Verificar si se obtuvo un email válido
       if (this.emailVendedor) {
-        this.productosVendidos = await this.dbService.getProductosVendidosPorVendedor(this.emailVendedor);
+        // Obtener productos vendidos por vendedor
+        this.productosVendidos = await this.dbService.getProductosVendidosVendedor(this.emailVendedor);
+      } else {
+        console.warn('No se encontró un email en Native Storage.');
       }
     } catch (error) {
       console.error('Error al obtener el registro de ventas:', error);
