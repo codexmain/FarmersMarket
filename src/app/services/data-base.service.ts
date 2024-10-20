@@ -2112,4 +2112,56 @@ async obtProducto(productoId: number): Promise<any> {
   });
 }
 
+//REGVENTAS
+
+// Obtener productos vendidos por el proveedor (vendedor)
+async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
+  try {
+      // Obtener el id del proveedor utilizando el email
+      const usuario = await this.database.executeSql(
+          'SELECT id FROM usuario WHERE email = ?',
+          [emailVendedor]
+      );
+
+      if (usuario.rows.length === 0) {
+          console.error('Proveedor no encontrado.');
+          return [];
+      }
+
+      const proveedorId = usuario.rows.item(0).id;
+
+      // Obtener detalles de la venta usando el proveedor_id
+      const query = `
+          SELECT 
+              p.id AS producto_id,
+              p.nombre,
+              p.precio,
+              dc.cantidad,
+              dc.subtotal,
+              (SELECT email FROM usuario WHERE id = cc.usuario_id) AS compradorEmail
+          FROM 
+              detalle_carro_compra dc
+          JOIN 
+              producto p ON dc.producto_id = p.id
+          JOIN 
+              carro_compra cc ON dc.carro_id = cc.id
+          WHERE 
+              p.proveedor_id = ?;
+      `;
+
+      const result = await this.database.executeSql(query, [proveedorId]);
+      const productosVendidos = [];
+      for (let i = 0; i < result.rows.length; i++) {
+          productosVendidos.push(result.rows.item(i));
+      }
+
+      return productosVendidos;
+  } catch (error) {
+      console.error('Error al obtener productos vendidos por vendedor:', error);
+      throw error;
+  }
+}
+
+
+
 }
