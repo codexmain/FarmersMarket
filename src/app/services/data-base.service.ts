@@ -91,7 +91,7 @@ export class DataBaseService {
           );`;
 
   tblCarroCompra: string = `CREATE TABLE IF NOT EXISTS carro_compra (
-;            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
             fecha_creacion TEXT DEFAULT(datetime('now')),
             total INTEGER DEFAULT 0,
@@ -100,7 +100,7 @@ export class DataBaseService {
           );`;
 
   tblDetalleCarroCompra: string = `CREATE TABLE IF NOT EXISTS detalle_carro_compra (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER,
             carro_id INTEGER NOT NULL,
             producto_id INTEGER NOT NULL,
             cantidad INTEGER NOT NULL,
