@@ -13,7 +13,7 @@ export class ProductosPage implements OnInit {
   constructor(private router: Router, private dbService: DataBaseService) {}
 
   async ngOnInit() {
-    this.productos = await this.dbService.getAllProductos();
+    this.productos = await this.dbService.getProductos(); // Cambia aquí
   }
 
   verDetalle(productoId: number) {
