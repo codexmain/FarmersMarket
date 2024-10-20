@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-view-proventas',
@@ -10,41 +10,45 @@ import { AlertController, ToastController } from '@ionic/angular';
 })
 export class ViewProventasPage implements OnInit {
   productoId: number = 0;
-  producto: any = null; // Variable para almacenar los datos del producto
+  producto: any = {
+    nombre: '',
+    descripcion: '',
+    precio: 0,
+    stock: 0,
+    organico: 0
+  };
 
   constructor(
     private route: ActivatedRoute,
     private db: DataBaseService,
-    private alertController: AlertController,
-    private toastController: ToastController,
-    private router: Router
+    private alertController: AlertController
   ) {}
 
-  async ngOnInit() {
-    this.productoId = +this.route.snapshot.paramMap.get('productoId')!;
-    await this.loadProductoDetails(); // Cargar detalles del producto al iniciar el componente
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.productoId = params['productoId'];
+      this.obtenerProducto(this.productoId);
+    });
   }
 
-  async loadProductoDetails() {
+  async obtenerProducto(productoId: number) {
     try {
-      this.producto = await this.db.getProductoselect(this.productoId);
+      this.producto = await this.db.obtenerProducto(productoId); // Método para obtener producto por ID
       if (!this.producto) {
-        const toast = await this.toastController.create({
-          message: 'Producto no encontrado.',
-          duration: 2000,
-          color: 'danger'
-        });
-        await toast.present();
-        this.router.navigate(['/']); // Redirigir si el producto no existe
+        this.mostrarAlertaError('Producto no encontrado.');
       }
     } catch (error) {
-      console.error('Error al cargar el producto:', error);
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Hubo un problema al cargar el producto. Inténtalo de nuevo.',
-        buttons: ['OK']
-      });
-      await alert.present();
+      console.error('Error al obtener el producto', error);
+      this.mostrarAlertaError();
     }
+  }
+
+  async mostrarAlertaError(mensaje: string = 'No se pudo cargar el producto.') {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: mensaje,
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 }

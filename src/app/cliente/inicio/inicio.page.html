@@ -1,35 +1,17 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Menu de Usuarios</ion-title>
+    <ion-title>Socios Agrícolas</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="flex-center">
-  <ion-card>
-    <ion-list>
-      <ion-searchbar 
-        animated="true" 
-        placeholder="Buscar Usuario" 
-        (ionInput)="buscarUsuario($event)" 
-        [(ngModel)]="searchTerm">
-      </ion-searchbar>
-
-      <ion-item *ngFor="let usuario of filteredUsuarios">
-        <ion-avatar slot="start">
-          <img [src]="usuario.foto_perfil || '../assets/icon/default-avatar.png'" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>{{ usuario.nombreCompleto }}</b></strong><br>
-          <strong><b>Email:</b> {{ usuario.email }}</strong>
-          <p><b>Descripción:</b> {{ usuario.descripcionMostrarListar }}</p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end">
-          Detalles
-        </ion-button>
-      </ion-item>
-    </ion-list>
-  </ion-card>
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let vendedor of vendedores">
+      <ion-label>
+        <h2>{{ vendedor.nombre }} {{ vendedor.apellido_paterno }}</h2>
+        <p>{{ vendedor.nombre_empresa }}</p>
+      </ion-label>
+      <ion-button (click)="acceder(vendedor.id)">Acceder</ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

@@ -8,15 +8,18 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let compra of compras">
+  <ion-list *ngIf="productosComprados.length > 0">
+    <ion-item *ngFor="let producto of productosComprados">
       <ion-label>
-        <strong>ID Compra: {{ compra.id }}</strong><br>
-        <strong>Fecha: {{ compra.fecha_creacion }}</strong><br>
-        <strong>Total: ${{ compra.total.toFixed(2) }}</strong><br>
-        <strong>Estado: {{ compra.estado }}</strong>
+        <h2>{{ producto.nombre }}</h2>
+        <p>Precio: {{ producto.precio | currency }}</p>
+        <p>Cantidad: {{ producto.cantidad }}</p>
+        <p>Subtotal: {{ producto.subtotal | currency }}</p>
       </ion-label>
-      <ion-button (click)="mostrarDetalles(compra.id)" slot="end">Detalles</ion-button>
     </ion-item>
   </ion-list>
+
+  <ion-text *ngIf="productosComprados.length === 0" color="danger">
+    <h2>No has realizado compras.</h2>
+  </ion-text>
 </ion-content>

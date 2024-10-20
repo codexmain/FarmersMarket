@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DataBaseService } from '../../services/data-base.service';
 import { AlertController } from '@ionic/angular';
-import { DataBaseService } from 'src/app/services/data-base.service'; // Verifica la ruta correcta
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { Router } from '@angular/router';  // Importar Router para redirigir
 
 @Component({
   selector: 'app-proventas',
@@ -10,79 +10,52 @@ import { Router } from '@angular/router';  // Importar Router para redirigir
   styleUrls: ['./proventas.page.scss'],
 })
 export class ProventasPage implements OnInit {
-
-  productos: any[] = [];  // Usando `any` en lugar de una interfaz
-  searchQuery: string = '';  // Para la barra de búsqueda
+  productos: any[] = [];
+  proveedorId: number = 0;
 
   constructor(
-    private databaseService: DataBaseService,
-    private nativeStorage: NativeStorage,
+    private router: Router,
+    private db: DataBaseService,
     private alertController: AlertController,
-    private router: Router  // Inyectar Router
+    private nativeStorage: NativeStorage
   ) {}
 
-  ngOnInit() {
-    this.cargarProductos();
-  }
-
-  async cargarProductos() {
+  async ngOnInit() {
     try {
-      const email = await this.nativeStorage.getItem('userEmail');  // Obtener el email del almacenamiento
-      const productos = await this.databaseService.mostrarProductos(email);
-      this.productos = productos;
+      const email = await this.nativeStorage.getItem('userEmail');
+      const usuario = await this.db.getUserEmail(email);
+      if (usuario) {
+        this.proveedorId = usuario.id;
+        this.productos = await this.db.getProductosProveedor(this.proveedorId);
+      } else {
+        throw new Error('Usuario no encontrado');
+      }
     } catch (error) {
-      console.error('Error al cargar productos', error);
+      console.error('Error al obtener productos:', error);
+      this.mostrarAlertaError();
     }
   }
 
-  async mostrarAlertaModificar(producto: any) {
-    const alert = await this.alertController.create({
-      header: 'Modificar Producto',
-      message: `Modificar producto: ${producto.nombre_producto}`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Modificar',
-          handler: () => {
-            // Redirigir a la página de modificar producto con el id
-            this.router.navigate([`pro-mod`, producto.id]);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+  verDetalle(productoId: number) {
+    // Redirigir a la página de detalles del producto
+    this.router.navigate([`/view-proventas`, { productoId }]);
   }
 
-  async mostrarAlertaAgregar() {
-    const alert = await this.alertController.create({
-      header: 'Agregar Producto',
-      message: `Agregar un nuevo producto`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Agregar',
-          handler: () => {
-            // Redirigir a la página de agregar producto
-            this.router.navigate([`pro-add`]);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+  modificarProducto(productoId: number) {
+    // Redirigir a la página de modificación del producto
+    this.router.navigate([`/mod-proventas`, { productoId }]);
   }
 
-  // Filtro simple para la barra de búsqueda
-  getProductosFiltrados() {
-    return this.productos.filter(producto =>
-      producto.nombre_producto.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+  agregarProducto() {
+    this.router.navigate(['/add-proventas', { proveedorId: this.proveedorId }]);
+  }
+
+  async mostrarAlertaError() {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: 'No se pudo cargar los productos.',
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 }

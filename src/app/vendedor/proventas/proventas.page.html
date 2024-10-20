@@ -3,32 +3,35 @@
     <ion-buttons slot="start">
       <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
     </ion-buttons>
-    <ion-title>Gestionar un producto</ion-title>
+    <ion-title>Productos en tienda</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="agregarProducto()">
+        Agregar
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <!-- Barra de búsqueda -->
-  <ion-searchbar [(ngModel)]="searchQuery" placeholder="Buscar productos"></ion-searchbar>
-
-  <!-- Lista de productos -->
+<ion-content *ngIf="productos && productos.length > 0">
   <ion-list>
-    <ion-item *ngFor="let producto of getProductosFiltrados()">
+    <ion-item *ngFor="let producto of productos">
       <ion-label>
-        <h2>{{ producto.nombre_producto }}</h2>
-        <p>{{ producto.descripcion_producto }}</p>
-        <p>Precio: {{ producto.precio }} | Stock: {{ producto.stock }}</p>
-        <p>Orgánico: {{ producto.organicoEnTexto }}</p>
+        <h2>{{ producto.nombre }}</h2>
+        <p>{{ producto.descripcion }}</p>
+        <p>Precio: {{ producto.precio | currency }}</p>
       </ion-label>
-      <!-- Botón para modificar producto -->
-      <ion-button color="primary" (click)="mostrarAlertaModificar(producto)">Modificar</ion-button>
+      <ion-button color="primary" (click)="verDetalle(producto.id)">
+        Detalle
+      </ion-button>
+      <ion-button color="secondary" (click)="modificarProducto(producto.id)">
+        Modificar
+      </ion-button>
     </ion-item>
   </ion-list>
+</ion-content>
 
-  <!-- Botón flotante para agregar nuevo producto -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="mostrarAlertaAgregar()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+<ion-content *ngIf="!productos || productos.length === 0">
+  <ion-text color="danger">
+    <h2>No hay productos disponibles.</h2>
+  </ion-text>
 </ion-content>

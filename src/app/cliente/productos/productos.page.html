@@ -3,34 +3,26 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Menu de Productos</ion-title>
+    <ion-title>Productos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="flex-center">
-  <ion-card>
-    <ion-list>
-      <ion-searchbar 
-        animated="true" 
-        placeholder="Buscar Producto" 
-        (ionInput)="filterProducts($event)" 
-        [(ngModel)]="searchTerm">
-      </ion-searchbar>
+<ion-content *ngIf="productos && productos.length > 0">
+  <ion-list>
+    <ion-item *ngFor="let producto of productos">
+      <ion-label>
+        <h2>{{ producto.nombre }}</h2>
+        <p>{{ producto.descripcion }}</p>
+      </ion-label>
+      <ion-button color="primary" (click)="verDetalle(producto.id)">
+        Acceder
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
 
-      <ion-item *ngFor="let producto of filteredProducts">
-        <ion-avatar slot="start">
-          <img [src]="producto.foto_producto || '../assets/icon/favicon.png'" />
-        </ion-avatar>
-        <ion-label>
-          <strong><b>{{ producto.nombre_producto }}</b></strong><br>
-          <strong><b>Valor:</b> ${{ producto.precio.toFixed(2) }}</strong>
-          <p><b>{{ producto.descripcion_producto }}</b></p>
-        </ion-label>
-        <ion-button expand="block" fill="outline" slot="end" (click)="agregarAlCarro(producto)">
-          Agregar
-        </ion-button>
-      </ion-item>
-
-    </ion-list>
-  </ion-card>
+<ion-content *ngIf="!productos || productos.length === 0">
+  <ion-text color="danger">
+    <h2>No hay productos disponibles.</h2>
+  </ion-text>
 </ion-content>

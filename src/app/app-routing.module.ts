@@ -130,6 +130,34 @@ const routes: Routes = [
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
+  },
+  {
+    path: 'pro-detalle/:id',
+    loadChildren: () => import('./cliente/pro-detalle/pro-detalle.module').then( m => m.ProDetallePageModule)
+  },
+  {
+    path: 'pro-inicio/:id',
+    loadChildren: () => import('./cliente/pro-inicio/pro-inicio.module').then( m => m.ProInicioPageModule)
+  },
+  {
+    path: 'mod-cuenta',
+    loadChildren: () => import('./cliente/mod-cuenta/mod-cuenta.module').then( m => m.ModCuentaPageModule)
+  },
+  {
+    path: 'mod-usuario',
+    loadChildren: () => import('./vendedor/mod-usuario/mod-usuario.module').then( m => m.ModUsuarioPageModule)
+  },
+  {
+    path: 'mod-proventas',
+    loadChildren: () => import('./vendedor/mod-proventas/mod-proventas.module').then( m => m.ModProventasPageModule)
+  },
+  {
+    path: 'add-proventas',
+    loadChildren: () => import('./vendedor/add-proventas/add-proventas.module').then( m => m.AddProventasPageModule)
+  },
+  {
+    path: 'view-proventas',
+    loadChildren: () => import('./vendedor/view-proventas/view-proventas.module').then( m => m.ViewProventasPageModule)
   }
 
 
@@ -143,3 +171,5 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
+
+
