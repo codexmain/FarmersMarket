@@ -17,6 +17,6 @@ export class InicioPage implements OnInit {
   }
 
   acceder(proveedorId: number) {
-    this.router.navigate([`/pro-inicio`, { id: proveedorId }]);
+    this.router.navigate([`/pro-inicio`, proveedorId]);
   }
 }
