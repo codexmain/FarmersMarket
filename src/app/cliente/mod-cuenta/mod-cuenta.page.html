@@ -10,10 +10,20 @@
 <ion-content>
   <ion-card>
     <form (ngSubmit)="actualizarUsuario()">
-      <ion-item>
+      <ion-item style="align-items: center; flex-direction: column;">
         <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
-        <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="avatar" style="width: 100px;height: 100px;" />
+    
+        <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
+          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="usuario.foto_perfil" 
+                 [src]="usuario.foto_perfil" 
+                 alt="avatar" 
+                 style="width: 100%; height: 100%; object-fit: cover;"/>
+          </ion-avatar>
+        </div>
       </ion-item>
+
+      
 
       <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
