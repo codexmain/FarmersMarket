@@ -14,7 +14,7 @@
         </ion-avatar>
       </div>
       <ion-card-title class="ion-text-center">Modulo de Administración</ion-card-title>
-      <ion-card-subtitle>Bienvenido "{{ primerNombre }} {{ aPaterno }}"</ion-card-subtitle>
+      <ion-card-subtitle>Bienvenido "{{ userData.nombre || 'N/A' }} {{ userData.apellido_paterno || 'N/A' }}"</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       Acá podras realizar diferentes acciones, principalmente para gestionar los usuarios de la aplicación.
