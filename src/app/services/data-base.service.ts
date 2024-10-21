@@ -2111,14 +2111,14 @@ JOIN
     });
   }
 
-  async agregarProducto(proveedorId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
+  async agregarProducto(proveedorId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number, foto_producto: string): Promise<void> {
     const query = `
-    INSERT INTO producto (proveedor_id, nombre, descripcion, precio, stock, organico, subcategoria_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO producto (proveedor_id, nombre, descripcion, precio, stock, organico, subcategoria_id, foto_producto)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [proveedorId, nombre, descripcion, precio, stock, organico, subcategoriaId])
+      this.database.executeSql(query, [proveedorId, nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto])
         .then(() => resolve())
         .catch((error) => {
           console.error('Error al agregar producto', error);
