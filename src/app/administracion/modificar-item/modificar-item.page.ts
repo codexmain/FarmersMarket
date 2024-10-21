@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, NavParams, AlertController } from '@ionic/angular';
+import { ModalController, NavParams, AlertController, ToastController} from '@ionic/angular';
 
 import { DataBaseService } from '../../services/data-base.service';
 
@@ -44,11 +44,31 @@ export class ModificarItemPage implements OnInit {
   ]
 
 
-  constructor(private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, public alertController: AlertController) {
+  constructor(private toastController: ToastController, private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, public alertController: AlertController) {
     this.producto = this.navParams.get('producto');
    }
 
-  ngOnInit() {
+   ngOnInit() {
+    this.bd.dbState().subscribe(data => {
+      // Validar si la bd está lista
+      if (data) {
+        // Suscribirse al observable de las listas
+        this.bd.fetchCmbProveedores().subscribe(res => {
+          this.arrayCmbProvedores = res;
+        });
+
+        this.bd.fetchCategorias().subscribe(res => {
+          this.arrayCmbCategorias = res;
+          this.categoria_id = this.producto.categoria_id; // Cargar la categoría del producto
+          this.onCategoriaChange({ detail: { value: this.categoria_id } }); // Cargar subcategorías
+        });
+
+        this.bd.fetchCmbSubCategorias().subscribe(res => {
+          this.arrayCmbSubcategorias = res; // Asigna las subcategorías obtenidas
+        });
+      }
+    });
+    
     this.proveedor_id = this.producto.proveedor_id;
     this.nombre_producto = this.producto.nombre_producto;
     this.descripcion_producto = this.producto.descripcion_producto;
@@ -57,45 +77,27 @@ export class ModificarItemPage implements OnInit {
     this.organico = this.producto.organico;
     this.categoria_id = this.producto.categoria_id;
     this.subcategoria_id = this.producto.subcategoria_id;
-
-    this.bd.dbState().subscribe(data=>{
-      //validar si la bd esta lista
-      if(data){
-        //subscribir al observable de la listaNoticias
-        this.bd.fetchCmbProveedores().subscribe(res=>{
-          this.arrayCmbProvedores = res;
-        })
-
-        this.bd.fetchCategorias().subscribe(res=>{
-          this.arrayCmbCategorias = res;
-        })  
-
-        this.bd.fetchCmbSubCategorias().subscribe(res=>{
-          this.arrayCmbSubcategorias = res;
-        })       
-      }
-    })
-    
-
   }
 
   onCategoriaChange(event: any) {
     this.categoria_id = event.detail.value;
+
     if (this.categoria_id) {
       this.bd.seleccionarCmbSubCategorias(this.categoria_id).then(() => {
         this.bd.fetchCmbSubCategorias().subscribe(res => {
-          this.arrayCmbSubcategorias = res; // Asigna las comunas obtenidas
+          this.arrayCmbSubcategorias = res; // Asigna las subcategorías obtenidas
+          this.subcategoria_id = this.producto.subcategoria_id; // Establecer la subcategoría del producto
         });
       });
     } else {
-      // Reiniciar la lista de comunas a la estructura inicial
+      // Reiniciar la lista de subcategorías
       this.arrayCmbSubcategorias = [
         {
           id: '',
           nombre: '',
         }
       ];
-      this.subcategoria_id = undefined; // Reiniciar comuna seleccionada
+      this.subcategoria_id = undefined; // Reiniciar subcategoría seleccionada
     }
   }
 
@@ -195,6 +197,15 @@ export class ModificarItemPage implements OnInit {
 
   clearProductDesc(){
     this.descripcion_producto = '';
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 

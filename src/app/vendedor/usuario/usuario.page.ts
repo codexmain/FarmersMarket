@@ -51,6 +51,8 @@ export class UsuarioPage implements OnInit {
    }
  }
 
+ 
+
   irAModUsuario() {
     this.router.navigate(['/mod-usuario']);
   }

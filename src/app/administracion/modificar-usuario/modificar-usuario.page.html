@@ -97,7 +97,7 @@
 
     <ion-item>
       <ion-label>Estado Usuario:</ion-label>
-      <ion-select [(ngModel)]="estado_cuenta" name="estado_cuenta" required #estadoCtrl="ngModel">
+      <ion-select [(ngModel)]="estado_cuenta" name="estado_cuenta" required #estadoCtrl="ngModel" [disabled]="isDisabled">
         <ion-select-option value="activa">Cuenta Activa</ion-select-option>
         <ion-select-option value="deshabilitada">Cuenta Deshabilitada</ion-select-option>
       </ion-select>
