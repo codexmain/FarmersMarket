@@ -320,6 +320,12 @@ export class DataBaseService {
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
             (5,'Ignacio','Javier','Fuenzalida','Chandia','example.Admin@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',3);`;
 
+  registroDireccion: string = `INSERT OR IGNORE INTO direccion (id,usuario_id,comuna_id,direccion) VALUES
+            (1,3,51,'El Sauce 1200.'),
+            (1,2,44,'Av. Independencia 4599'),
+            (1,4,26,'Mena 665.');`;
+
+
   registroProducto: string = `INSERT OR IGNORE INTO producto (id,proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado) VALUES
             (1,1,'Producto Desconocido','Descripción genérica para productos desconocidos.',0,0,0,NULL,1,'2024-10-04 20:20:28'),
             (2,2,'Manzana Roja','Manzana fresca y crujiente (500g).',1000,50,1,NULL,2,'2024-10-04 20:20:28'),
@@ -480,6 +486,8 @@ export class DataBaseService {
       await this.database.executeSql(this.registroUsuario, []);
       await this.seleccionarUsuarios();
       await this.seleccionarCbmProveedores();
+
+      await this.database.executeSql(this.registroDireccion, [])
 
       await this.database.executeSql(this.registroProducto, []);
       await this.seleccionarProductos();
