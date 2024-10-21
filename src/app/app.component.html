@@ -18,27 +18,27 @@
       <ion-content>
         <ion-card>
           <ion-list>
-            <ion-item [routerDirection]="'root'" [routerLink]="'/cuenta'">
+            <ion-item button (click)="navigateToCuenta()">
               <ion-icon name="person-circle"></ion-icon>
               <ion-label>Mi Cuenta</ion-label>
             </ion-item>
-            <ion-item [routerDirection]="'root'" [routerLink]="'/inicio'">
+            <ion-item button (click)="navigateToInicio()">
               <ion-icon name="home"></ion-icon>
               <ion-label>Socios</ion-label>
             </ion-item>
-            <ion-item [routerDirection]="'root'" [routerLink]="'/productos'">
+            <ion-item button (click)="navigateToProductos()">
               <ion-icon name="bag"></ion-icon>
               <ion-label>Productos</ion-label>
             </ion-item>
-            <ion-item [routerDirection]="'root'" [routerLink]="'/compras'">
+            <ion-item button (click)="navigateToCompras()">
               <ion-icon name="pricetags"></ion-icon>
               <ion-label>Mis Compras</ion-label>
             </ion-item>
-            <ion-item [routerDirection]="'root'" [routerLink]="'/carrito'">
+            <ion-item button (click)="navigateToCarrito()">
               <ion-icon name="cart"></ion-icon>
               <ion-label>Carrito</ion-label>
             </ion-item>
-            <ion-item (click)="Salir()" button>
+            <ion-item button (click)="Salir()">
               <ion-icon name="log-out"></ion-icon>
               <ion-label>Salir de la cuenta</ion-label>
             </ion-item>

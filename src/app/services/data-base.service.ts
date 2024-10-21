@@ -1664,6 +1664,23 @@ JOIN
 
   //PRODUCTOS
   // Función para obtener todos los productos disponibles
+  async getProductosPorRegion(regionId: number): Promise<any[]> {
+    const query = `
+      SELECT p.*
+      FROM producto p
+      JOIN usuario u ON p.proveedor_id = u.id
+      JOIN comuna c ON u.comuna_id = c.id
+      JOIN region r ON c.region_id = r.id
+      WHERE r.id = ?
+    `;
+    const productos = await this.database.executeSql(query, [regionId]);
+    let items: any[] = [];
+    for (let i = 0; i < productos.rows.length; i++) {
+      items.push(productos.rows.item(i));
+    }
+    return items;
+  }
+
   async getAllProductos() {
     const res = await this.database.executeSql('SELECT * FROM productos', []);
     const productos = [];
@@ -1682,12 +1699,12 @@ JOIN
          JOIN subcategoria s ON p.subcategoria_id = s.id;`,
         []
       );
-  
+
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-  
+
       console.log('Productos obtenidos:', productos);
       return productos;
     } catch (error) {
@@ -1762,193 +1779,252 @@ JOIN
   }
 
   // En tu servicio de base de datos (data-base.service.ts)
-async getUsuarioEmail(email: string): Promise<any> {
-  const query = 'SELECT * FROM usuario WHERE email = ?';
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [email])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          resolve({
-            id: res.rows.item(0).id,
-            nombre: res.rows.item(0).nombre,
-            // Otros campos que necesites
-          });
-        } else {
-          resolve(null);
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el usuario por email', error);
-        reject(error);
-      });
-  });
-}
+  async getUsuarioEmail(email: string): Promise<any> {
+    const query = 'SELECT * FROM usuario WHERE email = ?';
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [email])
+        .then((res) => {
+          if (res.rows.length > 0) {
+            resolve({
+              id: res.rows.item(0).id,
+              nombre: res.rows.item(0).nombre,
+              // Otros campos que necesites
+            });
+          } else {
+            resolve(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener el usuario por email', error);
+          reject(error);
+        });
+    });
+  }
 
 
-async getProducto(productoId: number): Promise<any> {
-  const result = await this.database.executeSql(
-    'SELECT * FROM producto WHERE id = ?',
-    [productoId]
-  );
-  return result.rows.item(0); // Devuelve el producto
-}
+  async getProducto(productoId: number): Promise<any> {
+    const result = await this.database.executeSql(
+      'SELECT * FROM producto WHERE id = ?',
+      [productoId]
+    );
+    return result.rows.item(0); // Devuelve el producto
+  }
 
-async createCarroCompra(usuarioId: number) {
-  return await this.database.executeSql(
-    'INSERT INTO carro_compra (usuario_id) VALUES (?)',
-    [usuarioId]
-  );
-}
+  async createCarroCompra(usuarioId: number) {
+    return await this.database.executeSql(
+      'INSERT INTO carro_compra (usuario_id) VALUES (?)',
+      [usuarioId]
+    );
+  }
 
-async agregarProductoAlCarro(carroId: number, productoId: number, cantidad: number, subtotal: number) {
-  await this.database.executeSql(
-    'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal) VALUES (?, ?, ?, ?)',
-    [carroId, productoId, cantidad, subtotal]
-  );
-}
+  async agregarProductoAlCarro(carroId: number, productoId: number, cantidad: number, subtotal: number) {
+    await this.database.executeSql(
+      'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal) VALUES (?, ?, ?, ?)',
+      [carroId, productoId, cantidad, subtotal]
+    );
+  }
 
-async reducirStock(productoId: number, cantidad: number) {
-  await this.database.executeSql(
-    'UPDATE producto SET stock = stock - ? WHERE id = ?',
-    [cantidad, productoId]
-  );
-}
+  async reducirStock(productoId: number, cantidad: number) {
+    await this.database.executeSql(
+      'UPDATE producto SET stock = stock - ? WHERE id = ?',
+      [cantidad, productoId]
+    );
+  }
 
 
-//COMPRAS
-async getUsuarioPorEmail(email: string): Promise<any> {
-  const query = 'SELECT * FROM usuario WHERE email = ?';
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [email])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          resolve(res.rows.item(0));
-        } else {
-          resolve(null);
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el usuario por email', error);
-        reject(error);
-      });
-  });
-}
+  //COMPRAS
+  async getUsuarioPorEmail(email: string): Promise<any> {
+    const query = 'SELECT * FROM usuario WHERE email = ?';
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [email])
+        .then((res) => {
+          if (res.rows.length > 0) {
+            resolve(res.rows.item(0));
+          } else {
+            resolve(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener el usuario por email', error);
+          reject(error);
+        });
+    });
+  }
 
-async getProductosCompradosPorUsuario(email: string): Promise<any[]> {
-  // Obtener el usuario
-  const usuario = await this.getUsuarioPorEmail(email);
-  if (!usuario) return [];
+  async getProductosCompradosPorUsuario(email: string): Promise<any[]> {
+    // Obtener el usuario
+    const usuario = await this.getUsuarioPorEmail(email);
+    if (!usuario) return [];
 
-  const usuarioId = usuario.id; // Obtener el id del usuario
-  const query = `
+    const usuarioId = usuario.id; // Obtener el id del usuario
+    const query = `
     SELECT d.*, p.nombre, p.precio 
     FROM detalle_carro_compra d
     JOIN carro_compra c ON d.carro_id = c.id
     JOIN producto p ON d.producto_id = p.id
     WHERE c.usuario_id = ? AND c.estado = 'pagado'
   `;
-  
-  const result = await this.database.executeSql(query, [usuarioId]);
-  const productos = [];
-  for (let i = 0; i < result.rows.length; i++) {
-    productos.push(result.rows.item(i));
+
+    const result = await this.database.executeSql(query, [usuarioId]);
+    const productos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productos.push(result.rows.item(i));
+    }
+    return productos;
   }
-  return productos;
-}
 
-async getCarrosPorUsuario(email: string): Promise<any[]> {
-  const usuario = await this.getUsuarioPorEmail(email);
-  if (!usuario) return [];
+  async getCarrosPorUsuario(email: string): Promise<any[]> {
+    const usuario = await this.getUsuarioPorEmail(email);
+    if (!usuario) return [];
 
-  const usuarioId = usuario.id; // Obtener el id del usuario
-  const query = `
+    const usuarioId = usuario.id; // Obtener el id del usuario
+    const query = `
     SELECT * FROM carro_compra
     WHERE usuario_id = ? 
   `;
-  
-  const result = await this.database.executeSql(query, [usuarioId]);
-  const carros = [];
-  for (let i = 0; i < result.rows.length; i++) {
-    carros.push(result.rows.item(i));
+
+    const result = await this.database.executeSql(query, [usuarioId]);
+    const carros = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      carros.push(result.rows.item(i));
+    }
+    return carros;
   }
-  return carros;
-}
 
 
 
-//MOD-USUARIO
-async actualizarUsuarioPorEmail(usuario: any): Promise<boolean> {
-  try {
-    const sql = `
+  // MOD-USUARIO
+  async actualizarUsuarioPorEmail(usuario: any): Promise<boolean> {
+    try {
+      // Actualiza la información del usuario
+      const sql = `
       UPDATE usuario
       SET 
         nombre = ?, 
         segundo_nombre = ?, 
         apellido_paterno = ?, 
         apellido_materno = ?, 
+        nombre_empresa = ?, 
+        descripcion_corta = ?, 
+        foto_perfil = ?,  
+        estado_cuenta = ?, 
         tipo_usuario_id = ?
       WHERE email = ?`; // No se cambia el email
 
-    const result = await this.database.executeSql(sql, [
-      usuario.nombre,
-      usuario.segundo_nombre || null,
-      usuario.apellido_paterno,
-      usuario.apellido_materno || null,
-      usuario.tipo_usuario_id,
-      usuario.email, // Se utiliza el email para identificar al usuario
-    ]);
+      const result = await this.database.executeSql(sql, [
+        usuario.nombre,
+        usuario.segundo_nombre || null,
+        usuario.apellido_paterno,
+        usuario.apellido_materno || null,
+        usuario.nombre_empresa || null,
+        usuario.descripcion_corta || null,
+        usuario.foto_perfil || null,
+        usuario.estado_cuenta,
+        usuario.tipo_usuario_id,
+        usuario.email // Se utiliza el email para identificar al usuario
+      ]);
 
-    return result.rowsAffected > 0; // Retorna true si la actualización fue exitosa
-  } catch (error) {
-    console.error('Error al actualizar el usuario:', error);
-    return false;
-  }
-}
-
-async obtenerUsuarioPorEmail(email: string): Promise<any> {
-  try {
-    const sql = 'SELECT * FROM usuario WHERE email = ?';
-    const result = await this.database.executeSql(sql, [email]);
-    
-    if (result.rows.length > 0) {
-      return result.rows.item(0); // Retorna el primer usuario encontrado
-    }
-    return null; // Si no se encontró, retorna null
-  } catch (error) {
-    console.error('Error al obtener usuario por email:', error);
-    return null;
-  }
-}
-
-
-
-//USUARIO
-async getUsuarioBYEmail(email: string): Promise<any> {
-  const query = 'SELECT * FROM usuario WHERE email = ?';
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [email])
-      .then((res) => {
-        if (res.rows.length > 0) {
-          resolve(res.rows.item(0));
-        } else {
-          resolve(null);
+      if (result.rowsAffected > 0) {
+        // Luego de actualizar el usuario, actualizamos la dirección si se proporciona
+        const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
+        if (usuarioId) {
+          return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
         }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el usuario por email', error);
-        reject(error);
-      });
-  });
-}
+      }
+
+      return false; // Retorna false si no se pudo actualizar
+    } catch (error) {
+      console.error('Error al actualizar el usuario:', error);
+      return false;
+    }
+  }
+
+  async actualizarDireccion(usuarioId: number, comunaId: number, direccion: string): Promise<boolean> {
+    try {
+      const sql = `
+      INSERT OR REPLACE INTO direccion (id, usuario_id, comuna_id, direccion)
+      VALUES (
+        (SELECT id FROM direccion WHERE usuario_id = ? LIMIT 1), 
+        ?, 
+        ?, 
+        ?
+      );`;
+
+      const result = await this.database.executeSql(sql, [
+        usuarioId, // Usamos el usuario_id para encontrar la fila
+        usuarioId,
+        comunaId,
+        direccion
+      ]);
+
+      return result.rowsAffected > 0; // Retorna true si la actualización fue exitosa
+    } catch (error) {
+      console.error('Error al actualizar la dirección:', error);
+      return false;
+    }
+  }
+
+  async obtenerUsuarioIdPorEmail(email: string): Promise<number | null> {
+    try {
+      const sql = 'SELECT id FROM usuario WHERE email = ?';
+      const result = await this.database.executeSql(sql, [email]);
+
+      if (result.rows.length > 0) {
+        return result.rows.item(0).id; // Retorna el ID del usuario
+      }
+      return null; // Si no se encontró, retorna null
+    } catch (error) {
+      console.error('Error al obtener usuario ID por email:', error);
+      return null;
+    }
+  }
 
 
-async getProductosVendidosPorVendedor(emailVendedor: string): Promise<any[]> {
-  // Obtener el usuario (vendedor)
-  const vendedor = await this.getUsuarioPorEmail(emailVendedor);
-  if (!vendedor) return [];
 
-  const vendedorId = vendedor.id;
-  const query = `
+  async obtenerUsuarioPorEmail(email: string): Promise<any> {
+    try {
+      const sql = 'SELECT * FROM usuario WHERE email = ?';
+      const result = await this.database.executeSql(sql, [email]);
+
+      if (result.rows.length > 0) {
+        return result.rows.item(0); // Retorna el primer usuario encontrado
+      }
+      return null; // Si no se encontró, retorna null
+    } catch (error) {
+      console.error('Error al obtener usuario por email:', error);
+      return null;
+    }
+  }
+
+
+
+  //USUARIO
+  async getUsuarioBYEmail(email: string): Promise<any> {
+    const query = 'SELECT * FROM usuario WHERE email = ?';
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [email])
+        .then((res) => {
+          if (res.rows.length > 0) {
+            resolve(res.rows.item(0));
+          } else {
+            resolve(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener el usuario por email', error);
+          reject(error);
+        });
+    });
+  }
+
+
+  async getProductosVendidosPorVendedor(emailVendedor: string): Promise<any[]> {
+    // Obtener el usuario (vendedor)
+    const vendedor = await this.getUsuarioPorEmail(emailVendedor);
+    if (!vendedor) return [];
+
+    const vendedorId = vendedor.id;
+    const query = `
     SELECT vp.*, p.nombre, p.precio, u.email as compradorEmail 
     FROM ventas_productos vp
     JOIN producto p ON vp.producto_id = p.id
@@ -1956,15 +2032,15 @@ async getProductosVendidosPorVendedor(emailVendedor: string): Promise<any[]> {
     WHERE vp.vendedor_id = ? AND vp.estado = 'vendido'
   `;
 
-  const result = await this.database.executeSql(query, [vendedorId]);
-  const productosVendidos = [];
-  for (let i = 0; i < result.rows.length; i++) {
-    productosVendidos.push(result.rows.item(i));
+    const result = await this.database.executeSql(query, [vendedorId]);
+    const productosVendidos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productosVendidos.push(result.rows.item(i));
+    }
+    return productosVendidos;
   }
-  return productosVendidos;
-}
 
-//PROVENTAS
+  //PROVENTAS
   // Obtener usuario por email
   async getUserEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
@@ -1995,137 +2071,137 @@ async getProductosVendidosPorVendedor(emailVendedor: string): Promise<any[]> {
 
 
 
-//ADD-PROVENTAS
+  //ADD-PROVENTAS
 
-async obtenerCategorias(): Promise<any[]> {
-  const query = `SELECT * FROM categoria`;
-  
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [])
-      .then((data) => {
-        let categorias: any[] = [];
-        for (let i = 0; i < data.rows.length; i++) {
-          categorias.push(data.rows.item(i));
-        }
-        resolve(categorias);
-      })
-      .catch((error) => {
-        console.error('Error al obtener categorías', error);
-        reject(error);
-      });
-  });
-}
+  async obtenerCategorias(): Promise<any[]> {
+    const query = `SELECT * FROM categoria`;
 
-async obtenerSubcategoriasPorCategoria(categoriaId: number): Promise<any[]> {
-  const query = `SELECT * FROM subcategoria WHERE categoria_id = ?`;
-  
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [categoriaId])
-      .then((data) => {
-        let subcategorias: any[] = [];
-        for (let i = 0; i < data.rows.length; i++) {
-          subcategorias.push(data.rows.item(i));
-        }
-        resolve(subcategorias);
-      })
-      .catch((error) => {
-        console.error('Error al obtener subcategorías', error);
-        reject(error);
-      });
-  });
-}
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [])
+        .then((data) => {
+          let categorias: any[] = [];
+          for (let i = 0; i < data.rows.length; i++) {
+            categorias.push(data.rows.item(i));
+          }
+          resolve(categorias);
+        })
+        .catch((error) => {
+          console.error('Error al obtener categorías', error);
+          reject(error);
+        });
+    });
+  }
 
-async agregarProducto(proveedorId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
-  const query = `
+  async obtenerSubcategoriasPorCategoria(categoriaId: number): Promise<any[]> {
+    const query = `SELECT * FROM subcategoria WHERE categoria_id = ?`;
+
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [categoriaId])
+        .then((data) => {
+          let subcategorias: any[] = [];
+          for (let i = 0; i < data.rows.length; i++) {
+            subcategorias.push(data.rows.item(i));
+          }
+          resolve(subcategorias);
+        })
+        .catch((error) => {
+          console.error('Error al obtener subcategorías', error);
+          reject(error);
+        });
+    });
+  }
+
+  async agregarProducto(proveedorId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
+    const query = `
     INSERT INTO producto (proveedor_id, nombre, descripcion, precio, stock, organico, subcategoria_id)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [proveedorId, nombre, descripcion, precio, stock, organico, subcategoriaId])
-      .then(() => resolve())
-      .catch((error) => {
-        console.error('Error al agregar producto', error);
-        reject(error);
-      });
-  });
-}
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [proveedorId, nombre, descripcion, precio, stock, organico, subcategoriaId])
+        .then(() => resolve())
+        .catch((error) => {
+          console.error('Error al agregar producto', error);
+          reject(error);
+        });
+    });
+  }
 
 
-//MOD-PROVENTAS
+  //MOD-PROVENTAS
 
-async modProducto(productoId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
-  const query = `
+  async modProducto(productoId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
+    const query = `
     UPDATE producto 
     SET nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, subcategoria_id = ?
     WHERE id = ?
   `;
 
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, productoId])
-      .then(() => resolve())
-      .catch((error) => {
-        console.error('Error al modificar producto', error);
-        reject(error);
-      });
-  });
-}
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, productoId])
+        .then(() => resolve())
+        .catch((error) => {
+          console.error('Error al modificar producto', error);
+          reject(error);
+        });
+    });
+  }
 
-async obtenerProducto(productoId: number): Promise<any> {
-  const query = `SELECT * FROM producto WHERE id = ?`;
+  async obtenerProducto(productoId: number): Promise<any> {
+    const query = `SELECT * FROM producto WHERE id = ?`;
 
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [productoId])
-      .then((data) => {
-        if (data.rows.length > 0) {
-          resolve(data.rows.item(0)); // Devuelve el primer producto encontrado
-        } else {
-          reject('Producto no encontrado');
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el producto', error);
-        reject(error);
-      });
-  });
-}
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [productoId])
+        .then((data) => {
+          if (data.rows.length > 0) {
+            resolve(data.rows.item(0)); // Devuelve el primer producto encontrado
+          } else {
+            reject('Producto no encontrado');
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener el producto', error);
+          reject(error);
+        });
+    });
+  }
 
 
-//VIEW-PROVENTAS
-// Obtener producto por ID
-async obtProducto(productoId: number): Promise<any> {
-  const query = `SELECT * FROM producto WHERE id = ?`;
-  
-  return new Promise((resolve, reject) => {
-    this.database.executeSql(query, [productoId])
-      .then((data) => {
-        if (data.rows.length > 0) {
-          resolve(data.rows.item(0));
-        } else {
-          resolve(null); // No se encontró el producto
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el producto', error);
-        reject(error);
-      });
-  });
-}
+  //VIEW-PROVENTAS
+  // Obtener producto por ID
+  async obtProducto(productoId: number): Promise<any> {
+    const query = `SELECT * FROM producto WHERE id = ?`;
 
-//REGVENTAS
+    return new Promise((resolve, reject) => {
+      this.database.executeSql(query, [productoId])
+        .then((data) => {
+          if (data.rows.length > 0) {
+            resolve(data.rows.item(0));
+          } else {
+            resolve(null); // No se encontró el producto
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener el producto', error);
+          reject(error);
+        });
+    });
+  }
 
-// Obtener productos vendidos por el proveedor (vendedor)
-async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
-  try {
+  //REGVENTAS
+
+  // Obtener productos vendidos por el proveedor (vendedor)
+  async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
+    try {
       // Obtener el id del proveedor utilizando el email
       const usuario = await this.database.executeSql(
-          'SELECT id FROM usuario WHERE email = ?',
-          [emailVendedor]
+        'SELECT id FROM usuario WHERE email = ?',
+        [emailVendedor]
       );
 
       if (usuario.rows.length === 0) {
-          console.error('Proveedor no encontrado.');
-          return [];
+        console.error('Proveedor no encontrado.');
+        return [];
       }
 
       const proveedorId = usuario.rows.item(0).id;
@@ -2152,15 +2228,51 @@ async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
       const result = await this.database.executeSql(query, [proveedorId]);
       const productosVendidos = [];
       for (let i = 0; i < result.rows.length; i++) {
-          productosVendidos.push(result.rows.item(i));
+        productosVendidos.push(result.rows.item(i));
       }
 
       return productosVendidos;
-  } catch (error) {
+    } catch (error) {
       console.error('Error al obtener productos vendidos por vendedor:', error);
       throw error;
+    }
   }
-}
+
+
+  //MOD-CUENTA
+  // Obtener todas las direcciones de un usuario por su ID
+  async obtenerDireccionesPorUsuario(usuario_id: number): Promise<any[]> {
+    const query = `SELECT * FROM direccion WHERE usuario_id = ?;`;
+    try {
+      const res = await this.database.executeSql(query, [usuario_id]);
+      let direcciones = [];
+      for (let i = 0; i < res.rows.length; i++) {
+        direcciones.push(res.rows.item(i));
+      }
+      return direcciones;
+    } catch (error) {
+      console.error('Error al obtener direcciones:', error);
+      return [];
+    }
+  }
+
+
+  async agregarDireccion(usuario_id: number, comuna_id: number, direccion: string) {
+    const query = `INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?);`;
+    await this.database.executeSql(query, [usuario_id, comuna_id, direccion]);
+  }
+
+  async eliminarDireccion(id: number) {
+    const query = `DELETE FROM direccion WHERE id = ?;`;
+    await this.database.executeSql(query, [id]);
+  }
+
+  async establecerDireccionPreferida(id: number, usuario_id: number) {
+    await this.database.executeSql(`UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`, [usuario_id]);
+    await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ?;`, [id]);
+  }
+
+
 
 
 

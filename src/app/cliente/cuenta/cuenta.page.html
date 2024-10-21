@@ -25,14 +25,13 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Botón para modificar cuenta -->
-  <ion-button expand="full" color="primary" (click)="irAModCuenta()">
+  <ion-button style="margin: 0 20px;" type="submit" color="primary" fill="solid" expand="full" (click)="irAModCuenta()">
     Modificar Cuenta
   </ion-button>
 </ion-content>
 
 <ion-content *ngIf="!usuario">
   <ion-text color="danger">
-    <h2>No se encontró información del usuario.</h2>
+    <ion-card class="ion-text-center">No se encontró información del usuario.</ion-card>
   </ion-text>
 </ion-content>

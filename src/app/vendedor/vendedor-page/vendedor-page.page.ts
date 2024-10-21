@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-vendedor-page',
   templateUrl: './vendedor-page.page.html',
   styleUrls: ['./vendedor-page.page.scss'],
 })
-export class VendedorPagePage implements OnInit {//! es obligatoria, ? es opcional
+export class VendedorPagePage implements OnInit {
   userData: any;
 
-  constructor(private route: Router, private activerouter: ActivatedRoute) { 
+  constructor(private route: Router) { 
     this.userData = this.route.getCurrentNavigation()?.extras?.state;
   }
   ngOnInit() {

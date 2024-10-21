@@ -8,23 +8,25 @@
 </ion-header>
 
 <ion-content>
-  <ng-container *ngIf="productos && productos.length > 0; else noProducts">
-    <ion-list>
-      <ion-item *ngFor="let producto of productos">
-        <ion-label>
-          <h2>{{ producto.nombre }}</h2>
-          <p>{{ producto.descripcion }}</p>
-        </ion-label>
-        <ion-button color="primary" (click)="verDetalle(producto.id)">
-          Acceder
-        </ion-button>
-      </ion-item>
-    </ion-list>
-  </ng-container>
+  <ion-card>
+    <ng-container *ngIf="productos && productos.length > 0; else noProducts">
+      <ion-list>
+        <ion-item *ngFor="let producto of productos">
+          <ion-label>
+            <h2>{{ producto.nombre }}</h2>
+            <p>{{ producto.descripcion }}</p>
+          </ion-label>
+          <ion-button color="primary" (click)="verDetalle(producto.id)">
+            Acceder
+          </ion-button>
+        </ion-item>
+      </ion-list>
+    </ng-container>
 
-  <ng-template #noProducts>
-    <ion-text color="danger">
-      <h2>No hay productos disponibles.</h2>
-    </ion-text>
-  </ng-template>
+    <ng-template #noProducts>
+      <ion-text color="danger">
+        <ion-card class="ion-text-center">No se encontró información del usuario.</ion-card>
+      </ion-text>
+    </ng-template>
+  </ion-card>
 </ion-content>
