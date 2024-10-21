@@ -2273,6 +2273,30 @@ JOIN
   }
 
 
+  // Obtener el nombre de la región en base al email del usuario
+  async obtenerRegionPorEmail(email: string): Promise<string | null> {
+    const query = `
+      SELECT r.nombre AS region
+      FROM usuario u
+      JOIN direccion d ON u.id = d.usuario_id
+      JOIN comuna c ON d.comuna_id = c.id
+      JOIN region r ON c.region_id = r.id
+      WHERE u.email = ?;
+    `;
+
+    try {
+      const result = await this.database.executeSql(query, [email]);
+      if (result.rows.length > 0) {
+        return result.rows.item(0).region;
+      } else {
+        console.warn('No se encontró región para el usuario con email:', email);
+        return 'Región no encontrada';
+      }
+    } catch (error) {
+      console.error('Error al obtener la región:', error);
+      return null;
+    }
+  }
 
 
 

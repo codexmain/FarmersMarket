@@ -10,6 +10,19 @@
 <ion-content>
   <ion-card>
     <form (ngSubmit)="actualizarUsuario()">
+      <ion-item style="align-items: center; flex-direction: column;">
+        <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
+    
+        <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
+          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="usuario.foto_perfil" 
+                 [src]="usuario.foto_perfil" 
+                 alt="avatar" 
+                 style="width: 100%; height: 100%; object-fit: cover;"/>
+          </ion-avatar>
+        </div>
+      </ion-item>
+
       <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
         <ion-input [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ingresar Nombre"></ion-input>
@@ -77,32 +90,5 @@
 
       <ion-button style="margin: 20px 20px;" expand="full" type="submit">Actualizar</ion-button>
     </form>
-  </ion-card><br>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Direcciones</ion-card-title>
-    </ion-card-header>
-
-    <ion-list>
-      <ion-item *ngFor="let direccion of direcciones">
-        <ion-label>
-          <h2>{{ direccion.direccion }}</h2>
-          <p>ID Comuna: {{ direccion.comuna_id }}</p>
-        </ion-label>
-
-        <ion-radio slot="start" [(ngModel)]="direccionSeleccionada" [value]="direccion.id"
-          (ionSelect)="seleccionarDireccionPreferida(direccion.id)">
-        </ion-radio>
-
-        <ion-button color="danger" (click)="eliminarDireccion(direccion.id)" slot="end">
-          Eliminar
-        </ion-button>
-      </ion-item>
-    </ion-list>
-
-    <ion-button expand="full" (click)="guardarDireccionPreferida()">
-      Guardar Dirección Preferida
-    </ion-button>
   </ion-card>
 </ion-content>
