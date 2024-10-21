@@ -8,13 +8,20 @@
 </ion-header>
 
 <ion-content>
+  <ion-card>
   <ion-list>
     <ion-item *ngFor="let vendedor of vendedores">
-      <ion-label>
-        <h2>{{ vendedor.nombre }} {{ vendedor.apellido_paterno }}</h2>
-        <p>{{ vendedor.nombre_empresa }}</p>
-      </ion-label>
-      <ion-button (click)="acceder(vendedor.id)">Acceder</ion-button>
+        <ion-card-header>
+          <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+            <img *ngIf="vendedor.foto_perfil" [src]="vendedor.foto_perfil" alt="avatar"/>
+          </ion-avatar>
+          <ion-card-title>{{ vendedor.nombre }} {{ vendedor.apellido_paterno }}</ion-card-title>
+          <ion-card-subtitle>{{ vendedor.nombre_empresa }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ vendedor.email }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-button (click)="acceder(vendedor.id)">Acceder</ion-button>
     </ion-item>
   </ion-list>
+</ion-card>
 </ion-content>
+

@@ -10,27 +10,38 @@
 <ion-content [fullscreen]="true">
   <ion-list *ngIf="detalles.length > 0">
     <ion-item *ngFor="let detalle of detalles">
-      <ion-label>
-        <h2>{{ detalle.nombre }}</h2>
-        <p>Cantidad: {{ detalle.cantidad }}</p>
-        <p>Subtotal: ${{ detalle.subtotal }}</p>
-      </ion-label>
+      <ion-card>
+        <ion-card-header>
+          <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+            <img *ngIf="detalle.foto_producto" [src]="detalle.foto_producto" alt="avatar" />
+          </ion-avatar>
+          <ion-card-title>{{ detalle.nombre }}</ion-card-title>
+          <ion-card-subtitle>{{ detalle.descripcion }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Precio:</strong> $ {{ detalle.precio | currency }}</p>
+          <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
+          <p><strong>Subtotal:</strong> {{ detalle.subtotal | currency }}</p>
+        </ion-card-content>
+      </ion-card>
       <ion-button color="danger" (click)="eliminarProducto(detalle.id)">
         Eliminar
       </ion-button>
     </ion-item>
   </ion-list>
 
-  <ion-text *ngIf="detalles.length === 0" color="danger">
-    <h2>No hay productos en el carrito.</h2>
-  </ion-text>
+  <ion-card>
+    <ion-text *ngIf="detalles.length === 0" color="danger">
+      <ion-card class="ion-text-center">No hay productos en el carrito</ion-card>
+    </ion-text>
 
-  <ion-item>
-    <ion-label>Total:</ion-label>
-    <ion-label>$ {{ totalCompra }}</ion-label>
-  </ion-item>
+    <ion-item>
+      <ion-label>Total:</ion-label>
+      <ion-label>$ {{ totalCompra }}</ion-label>
+    </ion-item>
 
-  <ion-button expand="full" (click)="confirmarCompra()" color="success">
-    Confirmar Compra
-  </ion-button>
+    <ion-button expand="full" (click)="confirmarCompra()" color="success">
+      Confirmar Compra
+    </ion-button>
+  </ion-card>
 </ion-content>

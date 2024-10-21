@@ -10,16 +10,25 @@
 <ion-content>
   <ion-list *ngIf="productosComprados.length > 0">
     <ion-item *ngFor="let producto of productosComprados">
-      <ion-label>
-        <h2>{{ producto.nombre }}</h2>
-        <p>Precio: {{ producto.precio | currency }}</p>
-        <p>Cantidad: {{ producto.cantidad }}</p>
-        <p>Subtotal: {{ producto.subtotal | currency }}</p>
-      </ion-label>
+      <ion-card>
+        <ion-card-header>
+          <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+            <img *ngIf="producto.foto_producto" [src]="producto.foto_producto" alt="avatar"/>
+          </ion-avatar>
+          <ion-card-title>{{ producto.nombre }}</ion-card-title>
+          <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Precio:</strong> $ {{ producto.precio | currency }}</p>
+          <p><strong>Cantidad:</strong> {{ producto.cantidad}}</p>
+          <p><strong>Subtotal:</strong> {{ producto.subtotal | currency }}</p>
+        </ion-card-content>
+      </ion-card>
     </ion-item>
   </ion-list>
 
   <ion-text *ngIf="productosComprados.length === 0" color="danger">
-    <h2>No has realizado compras.</h2>
+    <ion-card class="ion-text-center">No has realizado compras</ion-card>
   </ion-text>
 </ion-content>
+

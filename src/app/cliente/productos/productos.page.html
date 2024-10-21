@@ -12,13 +12,21 @@
     <ng-container *ngIf="productos && productos.length > 0; else noProducts">
       <ion-list>
         <ion-item *ngFor="let producto of productos">
-          <ion-label>
-            <h2>{{ producto.nombre }}</h2>
-            <p>{{ producto.descripcion }}</p>
-          </ion-label>
-          <ion-button color="primary" (click)="verDetalle(producto.id)">
-            Acceder
-          </ion-button>
+            <ion-card-header>
+              <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+                <img *ngIf="producto.foto_producto" [src]="producto.foto_producto" alt="avatar" />
+              </ion-avatar>
+              <ion-card-title>{{ producto.nombre }}</ion-card-title>
+              <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-card-subtitle>{{ producto.precio }}</ion-card-subtitle>
+              <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
+              <p><strong>Stock:</strong> {{ producto.stock }}</p>
+              <ion-button color="primary" (click)="verDetalle(producto.id)">
+                Acceder
+              </ion-button>
+            </ion-card-content>
         </ion-item>
       </ion-list>
     </ng-container>
