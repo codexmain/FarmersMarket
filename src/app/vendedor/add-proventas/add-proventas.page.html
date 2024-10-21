@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/vendedor-page'">Volver</ion-button>
@@ -7,53 +7,69 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Agregar Producto</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-card>
+    <form (ngSubmit)="agregarProducto()">
+      <ion-item style="align-items: center; flex-direction: column;">
+        <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
 
-  <form (ngSubmit)="agregarProducto()">
-    <ion-item>
-      <ion-label>Nombre del Producto</ion-label>
-      <ion-input type="text" [(ngModel)]="nombre" name="nombre" required></ion-input>
-    </ion-item>
+        <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
+          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="foto_producto" 
+                 [src]="foto_producto" 
+                 alt="avatar" 
+                 style="width: 100%; height: 100%; object-fit: cover;"/>
+          </ion-avatar>
+        </div>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Descripción</ion-label>
-      <ion-input type="text" [(ngModel)]="descripcion" name="descripcion"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Nombre del Producto</ion-label>
+        <ion-input [(ngModel)]="nombre" name="nombre" required placeholder="Ingresar Nombre del Producto"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Precio</ion-label>
-      <ion-input type="number" [(ngModel)]="precio" name="precio" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-input [(ngModel)]="descripcion" name="descripcion" placeholder="Ingresar Descripción"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Stock</ion-label>
-      <ion-input type="number" [(ngModel)]="stock" name="stock" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-input [(ngModel)]="precio" name="precio" type="number" required placeholder="Ingresar Precio"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Orgánico</ion-label>
-      <ion-toggle [(ngModel)]="organico" name="organico" value="1"></ion-toggle>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Stock</ion-label>
+        <ion-input [(ngModel)]="stock" name="stock" type="number" required placeholder="Ingresar Stock"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Categoría</ion-label>
-      <ion-select (ionChange)="onCategoriaChange($event.detail.value)" required>
-        <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <ion-item>
+        <ion-label>¿Producto Orgánico?:</ion-label>
+        <ion-select [(ngModel)]="organico" name="organico" required #orgCtrl="ngModel">
+          <ion-select-option value="0">No es Orgánico</ion-select-option>
+          <ion-select-option value="1">Es Orgánico</ion-select-option>
+        </ion-select>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Subcategoría</ion-label>
-      <ion-select [(ngModel)]="subcategoriaId" name="subcategoriaId" required>
-        <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <div *ngIf="orgCtrl.invalid && (orgCtrl.dirty || orgCtrl.touched)" class="error-message">
+        La procedencia del producto es obligatoria.
+      </div>
 
-    <ion-button expand="full" type="submit">Agregar Producto</ion-button>
-  </form>
+      <ion-item>
+        <ion-label>Categoría</ion-label>
+        <ion-select [(ngModel)]="categoriaId" (ionChange)="onCategoriaChange($event.detail.value)" required>
+          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Subcategoría</ion-label>
+        <ion-select [(ngModel)]="subcategoriaId" name="subcategoriaId" required>
+          <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-button style="margin: 20px 20px;" expand="full" type="submit">Agregar Producto</ion-button>
+    </form>
+  </ion-card>
 </ion-content>
