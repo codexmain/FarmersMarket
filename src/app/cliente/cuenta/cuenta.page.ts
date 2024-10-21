@@ -18,14 +18,39 @@ export class CuentaPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Obtener email del usuario desde Native Storage
-    const email = await this.nativeStorage.getItem('userEmail');
+    // Cargar datos al inicializar el componente
+    await this.cargarDatosUsuario();
+    this.recibirDatosDesdeNavegacion();
+  }
 
-    if (email) {
-      // Obtener datos del usuario desde la base de datos
-      this.usuario = await this.dbService.getUsuarioByEmail(email);
+  async ionViewWillEnter() {
+    // Recargar datos cada vez que la vista está a punto de entrar
+    await this.cargarDatosUsuario();
+  }
+
+  async cargarDatosUsuario() {
+    try {
+      const email = await this.nativeStorage.getItem('userEmail');
+
+      if (email) {
+        // Obtener datos del usuario desde la base de datos
+        this.usuario = await this.dbService.getUsuarioByEmail(email);
+      }
+    } catch (error) {
+      console.error('Error al cargar los datos del usuario:', error);
     }
   }
+
+  recibirDatosDesdeNavegacion() {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation && navigation.extras.state) {
+      const usuarioActualizado = navigation.extras.state['usuario'];
+      if (usuarioActualizado) {
+        this.usuario = usuarioActualizado; // Actualiza el usuario con los datos recibidos
+      }
+    }
+  }
+  
 
   irAModCuenta() {
     // Redirige a la página de modificación de cuenta

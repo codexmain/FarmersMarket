@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DataBaseService } from 'src/app/services/data-base.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-mod-cuenta',
@@ -9,25 +10,61 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
   styleUrls: ['./mod-cuenta.page.scss'],
 })
 export class ModCuentaPage implements OnInit {
+  // Variables del usuario
   usuario: any = {
-    id: 0,
     nombre: '',
     segundo_nombre: '',
     apellido_paterno: '',
     apellido_materno: '',
     email: '', // Email no editable
-    tipo_usuario_id: 1, // Asumiendo Cliente por defecto
+    nombre_empresa: '',
+    descripcion_corta: '',
+    direccion: '',
+    foto_perfil: '',
+    region_id: null, // ID de la región seleccionada
+    comuna_id: null, // ID de la comuna seleccionada
   };
+
+  selectedRegion: number | null = null;
+  selectedComuna: number | null = null;
+  regiones: any[] = [];
+  comunas: any[] = [];
+  direcciones: any[] = []; // Lista de direcciones del usuario
+  direccionSeleccionada: number | null = null; // 
 
   constructor(
     private dataBase: DataBaseService,
     public alertController: AlertController,
-    private nativeStorage: NativeStorage
-  ) { }
+    private nativeStorage: NativeStorage,
+    private router: Router,
+    private navCtrl: NavController
+  ) {}
 
   ngOnInit() {
     this.cargarDatosUsuario();
+    this.cargarRegiones();  // Cargar regiones al inicializar
+    this.cargarDirecciones();
+    
   }
+
+
+
+  
+
+  
+
+  async guardarDireccionPreferida() {
+    try {
+      const id = this.direccionSeleccionada ?? 0; // Valor por defecto si es null
+      await this.dataBase.establecerDireccionPreferida(id, this.usuario.id);
+      await this.presentAlert('Éxito', 'Dirección preferida actualizada.');
+    } catch (error) {
+      console.error('Error al guardar la dirección preferida:', error);
+      await this.presentAlert('Error', 'No se pudo guardar la dirección preferida.');
+    }
+  }
+
+ 
 
   async cargarDatosUsuario() {
     try {
@@ -36,6 +73,13 @@ export class ModCuentaPage implements OnInit {
       
       if (usuarioData) {
         this.usuario = usuarioData;
+        this.selectedRegion = usuarioData.region_id; // Asignar la región seleccionada
+        this.selectedComuna = usuarioData.comuna_id; // Asignar la comuna seleccionada
+
+        // Llamar a cargarcomunas solo si selectedRegion no es null
+        if (this.selectedRegion !== null) {
+          await this.cargarcomunas(this.selectedRegion); // Cargar comunas de la región seleccionada
+        }
       } else {
         await this.presentAlert('Error', 'No se encontró el usuario.');
       }
@@ -45,11 +89,32 @@ export class ModCuentaPage implements OnInit {
     }
   }
 
+  async cargarRegiones() {
+    try {
+      this.regiones = await this.dataBase.Regiones();
+    } catch (error) {
+      console.error('Error al cargar regiones:', error);
+    }
+  }
+
+  async cargarcomunas(regionId: number) {
+    if (regionId) {
+      try {
+        this.comunas = await this.dataBase.Comunas(regionId);
+      } catch (error) {
+        console.error('Error al cargar comunas:', error);
+      }
+    } else {
+      this.comunas = [];
+    }
+  }
+
   async actualizarUsuario() {
     try {
       const actualizado = await this.dataBase.actualizarUsuarioPorEmail(this.usuario);
       if (actualizado) {
         await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
+        this.irHaciaAtras();
       } else {
         await this.presentAlert('Error', 'Hubo un problema al actualizar el usuario.');
       }
@@ -59,6 +124,12 @@ export class ModCuentaPage implements OnInit {
     }
   }
 
+  irHaciaAtras() {
+    this.navCtrl.pop(); // Regresa a la página anterior
+  }
+
+
+
   async presentAlert(header: string, message: string) {
     const alert = await this.alertController.create({
       header: header,
@@ -67,4 +138,52 @@ export class ModCuentaPage implements OnInit {
     });
     await alert.present();
   }
+
+
+  async cargarDirecciones() {
+    this.direcciones = await this.dataBase.obtenerDireccionesPorUsuario(this.usuario.id);
+  }
+
+  async seleccionarDireccionPreferida(id: number) {
+    try {
+      await this.dataBase.establecerDireccionPreferida(id, this.usuario.id);
+      await this.cargarDirecciones(); // Recargar la lista
+    } catch (error) {
+      console.error('Error al seleccionar la dirección preferida:', error);
+    }
+  }
+
+  async eliminarDireccion(id: number) {
+    try {
+      await this.dataBase.eliminarDireccion(id);
+      await this.cargarDirecciones(); // Recargar la lista
+    } catch (error) {
+      console.error('Error al eliminar la dirección:', error);
+    }
+  }
+
+  async agregarDireccionPrompt() {
+    const alert = await this.alertController.create({
+      header: 'Nueva Dirección',
+      inputs: [
+        { name: 'direccion', type: 'text', placeholder: 'Ingrese la dirección' },
+        { name: 'comuna_id', type: 'number', placeholder: 'ID de la comuna' }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Agregar',
+          handler: async (data) => {
+            await this.dataBase.agregarDireccion(this.usuario.id, data.comuna_id, data.direccion);
+            await this.cargarDirecciones(); // Recargar la lista
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+
+
+
 }
