@@ -26,6 +26,7 @@ export class ViewUsuarioPage implements OnInit {
     tipo_usuario_id!: number;
     empresaObligatoria: boolean = false;
     descEmpresaObligatoria: boolean = false;
+    foto_perfil: String='';
   
     arrayCmbTipoUsuario: any = [
       {
@@ -33,6 +34,7 @@ export class ViewUsuarioPage implements OnInit {
         descripcion: '',
       }
     ]
+  
 
   constructor(private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService) { 
     // Obtener el usuario desde NavParams
@@ -50,6 +52,7 @@ export class ViewUsuarioPage implements OnInit {
     this.descripcion_corta = this.usuario.descripcion_corta;
     this.estado_cuenta = this.usuario.estado_cuenta;
     this.tipo_usuario_id = this.usuario.tipo_usuario_id;
+    this.foto_perfil = this.usuario.foto_perfil;
 
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista

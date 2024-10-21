@@ -54,6 +54,7 @@ export class ViewItemPage implements OnInit {
     this.organico = this.producto.organico;
     this.categoria_id = this.producto.categoria_id;
     this.subcategoria_id = this.producto.subcategoria_id;
+    this.photo = this.producto.photo;
 
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista

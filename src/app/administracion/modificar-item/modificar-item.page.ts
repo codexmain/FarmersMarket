@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, NavParams, AlertController, ToastController} from '@ionic/angular';
 
 import { DataBaseService } from '../../services/data-base.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-modificar-item',
@@ -42,6 +43,8 @@ export class ModificarItemPage implements OnInit {
       nombre: ''
     }
   ]
+  foto_perfil: string='';
+  imagen: any;
 
 
   constructor(private toastController: ToastController, private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, public alertController: AlertController) {
@@ -77,6 +80,7 @@ export class ModificarItemPage implements OnInit {
     this.organico = this.producto.organico;
     this.categoria_id = this.producto.categoria_id;
     this.subcategoria_id = this.producto.subcategoria_id;
+    this.foto_perfil = this.producto.foto_perfil;
   }
 
   onCategoriaChange(event: any) {
@@ -98,6 +102,21 @@ export class ModificarItemPage implements OnInit {
         }
       ];
       this.subcategoria_id = undefined; // Reiniciar subcategoría seleccionada
+    }
+  }
+
+
+
+  async takePicture() { 
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    if (image && image.webPath) { 
+      this.foto_perfil = image.webPath;
+      this.imagen = image.webPath;
     }
   }
 
@@ -173,7 +192,7 @@ export class ModificarItemPage implements OnInit {
       // Procede a actualizar el usuario en la base de datos
       const subcategoriaId = this.subcategoria_id as number
       await this.bd.modificarProducto(this.producto.id, this.proveedor_id,this.nombre_producto,
-                                    this.descripcion_producto, this.precio, this.stock, this.organico, '', subcategoriaId);
+                                    this.descripcion_producto, this.precio, this.stock, this.organico, this.foto_perfil, subcategoriaId);
   
       this.modalController.dismiss({ success: true });}
 

@@ -42,6 +42,8 @@ export class AddItemPage implements OnInit {
   organico: number = 0; //default de organico en false
   categoria_id!: number;
   subcategoria_id: number | undefined;
+  foto_perfil: string = '';
+  imagen: any;
 
 
   constructor(private bd: DataBaseService, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { }
@@ -163,7 +165,7 @@ export class AddItemPage implements OnInit {
       // Si todas las validaciones pasan
       await this.bd.insertarProducto(
         this.proveedor_id, this.nombre_producto, this.descripcion_producto, this.precio, this.stock, 
-        this.organico, '', this.subcategoria_id
+        this.organico, this.foto_perfil, this.subcategoria_id, 
       );
       this.presentAlert('Éxito', 'Se ha agregado el Producto exitosamente.');
       console.log('Formulario válido, proceder con el registro.');
@@ -171,7 +173,19 @@ export class AddItemPage implements OnInit {
     }
 
 
-
+    async takePicture() { 
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri
+      });
+  
+      if (image && image.webPath) { 
+        this.foto_perfil = image.webPath;
+        this.imagen = image.webPath;
+      }
+    }
+  
 
 
 
