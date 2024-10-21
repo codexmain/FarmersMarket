@@ -8,10 +8,16 @@
 </ion-header>
 
 <ion-content *ngIf="usuario">
-  <ion-card>
-    <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="Foto de perfil" />
+  <ion-card style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
+    <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
+      <img *ngIf="usuario.foto_perfil" 
+           [src]="usuario.foto_perfil" 
+           alt="avatar" 
+           style="width: 100%; height: 100%; object-fit: cover;"/>
+    </ion-avatar>
     <ion-card-header>
-      <ion-card-title>{{ usuario.nombre }} {{ usuario.apellido_paterno }}</ion-card-title>
+      <ion-card-title class="ion-text-center">{{ usuario.nombre }} {{ usuario.apellido_paterno }}</ion-card-title>
+      <ion-card-subtitle class="ion-text-center">{{ usuario.tipo_usuario }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       <p><strong>Email:</strong> {{ usuario.email }}</p>
@@ -22,16 +28,14 @@
       <p><strong>Comuna:</strong> {{ usuario.comuna || 'N/A' }}</p>
       <p><strong>Región:</strong> {{ usuario.region || 'N/A' }}</p>
     </ion-card-content>
+    <ion-button style="margin: 20px 20px;" type="submit" color="primary" fill="solid" expand="full" (click)="irAModUsuario()">
+      Modificar Cuenta
+    </ion-button>
   </ion-card>
-
-  <!-- Botón para modificar usuario -->
-  <ion-button expand="full" color="primary" (click)="irAModUsuario()">
-    Modificar Usuario
-  </ion-button>
 </ion-content>
 
 <ion-content *ngIf="!usuario">
   <ion-text color="danger">
-    <h2>No se encontró información del usuario.</h2>
+    <ion-card class="ion-text-center">No se encontró información del usuario</ion-card>
   </ion-text>
 </ion-content>
