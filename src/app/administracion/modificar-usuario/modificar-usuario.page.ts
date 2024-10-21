@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, NavParams, ToastController, AlertController } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+
 @Component({
   selector: 'app-modificar-usuario',
   templateUrl: './modificar-usuario.page.html',
@@ -11,6 +13,7 @@ export class ModificarUsuarioPage implements OnInit {
 
   isDisabled = true;
   usuario: any;
+  usuarioActual: any; // Para almacenar el usuario actual del native storage
 
   //cosas del formulario
   nombre: string = '';
@@ -29,17 +32,27 @@ export class ModificarUsuarioPage implements OnInit {
   arrayCmbTipoUsuario: any = [
     {
       id: '',
-      descripcion: ''
+      descripcion: '',
     }
   ]
 
 
-  constructor(private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, private toastController: ToastController, public alertController: AlertController) {
+  constructor(private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, private toastController: ToastController, public alertController: AlertController, private nativeStorage: NativeStorage) {
     // Obtener el usuario desde NavParams
     this.usuario = this.navParams.get('usuario'); //obtener todos los datos del usuario en especifico
   }
 
   ngOnInit() {
+    //Carga de los combobox correspondientes
+    this.bd.dbState().subscribe(data=>{
+      //validar si la bd esta lista
+      if(data){
+        this.bd.fetchCmbTipUsuario().subscribe(res=>{
+          this.arrayCmbTipoUsuario = res;
+        })     
+      }
+    });
+    this.cargarDatosUsuarioActual(); // Cargar los datos del usuario actual al iniciar
     //carga de los datos al formulario
     this.nombre = this.usuario.nombre;
     this.apellido_paterno = this.usuario.apellido_paterno;
@@ -52,18 +65,30 @@ export class ModificarUsuarioPage implements OnInit {
     this.estado_cuenta = this.usuario.estado_cuenta;
     this.tipo_usuario_id = this.usuario.tipo_usuario_id;
 
+    
+
     // Actualiza la obligatoriedad de los campos al cargar
     this.onFieldsChange();
 
-    //Carga de los combobox correspondientes
-    this.bd.dbState().subscribe(data=>{
-      //validar si la bd esta lista
-      if(data){
-        this.bd.fetchCmbTipUsuario().subscribe(res=>{
-          this.arrayCmbTipoUsuario = res;
-        })     
+
+
+    // Desactiva el campo estado_cuenta si el usuario está modificando su propia cuenta
+    if (this.usuarioActual && this.usuario.id === this.usuarioActual.id) {
+      this.isDisabled = true; // Desactivar el campo
+    } else {
+      this.isDisabled = false; // Activar el campo
+    }
+  }
+
+  async cargarDatosUsuarioActual() {
+    try {
+      const email = await this.nativeStorage.getItem('userEmail');
+      if (email) {
+        this.usuarioActual = await this.bd.getUsuarioByEmail(email); // Obtener los datos del usuario actual
       }
-    })
+    } catch (error) {
+      console.error('Error al cargar los datos del usuario actual:', error);
+    }
   }
 
   onFieldsChange() {
