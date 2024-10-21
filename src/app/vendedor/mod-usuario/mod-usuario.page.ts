@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { AlertController, NavController } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
+import { Camera, CameraResultType } from '@capacitor/camera';
 
 @Component({
   selector: 'app-mod-usuario',
@@ -24,6 +25,7 @@ export class ModUsuarioPage implements OnInit {
     region_id: null, // ID de la región seleccionada
     comuna_id: null, // ID de la comuna seleccionada
   };
+  imagen: any;
 
   selectedRegion: number | null = null;
   selectedComuna: number | null = null;
@@ -177,6 +179,18 @@ export class ModUsuarioPage implements OnInit {
     await alert.present();
   }
 
+  async takePicture() {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    if (image && image.webPath) {
+      this.usuario.foto_perfil = image.webPath; // Guardar en usuario.foto_perfil
+      this.imagen = image.webPath; // Guardar en usuario.imagen
+    }
+  }
 
 
 
