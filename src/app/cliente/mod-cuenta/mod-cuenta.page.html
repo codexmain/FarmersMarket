@@ -11,6 +11,11 @@
   <ion-card>
     <form (ngSubmit)="actualizarUsuario()">
       <ion-item>
+        <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
+        <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="avatar" style="width: 100px;height: 100px;" />
+      </ion-item>
+
+      <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
         <ion-input [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ingresar Nombre"></ion-input>
       </ion-item>
@@ -50,30 +55,6 @@
           placeholder="Ingresar Descripción Corta"></ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-label>Región</ion-label>
-        <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region"
-          required>
-          <ion-select-option *ngFor="let region of regiones" [value]="region.id">
-            {{ region.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Comuna</ion-label>
-        <ion-select [(ngModel)]="usuario.comuna_id" name="comuna" required>
-          <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
-            {{ comuna.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Dirección</ion-label>
-        <ion-input [(ngModel)]="usuario.direccion" name="direccion" required
-          placeholder="Ingresar Dirección"></ion-input>
-      </ion-item>
 
       <ion-button style="margin: 20px 20px;" expand="full" type="submit">Actualizar</ion-button>
     </form>
@@ -83,6 +64,32 @@
     <ion-card-header>
       <ion-card-title>Direcciones</ion-card-title>
     </ion-card-header>
+
+    <ion-item>
+      <ion-label>Región</ion-label>
+      <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region"
+        required>
+        <ion-select-option *ngFor="let region of regiones" [value]="region.id">
+          {{ region.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Comuna</ion-label>
+      <ion-select [(ngModel)]="usuario.comuna_id" name="comuna" required>
+        <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
+          {{ comuna.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Dirección</ion-label>
+      <ion-input [(ngModel)]="usuario.direccion" name="direccion" required
+        placeholder="Ingresar Dirección"></ion-input>
+    </ion-item>
+
 
     <ion-list>
       <ion-item *ngFor="let direccion of direcciones">

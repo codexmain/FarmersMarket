@@ -23,11 +23,10 @@
       <p><strong>Comuna:</strong> {{ usuario.comuna || 'N/A' }}</p>
       <p><strong>Región:</strong> {{ usuario.region || 'N/A' }}</p>
     </ion-card-content>
+    <ion-button style="margin: 20px 20px;" type="submit" color="primary" fill="solid" expand="full" (click)="irAModCuenta()">
+      Modificar Cuenta
+    </ion-button>
   </ion-card>
-
-  <ion-button style="margin: 0 20px;" type="submit" color="primary" fill="solid" expand="full" (click)="irAModCuenta()">
-    Modificar Cuenta
-  </ion-button>
 </ion-content>
 
 <ion-content *ngIf="!usuario">
