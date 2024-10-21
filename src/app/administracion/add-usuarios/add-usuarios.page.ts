@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
 import { Geolocation } from '@capacitor/geolocation';
 import { GeocodingService } from 'src/app/services/geocoding.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationValidationService } from 'src/app/services/location-validation.service';
 
 
@@ -53,6 +54,8 @@ export class AddUsuariosPage implements OnInit {
   direccion: string = '';
   empresaObligatoria: boolean = false;
   descEmpresaObligatoria: boolean = false;
+  foto_perfil: string ='';
+  imagen: any;
 
   constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) { 
 
@@ -98,6 +101,18 @@ export class AddUsuariosPage implements OnInit {
   }
 
 
+  async takePicture() { 
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    if (image && image.webPath) { 
+      this.foto_perfil = image.webPath;
+      this.imagen = image.webPath;
+    }
+  }
 
 
 
@@ -265,7 +280,7 @@ export class AddUsuariosPage implements OnInit {
     // Si todas las validaciones pasan
     await this.bd.insertarUsuario(
       this.pNombre, this.sNombre, this.aPaterno, this.aMaterno, this.email, 
-      this.password, this.empresa, this.descEmpresa, '', this.estadoUsuario, 
+      this.password, this.empresa, this.descEmpresa, this.foto_perfil, this.estadoUsuario, 
       this.tipoUsuario, this.comuna, this.direccion
     );
     this.presentAlert('Éxito', 'Se ha agregado el cliente exitosamente.');

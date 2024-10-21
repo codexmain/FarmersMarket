@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, NavParams, ToastController, AlertController } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-modificar-usuario',
@@ -35,6 +36,8 @@ export class ModificarUsuarioPage implements OnInit {
       descripcion: '',
     }
   ]
+  foto_perfil: string='';
+  imagen: any;
 
 
   constructor(private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, private toastController: ToastController, public alertController: AlertController, private nativeStorage: NativeStorage) {
@@ -64,6 +67,7 @@ export class ModificarUsuarioPage implements OnInit {
     this.descripcion_corta = this.usuario.descripcion_corta;
     this.estado_cuenta = this.usuario.estado_cuenta;
     this.tipo_usuario_id = this.usuario.tipo_usuario_id;
+    this.foto_perfil = this.usuario.foto_perfil;
 
     
 
@@ -129,7 +133,7 @@ export class ModificarUsuarioPage implements OnInit {
       // Procede a actualizar el usuario en la base de datos
       await this.bd.modificarUsuario(this.usuario.id, this.nombre,
                                     this.segundo_nombre, this.apellido_paterno, this.apellido_materno, this.email,
-                                    this.nombre_empresa, this.descripcion_corta, '', this.estado_cuenta, this.tipo_usuario_id);
+                                    this.nombre_empresa, this.descripcion_corta, this.foto_perfil, this.estado_cuenta, this.tipo_usuario_id);
   
       this.modalController.dismiss({ success: true });}
 
@@ -214,6 +218,20 @@ export class ModificarUsuarioPage implements OnInit {
         });
         await alert.present();
       }
+
+      
+  async takePicture() { 
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    if (image && image.webPath) { 
+      this.foto_perfil = image.webPath;
+      this.imagen = image.webPath;
+    }
+  }
     
       dismiss() {
         this.modalController.dismiss();

@@ -16,6 +16,18 @@
     <ion-card-header class="custom-card-header">Modificar Usuario</ion-card-header>
   <form id="editUserForm" (ngSubmit)="modificarUser()"> 
 
+    <ion-item style="align-items: center; flex-direction: column;">
+      <ion-button (click)="takePicture()">Foto Perfil</ion-button><br>
+
+      <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
+        <ion-avatar
+          style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+          <img *ngIf="foto_perfil" [src]="foto_perfil" alt="avatar"
+            style="width: 100%; height: 100%; object-fit: cover;" />
+        </ion-avatar>
+      </div>
+    </ion-item>
+
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
       <ion-input type="text" [(ngModel)]="nombre" name="nombre" required minlength="2" #nombreCtrl="ngModel"></ion-input>
