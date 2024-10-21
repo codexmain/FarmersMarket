@@ -18,15 +18,38 @@ export class UsuarioPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    try {
-      const email = await this.nativeStorage.getItem('userEmail');
-      if (email) {
-        this.usuario = await this.dbService.getUsuarioByEmail(email);
-      }
-    } catch (error) {
-      console.error('Error al obtener los datos del usuario:', error);
-    }
-  }
+   // Cargar datos al inicializar el componente
+   await this.cargarDatosUsuario();
+   this.recibirDatosDesdeNavegacion();
+ }
+
+ async ionViewWillEnter() {
+   // Recargar datos cada vez que la vista está a punto de entrar
+   await this.cargarDatosUsuario();
+ }
+
+ async cargarDatosUsuario() {
+   try {
+     const email = await this.nativeStorage.getItem('userEmail');
+
+     if (email) {
+       // Obtener datos del usuario desde la base de datos
+       this.usuario = await this.dbService.getUsuarioByEmail(email);
+     }
+   } catch (error) {
+     console.error('Error al cargar los datos del usuario:', error);
+   }
+ }
+
+ recibirDatosDesdeNavegacion() {
+   const navigation = this.router.getCurrentNavigation();
+   if (navigation && navigation.extras.state) {
+     const usuarioActualizado = navigation.extras.state['usuario'];
+     if (usuarioActualizado) {
+       this.usuario = usuarioActualizado; // Actualiza el usuario con los datos recibidos
+     }
+   }
+ }
 
   irAModUsuario() {
     this.router.navigate(['/mod-usuario']);
