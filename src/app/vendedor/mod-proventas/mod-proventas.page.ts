@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
-import { AlertController } from '@ionic/angular';
+import { Camera, CameraResultType } from '@capacitor/camera';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-mod-proventas',
@@ -14,71 +15,143 @@ export class ModProventasPage implements OnInit {
   descripcion: string = '';
   precio: number = 0;
   stock: number = 0;
-  organico: number = 0; // 0 para no orgánico, 1 para orgánico
+  organico: number = 0; // 0 = No orgánico, 1 = Orgánico
+  categoriaId: number = 0;
   subcategoriaId: number = 0;
-  categorias: any[] = []; // Aquí puedes almacenar las categorías
-  subcategorias: any[] = []; // Aquí puedes almacenar las subcategorías
+  foto_producto: string = ''; // Nueva propiedad para la foto
+  imagen: any;
+
+  categorias: Array<{ id: number, nombre: string }> = [];
+  subcategorias: Array<{ id: number, nombre: string }> = [];
 
   constructor(
     private route: ActivatedRoute,
     private db: DataBaseService,
     private alertController: AlertController,
+    private toastController: ToastController,
     private router: Router
   ) {}
 
   async ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.productoId = params['productoId']; // Obtener productoId de los parámetros de la ruta
-    });
-
-    // Obtener los detalles del producto
+    this.productoId = +this.route.snapshot.paramMap.get('productoId')!;
+    await this.cargarCategorias();
     await this.obtenerProducto(this.productoId);
+  }
 
-    // Obtener las categorías para el select
-    this.categorias = await this.db.obtenerCategorias();
-    // Obtener las subcategorías para el select
-    this.subcategorias = await this.db.obtenerSubcategoriasPorCategoria(this.subcategoriaId);
+  async cargarCategorias() {
+    try {
+      this.categorias = await this.db.obtenerCategorias();
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+      this.mostrarAlertaError('No se pudieron cargar las categorías.');
+    }
   }
 
   async obtenerProducto(productoId: number) {
     try {
-      const producto = await this.db.obtenerProducto(productoId); // Llama a la función del servicio
-      // Llena los campos con los datos del producto
+      const producto = await this.db.obtenerProducto(productoId);
       this.nombre = producto.nombre;
       this.descripcion = producto.descripcion;
       this.precio = producto.precio;
       this.stock = producto.stock;
       this.organico = producto.organico;
+      this.categoriaId = producto.categoria_id;
       this.subcategoriaId = producto.subcategoria_id;
+      this.foto_producto = producto.foto_producto; // Asignar la foto del producto
+      await this.cargarSubcategorias(this.categoriaId);
     } catch (error) {
-      console.error('Error al obtener el producto', error);
-      this.mostrarAlertaError();
+      console.error('Error al obtener el producto:', error);
+      this.mostrarAlertaError('No se pudo cargar el producto.');
     }
+  }
+
+  async cargarSubcategorias(categoriaId: number) {
+    try {
+      this.subcategorias = await this.db.obtenerSubcategoriasPorCategoria(categoriaId);
+    } catch (error) {
+      console.error('Error al cargar subcategorías:', error);
+      this.mostrarAlertaError('No se pudieron cargar las subcategorías.');
+    }
+  }
+
+  async onCategoriaChange(categoriaId: number) {
+    this.categoriaId = categoriaId;
+    await this.cargarSubcategorias(categoriaId);
+  }
+
+
+  validarCampos(): boolean {
+    if (
+      !this.nombre.trim() || 
+      !this.descripcion.trim() || 
+      this.precio <= 0 || 
+      this.stock < 0 || 
+      this.categoriaId === 0 || 
+      this.subcategoriaId === 0 || 
+      !this.foto_producto
+    ) {
+      this.mostrarAlertaError('Todos los campos son obligatorios y deben ser válidos.');
+      return false;
+    }
+    return true;
   }
 
   async guardarCambios() {
-    try {
-      await this.db.modProducto(this.productoId, this.nombre, this.descripcion, this.precio, this.stock, this.organico, this.subcategoriaId);
-      console.log('Producto modificado con éxito');
-      // Redirigir o mostrar un mensaje de éxito
-      this.router.navigate(['/proventas']); // Redirigir a la página de productos
-    } catch (error) {
-      console.error('Error al modificar el producto', error);
-      this.mostrarAlertaError();
+    if (this.validarCampos()) {
+      try {
+        await this.db.modProducto(
+          this.productoId,
+          this.nombre,
+          this.descripcion,
+          this.precio,
+          this.stock,
+          this.organico,
+          this.subcategoriaId,
+          this.foto_producto
+        );
+        this.mostrarToast('Producto modificado exitosamente.', 'success');
+        this.router.navigate(['/proventas']);
+      } catch (error) {
+        console.error('Error al modificar el producto:', error);
+        this.mostrarAlertaError('No se pudo modificar el producto.');
+      }
     }
   }
 
-  async mostrarAlertaError() {
+  async takePicture() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+      });
+
+      if (image && image.webPath) {
+        this.foto_producto = image.webPath; // Asignar la ruta de la foto
+        this.imagen = image.webPath;
+        this.mostrarToast('Foto tomada exitosamente.', 'success');
+      }
+    } catch (error) {
+      console.error('Error al tomar la foto:', error);
+      this.mostrarAlertaError('No se pudo tomar la foto.');
+    }
+  }
+
+  async mostrarAlertaError(mensaje: string) {
     const alert = await this.alertController.create({
       header: 'Error',
-      message: 'No se pudo modificar el producto.',
+      message: mensaje,
       buttons: ['OK'],
     });
     await alert.present();
   }
 
-  async onCategoriaChange(categoriaId: number) {
-    // Obtener las subcategorías para la categoría seleccionada
-    this.subcategorias = await this.db.obtenerSubcategoriasPorCategoria(categoriaId);
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color: color,
+    });
+    await toast.present();
   }
 }

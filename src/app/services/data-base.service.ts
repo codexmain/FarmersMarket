@@ -2049,6 +2049,17 @@ JOIN
   }
 
   //PROVENTAS
+
+  // Método para eliminar un producto por ID
+  async eliminarPro(id: number): Promise<void> {
+    try {
+      await this.database.executeSql('DELETE FROM producto WHERE id = ?', [id]);
+    } catch (error) {
+      console.error('Error al eliminar el producto:', error);
+      throw error;  // Lanza el error para manejarlo más adelante
+    }
+  }
+
   // Obtener usuario por email
   async getUserEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
@@ -2138,15 +2149,24 @@ JOIN
 
   //MOD-PROVENTAS
 
-  async modProducto(productoId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number): Promise<void> {
+  async modProducto(
+    productoId: number, 
+    nombre: string, 
+    descripcion: string, 
+    precio: number, 
+    stock: number, 
+    organico: number, 
+    subcategoriaId: number, 
+    foto_producto: string
+  ): Promise<void> {
     const query = `
-    UPDATE producto 
-    SET nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, subcategoria_id = ?
-    WHERE id = ?
-  `;
-
+      UPDATE producto 
+      SET nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, subcategoria_id = ?, foto_producto = ?
+      WHERE id = ?
+    `;
+  
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, productoId])
+      this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto, productoId])
         .then(() => resolve())
         .catch((error) => {
           console.error('Error al modificar producto', error);

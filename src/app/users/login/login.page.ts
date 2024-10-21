@@ -29,7 +29,8 @@ export class LoginPage implements OnInit {
     private nativeStorage: NativeStorage
   ) {}
 
-  ngOnInit() {}
+  ngOnInit(
+  ) {}
 
   async Logearse() {
     // Validar campos vacíos
@@ -92,7 +93,7 @@ export class LoginPage implements OnInit {
           setTimeout(() => {
             this.isCooldown = false;
             this.intentoLogin = 0;
-          }, 20000); // 20 segundos de cooldown
+          }, 10000); // 10 segundos de cooldown
           await this.showAlert(
             'Error',
             'Demasiados intentos fallidos. Por favor, espera 20 segundos.'
