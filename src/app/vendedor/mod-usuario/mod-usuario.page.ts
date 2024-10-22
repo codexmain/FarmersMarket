@@ -149,14 +149,6 @@ export class ModUsuarioPage implements OnInit {
     }
   }
 
-  async eliminarDireccion(id: number) {
-    try {
-      await this.dataBase.eliminarDireccion(id);
-      await this.cargarDirecciones(); // Recargar la lista
-    } catch (error) {
-      console.error('Error al eliminar la dirección:', error);
-    }
-  }
 
   async agregarDireccionPrompt() {
     const alert = await this.alertController.create({

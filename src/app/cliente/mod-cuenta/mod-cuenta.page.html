@@ -84,7 +84,8 @@
     <form (ngSubmit)="agregarDireccion()">
       <ion-item>
         <ion-label>Región</ion-label>
-        <ion-select [(ngModel)]="nuevaDireccion.region_id" name="region_id" (ionChange)="cargarcomunas(nuevaDireccion.region_id)" required>
+        <ion-select [(ngModel)]="nuevaDireccion.region_id" name="region_id"
+          (ionChange)="cargarcomunas(nuevaDireccion.region_id)" required>
           <ion-select-option *ngFor="let region of regiones" [value]="region.id">
             {{ region.nombre }}
           </ion-select-option>
@@ -114,18 +115,17 @@
     <ion-item-divider>
       <ion-label>Eliminar Dirección Existente</ion-label>
     </ion-item-divider>
-    
-    <form (ngSubmit)="eliminarDireccion(direccionAEliminar)">
+
+    <form (ngSubmit)="eliminarDireccion()">
       <ion-item>
-        <ion-label>Seleccione Dirección</ion-label>
-        <ion-select [(ngModel)]="direccionAEliminar" name="direccionAEliminar" required>
-          <ion-select-option *ngFor="let direccion of direcciones" [value]="direccion.id">
-            {{ direccion.direccion }}
-          </ion-select-option>
-        </ion-select>
+          <ion-label>Seleccione Dirección</ion-label>
+          <ion-select [(ngModel)]="direccionAEliminar" name="direccionAEliminar" required>
+              <ion-select-option *ngFor="let direccion of direcciones" [value]="direccion.id">
+                  {{ direccion.direccion }}
+              </ion-select-option>
+          </ion-select>
       </ion-item>
-  
       <ion-button expand="block" type="submit">Eliminar Dirección</ion-button>
-    </form>
+  </form>
   </ion-card>
 </ion-content>
