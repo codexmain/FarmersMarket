@@ -159,7 +159,10 @@ export class ModCuentaPage implements OnInit {
 
   async actualizarUsuario() {
     try {
-      const actualizado = await this.dataBase.actualizarUsuarioPorEmail(this.usuario);
+      // Asegurarse de que la dirección seleccionada se guarde en el objeto usuario
+      this.usuario.direccion = this.direccionSeleccionada ? this.direccionSeleccionada.direccion : '';
+  
+      const actualizado = await this.dataBase.actualizarUsuarioEmail(this.usuario);
       if (actualizado) {
         await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
         this.irHaciaAtras();
