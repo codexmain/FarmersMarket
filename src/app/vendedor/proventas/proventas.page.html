@@ -13,28 +13,28 @@
 </ion-header>
 
 <ion-content>
-  <ion-card></ion-card>
-  <ion-list *ngIf="productos && productos.length > 0; else noProductos">
-    <ion-item *ngFor="let producto of productos" lines="none">
-      <ion-label>
-        <h2>{{ producto.nombre }}</h2>
-        <p>{{ producto.descripcion }}</p>
-        <p>Precio: {{ producto.precio | currency }}</p>
-      </ion-label>
-      <ion-buttons slot="end" class="compact-buttons">
-        <ion-button size="small" color="primary" (click)="verDetalle(producto.id)">
-          <ion-icon name="eye"></ion-icon>
-        </ion-button>
-        <ion-button size="small" color="secondary" (click)="modificarProducto(producto.id)">
-          <ion-icon name="create"></ion-icon>
-        </ion-button>
-        <ion-button size="small" color="danger" (click)="confirmarEliminacion(producto.id)">
-          <ion-icon name="trash"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-item>
+  <ion-card>
+    <ion-list *ngIf="productos && productos.length > 0; else noProductos">
+      <ion-item *ngFor="let producto of productos" lines="none">
+        <ion-label>
+          <h2>{{ producto.nombre }}</h2>
+          <p>{{ producto.descripcion }}</p>
+          <p>Precio: {{ producto.precio | currency }}</p>
+        </ion-label>
+        <ion-buttons slot="end" class="compact-buttons">
+          <ion-button size="small" color="primary" (click)="verDetalle(producto.id)">
+            <ion-icon name="eye"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="secondary" (click)="modificarProducto(producto.id)">
+            <ion-icon name="create"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="danger" (click)="confirmarEliminacion(producto.id)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ion-list>
   </ion-card>
-  </ion-list>
 
   <ng-template #noProductos>
     <ion-text color="danger">
