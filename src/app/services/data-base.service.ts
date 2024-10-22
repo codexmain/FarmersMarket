@@ -327,28 +327,28 @@ export class DataBaseService {
             (1,4,26,'Mena 665.',0);`;
 
 
-  registroProducto: string = `INSERT OR IGNORE INTO producto (id,proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado) VALUES
-            (1,1,'Producto Desconocido','Descripción genérica para productos desconocidos.',0,0,0,NULL,1,'2024-10-04 20:20:28'),
-            (2,2,'Manzana Roja','Manzana fresca y crujiente (500g).',1000,50,1,NULL,2,'2024-10-04 20:20:28'),
-            (3,2,'Pera Williams','Deliciosas peras Williams (600g).',1200,30,1,NULL,3,'2024-10-04 20:20:28'),
-            (4,2,'Plátano','Plátano maduro y dulce (1kg).',800,40,0,NULL,4,'2024-10-04 20:20:28'),
-            (5,2,'Cítricos Variados','Mezcla de cítricos frescos (1kg).',1500,20,1,NULL,5,'2024-10-04 20:20:28'),
-            (6,2,'Berries Mixtos','Fresas, arándanos y frambuesas (300g).',2000,15,1,NULL,6,'2024-10-04 20:20:28'),
-            (7,2,'Zanahorias','Zanahorias frescas y crujientes (1kg).',700,25,0,NULL,8,'2024-10-04 20:20:28'),
-            (8,2,'Lechuga','Lechuga fresca y crujiente (300g).',600,35,0,NULL,9,'2024-10-04 20:20:28'),
-            (9,2,'Tomates','Tomates rojos y jugosos (1kg).',900,50,1,NULL,10,'2024-10-04 20:20:28'),
-            (10,2,'Queso Fresco','Queso fresco y cremoso (200g).',2500,10,1,NULL,19,'2024-10-04 20:20:28'),
-            (11,4,'Mantequilla','Mantequilla fresca y cremosa (250g).',3000,12,0,NULL,20,'2024-10-04 20:20:28'),
-            (12,4,'Pollo Entero','Pollo fresco y de calidad (2kg).',5000,8,1,NULL,22,'2024-10-04 20:20:28'),
-            (13,4,'Res Cortada','Carne de res fresca y de calidad (1kg).',8000,5,0,NULL,23,'2024-10-04 20:20:28'),
-            (14,4,'Cerdo Cortado','Carne de cerdo fresca (1kg).',7000,6,0,NULL,24,'2024-10-04 20:20:28'),
-            (15,4,'Salmón','Salmón fresco y saludable (300g).',12000,4,1,NULL,25,'2024-10-04 20:20:28'),
-            (16,4,'Albahaca','Albahaca fresca para tus platos (50g).',500,30,1,NULL,27,'2024-10-04 20:20:28'),
-            (17,4,'Perejil','Perejil fresco y aromático (50g).',400,40,0,NULL,28,'2024-10-04 20:20:28'),
-            (18,4,'Romero','Romero fresco para tus recetas (30g).',600,35,1,NULL,29,'2024-10-04 20:20:28'),
-            (19,4,'Canela','Canela en rama para tus postres (100g).',200,50,0,NULL,30,'2024-10-04 20:20:28'),
-            (20,4,'Semillas de Chía','Semillas de chía saludables (200g).',1000,20,1,NULL,34,'2024-10-04 20:20:28'),
-            (21,4,'Quinoa','Quinoa orgánica y nutritiva (500g).',3000,15,1,NULL,13,'2024-10-04 20:20:28');`;
+  registroProducto: string = `INSERT OR IGNORE INTO producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id, fecha_agregado) VALUES
+  (1, 1, 'Producto Desconocido', 'Descripción genérica para productos desconocidos.', 0, 0, 0, NULL, 1, '2024-10-04 20:20:28'),
+  (2, 2, 'Manzana Roja', 'Manzana fresca y crujiente (500g).', 1000, 50, 1, 'src/assets/imgProductos/producto2.jpg', 2, '2024-10-04 20:20:28'),
+  (3, 2, 'Pera Williams', 'Deliciosas peras Williams (600g).', 1200, 30, 1, 'src/assets/imgProductos/producto3.jpg', 3, '2024-10-04 20:20:28'),
+  (4, 2, 'Plátano', 'Plátano maduro y dulce (1kg).', 800, 40, 0, 'src/assets/imgProductos/producto4.jpg', 4, '2024-10-04 20:20:28'),
+  (5, 2, 'Cítricos Variados', 'Mezcla de cítricos frescos (1kg).', 1500, 20, 1, 'src/assets/imgProductos/producto5.jpg', 5, '2024-10-04 20:20:28'),
+  (6, 2, 'Berries Mixtos', 'Fresas, arándanos y frambuesas (300g).', 2000, 15, 1, 'src/assets/imgProductos/producto6.jpg', 6, '2024-10-04 20:20:28'),
+  (7, 2, 'Zanahorias', 'Zanahorias frescas y crujientes (1kg).', 700, 25, 0, 'src/assets/imgProductos/producto7.jpg', 8, '2024-10-04 20:20:28'),
+  (8, 2, 'Lechuga', 'Lechuga fresca y crujiente (300g).', 600, 35, 0,'src/assets/imgProductos/producto8.jpg',9,'2024-10-04 20:20:28'),
+  (9 ,2 ,'Tomates','Tomates rojos y jugosos (1kg).',900 ,50 ,1 ,'src/assets/imgProductos/producto9.jpg' ,10 ,'2024-10-04 20:20:28'),
+  (10 ,2 ,'Queso Fresco','Queso fresco y cremoso (200g).',2500 ,10 ,1 ,'src/assets/imgProductos/producto10.jpg' ,19 ,'2024-10-04 20:20:28'),
+  (11 ,4 ,'Mantequilla','Mantequilla fresca y cremosa (250g).',3000 ,12 ,0 ,'src/assets/imgProductos/producto11.jpg' ,20 ,'2024-10-04 20:20:28'),
+  (12 ,4 ,'Pollo Entero','Pollo fresco y de calidad (2kg).',5000 ,8 ,1 ,'src/assets/imgProductos/producto12.jpg' ,22 ,'2024-10-04 20:20:28'),
+  (13 ,4 ,'Res Cortada','Carne de res fresca y de calidad (1kg).',8000 ,5 ,0 ,'src/assets/imgProductos/producto13.jpg' ,23 ,'2024-10-04 20:20:28'),
+  (14 ,4 ,'Cerdo Cortado','Carne de cerdo fresca (1kg).',7000 ,6 ,0 ,'src/assets/imgProductos/producto14.jpg' ,24 ,'2024-10-04 20:20:28'),
+  (15 ,4 ,'Salmón','Salmón fresco y saludable (300g).',12000 ,4 ,1 ,'src/assets/imgProductos/producto15.jpg' ,25 ,'2024-10-04 20:20:28'),
+  (16 ,4 ,'Albahaca','Albahaca fresca para tus platos (50g).',500 ,30 ,1 ,'src/assets/imgProductos/producto16.jpg' ,27 ,'2024-10-04 20:20:28'),
+  (17 ,4 ,'Perejil','Perejil fresco y aromático (50g).',400 ,40 ,0 ,'src/assets/imgProductos/producto17.jpg' ,28 ,'2024-10-04 20:20:28'),
+  (18 ,4 ,'Romero','Romero fresco para tus recetas (30g).',600 ,35 ,1 ,'src/assets/imgProductos/producto18.jpg' ,29 ,'2024-10-04 20:20:28'),
+  (19 ,4 ,'Canela','Canela en rama para tus postres (100g).',200 ,50 ,0 ,'src/assets/imgProductos/producto19.jpg' ,30 ,'2024-10-04 20:20:28'),
+  (20 ,4 ,'Semillas de Chía','Semillas de chía saludables (200g).',1000 ,20 ,1 ,'src/assets/imgProductos/producto20.jpg' ,34 ,'2024-10-04 20:20:28'),
+  (21 ,4,'Quinoa','Quinoa orgánica y nutritiva(500 g)',3000,'15','1',' src/assets/imgProductos/producto21.jpg ',13,'20241004202028');`;
 
   //declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
 
