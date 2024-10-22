@@ -1,0 +1,17 @@
+#autoscroll-input::placeholder {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    animation: scroll-placeholder 10s linear infinite;
+  }
+  
+  @keyframes scroll-placeholder {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
