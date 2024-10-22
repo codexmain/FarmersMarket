@@ -101,19 +101,40 @@ export class ModProventasPage implements OnInit {
         await this.mostrarAlertaError('El Nombre del Producto es un campo obligatorio.');
         return false;
       }
-  
-      if (!this.descripcion.trim()) {
-        await this.mostrarAlertaError('La Descripción del Producto es un campo obligatorio.');
+      if (this.nombre.length < 3 || this.nombre.length > 40) {
+        await this.mostrarAlertaError('El Nombre del producto debe tener entre 3 y 40 caracteres.');
         return false;
       }
-  
+
+      if (this.descripcion && 
+        (this.descripcion.length < 10 || this.descripcion.length > 255)) {
+         this.mostrarAlertaError('La Descripción del producto debe tener entre 10 y 255 caracteres.');
+         return false;
+      }
+
+      if (!this.precio) {
+        await this.mostrarAlertaError('El Precio del producto es un campo obligatorio.');
+        return false;
+      }
+
+      
       if (!this.validarPrecio(this.precio)) {
         await this.mostrarAlertaError('El Precio del producto debe ser un número entero mayor a 0 y no debe superar los 7 dígitos.');
         return false;
       }
-  
+
+      if (this.stock === null || this.stock === undefined) {
+        await this.mostrarAlertaError('El Stock/Existencias es un campo obligatorio.');
+        return false;
+      }
+
       if (!this.validarStock(this.stock)) {
         await this.mostrarAlertaError('El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar los 5 dígitos.');
+        return false;
+      }
+
+      if (this.organico === null || this.organico === undefined) {
+        await this.mostrarAlertaError('La procedencia del producto (Orgánico/No Orgánico) es un campo obligatorio.');
         return false;
       }
   
@@ -126,12 +147,7 @@ export class ModProventasPage implements OnInit {
         await this.mostrarAlertaError('La Subcategoría es un campo obligatorio.');
         return false;
       }
-  
-      if (!this.foto_producto) {
-        await this.mostrarAlertaError('La Foto del producto es obligatoria.');
-        return false;
-      }
-  
+
       return true; // Todos los campos son válidos
     };
 
@@ -194,4 +210,14 @@ export class ModProventasPage implements OnInit {
     });
     await toast.present();
   }
+
+  clearProductName(){
+    this.nombre = '';
+  }
+
+  clearProductDesc(){
+    this.descripcion = '';
+  }
+
+  
 }

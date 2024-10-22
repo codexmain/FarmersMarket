@@ -126,17 +126,35 @@ export class AddItemPage implements OnInit {
 
     if (!this.nombre_producto) {
       this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
-      return;}
+      return;}  
+
+    if (this.nombre_producto.length < 3 || this.nombre_producto.length > 40) {
+      this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
+      return;} 
+
+    // Validación de la descripción del producto
+    if (this.descripcion_producto && 
+      (this.descripcion_producto.length < 10 || this.descripcion_producto.length > 255)) {
+       this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
+       return;
+   }
 
 
     if (!this.precio) {
       this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');
       return;}
 
+    if (!this.validarPrecio(this.precio)) {
+      this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
+      return;}
+
     if (this.stock === null || this.stock === undefined) {
       this.presentAlert('Error', 'El Stock/Existencias es un campo obligatorio.');
       return;
     }
+    if (!this.validarStock(this.stock)) {
+      this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual cero y no debe superar las 5 cifras.');
+      return;}
 
     if (!this.organico) {
       this.presentAlert('Error', 'La procedencia del producto(Orgánico/No Orgánico) es un campo obligatorio.');
@@ -150,17 +168,6 @@ export class AddItemPage implements OnInit {
       this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
       return;}    
       
-    if (this.nombre_producto.length < 3 || this.nombre_producto.length > 40) {
-      this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
-      return;}  
-      
-    if (!this.validarPrecio(this.precio)) {
-      this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
-      return;}
-    
-    if (!this.validarStock(this.stock)) {
-      this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual cero y no debe superar las 5 cifras.');
-      return;}
 
       // Si todas las validaciones pasan
       await this.bd.insertarProducto(

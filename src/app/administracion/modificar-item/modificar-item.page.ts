@@ -143,6 +143,13 @@ export class ModificarItemPage implements OnInit {
       this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
       return false;}
 
+    // Validación de la descripción del producto
+    if (this.descripcion_producto && 
+      (this.descripcion_producto.length < 10 || this.descripcion_producto.length > 255)) {
+       this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
+       return false;
+   }  
+
 
     if (!this.precio) {
       this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');

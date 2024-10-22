@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { Geolocation } from '@capacitor/geolocation';
+import { GeocodingService } from 'src/app/services/geocoding.service';
+import { LocationValidationService } from 'src/app/services/location-validation.service';
+
 
 @Component({
   selector: 'app-mod-usuario',
@@ -39,7 +43,10 @@ export class ModUsuarioPage implements OnInit {
     public alertController: AlertController,
     private nativeStorage: NativeStorage,
     private router: Router,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private toastController: ToastController,
+    private geocodingService: GeocodingService, 
+    private locationValidationService: LocationValidationService
   ) {}
 
   ngOnInit() {
@@ -155,6 +162,7 @@ export class ModUsuarioPage implements OnInit {
       await this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres, y solo puede contener letras, números y espacios.');
       return false;
     }
+    
 
     // Validar descripción de la empresa
     if (!this.usuario.descripcion_corta) {
@@ -167,6 +175,25 @@ export class ModUsuarioPage implements OnInit {
       await this.presentAlert('Error', 'La descripción de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
       return false;
     }
+
+    // Validar región
+  if (!this.usuario.region_id) {
+    this.presentAlert('Error', 'La región es obligatoria.');
+    return false;
+  }
+
+    // Validar comuna
+  if (!this.usuario.comuna_id) {
+    this.presentAlert('Error', 'La comuna es obligatoria.');
+    return false;
+  }
+
+//Validar dirección
+  const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
+  if (!direccionPattern.test(this.usuario.direccion)) {
+    this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
+    return false;
+  }
 
     return true; // Todos los campos son válidos
   }
@@ -233,6 +260,82 @@ export class ModUsuarioPage implements OnInit {
       this.usuario.foto_perfil = image.webPath; // Guardar en usuario.foto_perfil
       this.imagen = image.webPath; // Guardar en usuario.imagen
     }
+  }
+
+  clearPNombre(){
+    this.usuario.nombre = '';
+  }
+  clearSNombre(){
+    this.usuario.segundo_nombre = '';
+  }
+
+  clearAPaterno(){
+    this.usuario.apellido_paterno = '';
+  }
+  clearAMaterno(){
+    this.usuario.apellido_materno = '';
+
+  }
+
+  clearEmpresa(){
+    this.usuario.nombre_empresa = '';
+
+  }
+  clearDescEmpresa(){
+    this.usuario.descripcion_corta = '';
+
+  }
+
+  clearDirr(){
+    this.usuario.direccion = '';
+
+  }
+
+  async useCurrentLocation() {
+    try {
+      const coordinates = await Geolocation.getCurrentPosition();
+      const lat = coordinates.coords.latitude;
+      const lng = coordinates.coords.longitude;
+  
+      if (this.usuario.comuna_id && this.locationValidationService.isWithinBoundary(this.usuario.comuna_id, lat, lng)) {
+        this.geocodingService.reverseGeocode(lat, lng)
+          .subscribe({
+            next: (response) => {
+              if (response.results.length > 0) {
+                this.usuario.direccion = response.results[0].formatted_address;
+              } else {
+                this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+              }
+            },
+            error: (error) => {
+              this.presentToast(`Error: ${error}`);
+            }
+          });
+      } else {
+        this.presentToast('Tu ubicación actual no coincide con la comuna seleccionada.');
+      }
+    } catch (error) {
+      this.presentToast(`Error al obtener la ubicación: ${error}`);
+    }
+  }
+
+  async reverseGeocode(lat: number, lng: number) {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDMAPS`);
+    const data = await response.json();
+    if (data.results.length > 0) {
+      this.usuario.direccion = data.results[0].formatted_address;
+    } else {
+      this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+    }
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 
