@@ -1,29 +1,55 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-button fill="outline" [routerDirection]="'back'" [routerLink]="'/proventas'">Volver</ion-button>
     </ion-buttons>
-    <ion-title>Detalle del Producto</ion-title>
+    <ion-title>Detalles del Producto</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="false">
   <ion-card *ngIf="producto">
-    <img [src]="producto.foto_producto" alt="{{ producto.nombre }}" />
+    <ion-item style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
+      <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
+        <img *ngIf="producto.foto_producto" [src]="producto.foto_producto" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;" />
+      </ion-avatar>
+    </ion-item>
+
     <ion-card-header>
       <ion-card-title>{{ producto.nombre }}</ion-card-title>
-      <ion-card-subtitle>{{ producto.precio | currency }}</ion-card-subtitle>
+      <ion-card-subtitle>${{ producto.precio | currency }}</ion-card-subtitle>
+      <ion-card-subtitle>Stock{{ producto.stock | currency }}</ion-card-subtitle>
     </ion-card-header>
+
     <ion-card-content>
-      <p>{{ producto.descripcion }}</p>
       <ion-item>
-        <ion-label>Cantidad</ion-label>
-        <ion-input type="number" [(ngModel)]="cantidad" min="1" [max]="producto.stock" (ionInput)="actualizarSubtotal()"></ion-input>
+        <ion-label>Descripción:</ion-label>
+        <p>{{ producto.descripcion }}</p>
       </ion-item>
-      <ion-text>
-        <h3>Subtotal: {{ subtotal | currency }}</h3>
-      </ion-text>
-      <ion-button expand="full" color="primary" (click)="agregarAlCarrito()" [disabled]="cantidad > producto.stock || cantidad < 1">Agregar al Carrito</ion-button>
+
+      <ion-item>
+        <ion-label>Cantidad: </ion-label>
+        <ion-input 
+          type="number" 
+          [(ngModel)]="cantidad" 
+          min="1" 
+          [max]="producto.stock" 
+          (ionInput)="actualizarSubtotal()">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Subtotal:</ion-label>
+        <ion-text>{{ subtotal | currency }}</ion-text>
+      </ion-item>
+
+      <ion-button 
+        expand="full" 
+        color="primary" 
+        (click)="agregarAlCarrito()" 
+        [disabled]="cantidad > producto.stock || cantidad < 1">
+        Agregar al Carrito
+      </ion-button>
     </ion-card-content>
   </ion-card>
 
@@ -32,6 +58,6 @@
     header="Éxito"
     message="El producto ha sido agregado al carrito."
     [buttons]="['OK']"
-    (ionAlertDidDismiss)="alertOpen = false"
-  ></ion-alert>
+    (ionAlertDidDismiss)="alertOpen = false">
+  </ion-alert>
 </ion-content>
