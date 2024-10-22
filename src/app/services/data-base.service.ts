@@ -2273,7 +2273,7 @@ JOIN
     const query = `SELECT * FROM direccion WHERE usuario_id = ?;`;
     try {
       const res = await this.database.executeSql(query, [usuario_id]);
-      let direcciones = [];
+      const direcciones = [];
       for (let i = 0; i < res.rows.length; i++) {
         direcciones.push(res.rows.item(i));
       }
@@ -2283,21 +2283,31 @@ JOIN
       return [];
     }
   }
-
-
   async agregarDireccion(usuario_id: number, comuna_id: number, direccion: string) {
     const query = `INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?);`;
-    await this.database.executeSql(query, [usuario_id, comuna_id, direccion]);
+    try {
+      await this.database.executeSql(query, [usuario_id, comuna_id, direccion]);
+    } catch (error) {
+      console.error('Error al agregar dirección:', error);
+    }
   }
 
   async eliminarDireccion(id: number) {
     const query = `DELETE FROM direccion WHERE id = ?;`;
-    await this.database.executeSql(query, [id]);
+    try {
+      await this.database.executeSql(query, [id]);
+    } catch (error) {
+      console.error('Error al eliminar la dirección:', error);
+    }
   }
 
   async establecerDireccionPreferida(id: number, usuario_id: number) {
-    await this.database.executeSql(`UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`, [usuario_id]);
-    await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ?;`, [id]);
+    try {
+      await this.database.executeSql(`UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`, [usuario_id]);
+      await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ?;`, [id]);
+    } catch (error) {
+      console.error('Error al establecer la dirección preferida:', error);
+    }
   }
 
 
@@ -2311,7 +2321,7 @@ JOIN
       JOIN region r ON c.region_id = r.id
       WHERE u.email = ?;
     `;
-
+  
     try {
       const result = await this.database.executeSql(query, [email]);
       if (result.rows.length > 0) {
@@ -2325,6 +2335,30 @@ JOIN
       return null;
     }
   }
+
+  async obtenerDireccionesUsuario(usuarioId: number): Promise<any[]> {
+  const query = 'SELECT * FROM direccion WHERE usuario_id = ?';
+  try {
+    const result = await this.database.executeSql(query, [usuarioId]);
+    const direcciones = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      direcciones.push(result.rows.item(i));
+    }
+    return direcciones;
+  } catch (error) {
+    console.error('Error al obtener direcciones:', error);
+    return [];
+  }
+}
+  
+async agregarDirec(usuarioId: number, comunaId: number, direccion: string) {
+  const query = 'INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?)';
+  try {
+    await this.database.executeSql(query, [usuarioId, comunaId, direccion]);
+  } catch (error) {
+    console.error('Error al agregar dirección:', error);
+  }
+}
 
 
 

@@ -12,17 +12,16 @@
     <form (ngSubmit)="actualizarUsuario()">
       <ion-item style="align-items: center; flex-direction: column;">
         <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
-    
         <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
-          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
-            <img *ngIf="usuario.foto_perfil" 
-                 [src]="usuario.foto_perfil" 
-                 alt="avatar" 
-                 style="width: 100%; height: 100%; object-fit: cover;"/>
+          <ion-avatar
+            style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="avatar"
+              style="width: 100%; height: 100%; object-fit: cover;" />
           </ion-avatar>
         </div>
       </ion-item>
 
+      <!-- Campos de datos personales -->
       <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
         <ion-input [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ingresar Nombre"></ion-input>
@@ -63,61 +62,70 @@
           placeholder="Ingresar Descripción Corta"></ion-input>
       </ion-item>
 
+      <!-- Selector de Dirección Actual -->
+      <ion-item>
+        <ion-label>Dirección Actual</ion-label>
+        <ion-select [(ngModel)]="direccionSeleccionada" name="direccionSeleccionada" (ionChange)="cambiarDireccion()">
+          <ion-select-option *ngFor="let dir of direcciones" [value]="dir">
+            {{ dir.direccion }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
       <ion-button style="margin: 20px 20px;" expand="full" type="submit">Actualizar</ion-button>
     </form>
   </ion-card><br>
 
+  <!-- Agregar Nueva Dirección -->
   <ion-card>
-    <ion-card-header>
-      <ion-card-title>Direcciones</ion-card-title>
-    </ion-card-header>
-
-    <ion-item>
-      <ion-label>Región</ion-label>
-      <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region"
-        required>
-        <ion-select-option *ngFor="let region of regiones" [value]="region.id">
-          {{ region.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Comuna</ion-label>
-      <ion-select [(ngModel)]="usuario.comuna_id" name="comuna" required>
-        <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
-          {{ comuna.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Dirección</ion-label>
-      <ion-input [(ngModel)]="usuario.direccion" name="direccion" required
-        placeholder="Ingresar Dirección"></ion-input>
-    </ion-item>
-
-
-    <ion-list>
-      <ion-item *ngFor="let direccion of direcciones">
-        <ion-label>
-          <h2>{{ direccion.direccion }}</h2>
-          <p>ID Comuna: {{ direccion.comuna_id }}</p>
-        </ion-label>
-
-        <ion-radio slot="start" [(ngModel)]="direccionSeleccionada" [value]="direccion.id"
-          (ionSelect)="seleccionarDireccionPreferida(direccion.id)">
-        </ion-radio>
-
-        <ion-button color="danger" (click)="eliminarDireccion(direccion.id)" slot="end">
-          Eliminar
-        </ion-button>
+    <ion-item-divider>
+      <ion-label>Agregar Nueva Dirección</ion-label>
+    </ion-item-divider>
+    <form (ngSubmit)="agregarDireccion()">
+      <ion-item>
+        <ion-label>Región</ion-label>
+        <ion-select [(ngModel)]="nuevaDireccion.region_id" name="region_id" (ionChange)="cargarcomunas(nuevaDireccion.region_id)" required>
+          <ion-select-option *ngFor="let region of regiones" [value]="region.id">
+            {{ region.nombre }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
-    </ion-list>
 
-    <ion-button expand="full">
-      Guardar Dirección
-    </ion-button>
+      <ion-item>
+        <ion-label>Comuna</ion-label>
+        <ion-select [(ngModel)]="nuevaDireccion.comuna_id" name="comuna_id" required>
+          <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
+            {{ comuna.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Dirección</ion-label>
+        <ion-input [(ngModel)]="nuevaDireccion.direccion" name="direccion" required></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" type="submit">Agregar Dirección</ion-button>
+    </form>
+  </ion-card>
+
+  <!-- Eliminar Dirección -->
+  <ion-card>
+    <ion-item-divider>
+      <ion-label>Eliminar Dirección Existente</ion-label>
+    </ion-item-divider>
+    
+    <form (ngSubmit)="eliminarDireccion(direccionAEliminar)">
+      <ion-item>
+        <ion-label>Seleccione Dirección</ion-label>
+        <ion-select [(ngModel)]="direccionAEliminar" name="direccionAEliminar" required>
+          <ion-select-option *ngFor="let direccion of direcciones" [value]="direccion.id">
+            {{ direccion.direccion }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-button expand="block" type="submit">Eliminar Dirección</ion-button>
+    </form>
   </ion-card>
 </ion-content>
