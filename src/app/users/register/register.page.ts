@@ -168,7 +168,12 @@ export class RegisterPage implements OnInit {
     }
 
     if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres.');
+      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.');
+      return false;
+    }
+
+    if (this.descripcion_corta && !descEmpresaPattern.test(this.descripcion_corta)) {
+      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
       return false;
     }
     
