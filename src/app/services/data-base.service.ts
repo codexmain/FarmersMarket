@@ -432,7 +432,7 @@ export class DataBaseService {
       //crear la Base de Datos
       this.sqlite
         .create({
-          name: 'cutucox12.db',
+          name: 'cutucoxx12.db',
           location: 'default',
         })
         .then((db: SQLiteObject) => {

@@ -60,13 +60,36 @@ export class RecuperarPasswordPage implements OnInit {
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (data.newPassword.length < 10) {
-              await this.presentAlert('Error', 'La contraseña debe tener al menos 10 caracteres.');
-              return false; // Si la contraseña es inválida
+            // Validar la nueva contraseña
+            const password = data.newPassword;
+
+            // Validar longitud de la contraseña
+            if (password.length < 10 || password.length > 30) {
+              await this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
+              return false;
             }
-  
+
+            // Validar que contenga al menos un carácter especial
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+              await this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
+              return false;
+            }
+
+            // Validar que no contenga caracteres o números consecutivos repetidos
+            if (/(\d)\1/.test(password) || /([a-zA-Z])\1/.test(password)) {
+              await this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
+              return false;
+            }
+
+            // Validar que contenga al menos dos letras mayúsculas
+            if (!/(?=(.*[A-Z]){2})/.test(password)) {
+              await this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+              return false; 
+            }
+
+            // Si todas las validaciones son correctas
             try {
-              await this.DataBase.actualizarcon(this.correo, data.newPassword);
+              await this.DataBase.actualizarcon(this.correo, password);
               await this.presentAlert('Éxito', 'Contraseña actualizada correctamente.');
               this.dismiss();
               return true; // Si todo va bien, retornamos 'true'

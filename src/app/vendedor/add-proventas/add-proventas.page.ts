@@ -76,25 +76,88 @@ export class AddProventasPage implements OnInit {
     });
   }
 
+  
+  async validarCampos(): Promise<boolean> {
+
+    if (!this.nombre.trim()) {
+      await this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
+      return false;
+    }
+
+    if (!this.precio) {
+      await this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');
+      return false;
+    }
+
+    if (this.stock === null || this.stock === undefined) {
+      await this.presentAlert('Error', 'El Stock/Existencias es un campo obligatorio.');
+      return false;
+    }
+
+    if (this.organico === null || this.organico === undefined) {
+      await this.presentAlert('Error', 'La procedencia del producto (Orgánico/No Orgánico) es un campo obligatorio.');
+      return false;
+    }
+
+    if (!this.categoriaId) {
+      await this.presentAlert('Error', 'La Categoría es un campo obligatorio.');
+      return false;
+    }
+
+    if (!this.subcategoriaId) {
+      await this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
+      return false;
+    }
+
+    if (this.nombre.length < 3 || this.nombre.length > 40) {
+      await this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
+      return false;
+    }
+
+    if (!this.validarPrecio(this.precio)) {
+      await this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
+      return false;
+    }
+
+    if (!this.validarStock(this.stock)) {
+      await this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar las 5 cifras.');
+      return false;
+    }
+
+    return true; // Todos los campos son válidos
+  }
+
+  validarPrecio(precio: number): boolean {
+    const esEntero = Number.isInteger(precio);
+    return esEntero && precio > 0 && precio <= 9999999;
+  }
+
+  validarStock(stock: number): boolean {
+    const esEntero = Number.isInteger(stock);
+    return esEntero && stock >= 0 && stock <= 99999; // Longitud de cinco, mayor o igual a cero
+  }
+
+
   async agregarProducto() {
-    try {
-      await this.db.agregarProducto(
-        this.proveedorId,
-        this.nombre,
-        this.descripcion,
-        this.precio,
-        this.stock,
-        this.organico,
-        this.subcategoriaId,
-        this.foto_producto,
-      );
-      // Aquí puedes agregar un mensaje de éxito o redirigir a otra página
-      console.log('Producto agregado con éxito');
-      await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
+    if (await this.validarCampos()) {
+      try {
+        await this.db.agregarProducto(
+          this.proveedorId,
+          this.nombre,
+          this.descripcion,
+          this.precio,
+          this.stock,
+          this.organico,
+          this.subcategoriaId,
+          this.foto_producto,
+        );
+        console.log('Producto agregado con éxito');
+        await this.presentAlert('Éxito', 'Producto agregado exitosamente.');
         this.irHaciaAtras();
-    } catch (error) {
-      console.error('Error al agregar producto', error);
-      // Aquí puedes agregar un mensaje de error en la UI
+      } catch (error) {
+        console.error('Error al agregar producto', error);
+        await this.presentAlert('Error', 'No se pudo agregar el producto.');
+      }
     }
   }
 
