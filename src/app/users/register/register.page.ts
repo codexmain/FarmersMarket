@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuController, ModalController, AlertController } from '@ionic/angular';
+import { MenuController, ModalController, AlertController, ToastController} from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from 'src/app/services/data-base.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { Geolocation } from '@capacitor/geolocation';
+import { GeocodingService } from 'src/app/services/geocoding.service';
+import { LocationValidationService } from 'src/app/services/location-validation.service';
+
+
 
 interface RegionesComunas {
   [key: string]: string[];
@@ -36,6 +41,9 @@ export class RegisterPage implements OnInit {
   comunas: any[] = [];
   
   emails: string[] = [];
+
+  empresaObligatoria: boolean = false;
+  descEmpresaObligatoria: boolean = false;
   
 
   constructor(
@@ -44,7 +52,10 @@ export class RegisterPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     public alertController: AlertController,
-    private dataBase: DataBaseService
+    private dataBase: DataBaseService,
+    private toastController: ToastController,
+    private geocodingService: GeocodingService, 
+    private locationValidationService: LocationValidationService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
@@ -78,6 +89,32 @@ export class RegisterPage implements OnInit {
     this.selectedComuna = null;
   }
 
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+
+  onFieldsChange() {
+    if (this.empresa.length > 0 || this.descripcion_corta.length > 0) {
+      this.empresaObligatoria = true;
+      this.descEmpresaObligatoria = true;
+      this.presentToast('Los campos "Empresa" y "Descripción Empresa" son ahora obligatorios y la cuenta será Proveedor/Vendedor.');
+    } else {
+      this.empresaObligatoria = false;
+      this.descEmpresaObligatoria = false;
+    }
+    // Actualizar el tipo de usuario según los campos
+    if (this.empresaObligatoria && this.descEmpresaObligatoria) {
+      this.tipo_usuario_id = 2; // Proveedor/Vendedor
+    } else {
+      this.tipo_usuario_id = 1; // Usuario regular
+    }
+  }
+
   async presentAlert(header: string, message: string) {
     const alert = await this.alertController.create({
       header: header,
@@ -107,6 +144,10 @@ export class RegisterPage implements OnInit {
       direccion: this.direccion,
     };
 
+
+
+
+
     const registroExitoso = await this.dataBase.registrarUsuario(nuevoUsuario);
 
     if (registroExitoso) {
@@ -118,29 +159,21 @@ export class RegisterPage implements OnInit {
   }
 
   validarFormulario(): boolean {
-    const namePattern = /^[a-zA-Z\s]{2,}$/;
-    const empresaPattern = /^[a-zA-Z0-9\s]{3,}$/;
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
+    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const direccionPattern = /^[a-zA-Z0-9\s]+$/;
+    const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
 
-    if (!this.pNombre || !namePattern.test(this.pNombre)) {
-      this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
+    if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
+        (this.sNombre && !namePattern.test(this.sNombre)) ||
+        (this.aMaterno && !namePattern.test(this.aMaterno))) {
+      this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 carecteres y no contener números.');
       return false;
     }
-    if (!this.aPaterno || !namePattern.test(this.aPaterno)) {
-      this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
-      return false;
-    }
-    if (this.sNombre && !namePattern.test(this.sNombre)) {
-      this.presentAlert('Error', 'El segundo nombre debe tener al menos 2 caracteres y no contener números.');
-      return false;
-    }
-    if (this.aMaterno && !namePattern.test(this.aMaterno)) {
-      this.presentAlert('Error', 'El apellido materno debe tener al menos 2 caracteres y no contener números.');
-      return false;
-    }
+
     if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres.');
+      this.presentAlert('Error', 'El nombre de la empresa debe entre 3 y 30 caracteres.');
       return false;
     }
     if (!emailPattern.test(this.email) || this.emails.includes(this.email)) {
@@ -206,5 +239,43 @@ export class RegisterPage implements OnInit {
       this.imagen = image.webPath;
 		}
 	}
+
+  async useCurrentLocation() {
+    try {
+      const coordinates = await Geolocation.getCurrentPosition();
+      const lat = coordinates.coords.latitude;
+      const lng = coordinates.coords.longitude;
+  
+      if (this.selectedComuna && this.locationValidationService.isWithinBoundary(this.selectedComuna, lat, lng)) {
+        this.geocodingService.reverseGeocode(lat, lng)
+          .subscribe({
+            next: (response) => {
+              if (response.results.length > 0) {
+                this.direccion = response.results[0].formatted_address;
+              } else {
+                this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+              }
+            },
+            error: (error) => {
+              this.presentToast(`Error: ${error}`);
+            }
+          });
+      } else {
+        this.presentToast('Tu ubicación actual no coincide con la comuna seleccionada.');
+      }
+    } catch (error) {
+      this.presentToast(`Error al obtener la ubicación: ${error}`);
+    }
+  }
+
+  async reverseGeocode(lat: number, lng: number) {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDGMAPS`);
+    const data = await response.json();
+    if (data.results.length > 0) {
+      this.direccion = data.results[0].formatted_address;
+    } else {
+      this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
+    }
+  }
 
 }

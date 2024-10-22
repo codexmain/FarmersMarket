@@ -79,25 +79,63 @@ export class ModProventasPage implements OnInit {
     await this.cargarSubcategorias(categoriaId);
   }
 
-
-  validarCampos(): boolean {
-    if (
-      !this.nombre.trim() || 
-      !this.descripcion.trim() || 
-      this.precio <= 0 || 
-      this.stock < 0 || 
-      this.categoriaId === 0 || 
-      this.subcategoriaId === 0 || 
-      !this.foto_producto
-    ) {
-      this.mostrarAlertaError('Todos los campos son obligatorios y deben ser válidos.');
-      return false;
+    // Validar precio
+    validarPrecio(precio: number): boolean {
+      const esEntero = Number.isInteger(precio);
+      const esValido = esEntero && precio > 0 && precio <= 9999999;
+      return esValido;
     }
-    return true;
-  }
+  
+    // Validar stock
+    validarStock(stock: number): boolean {
+      const esEntero = Number.isInteger(stock);
+      const esValido = esEntero && stock >= 0 && stock <= 99999; // Longitud de cinco, mayor o igual a cero
+      return esValido;
+    }
+
+
+    async validarCampos(): Promise<boolean> {
+
+      if (!this.nombre.trim()) {
+        await this.mostrarAlertaError('El Nombre del Producto es un campo obligatorio.');
+        return false;
+      }
+  
+      if (!this.descripcion.trim()) {
+        await this.mostrarAlertaError('La Descripción del Producto es un campo obligatorio.');
+        return false;
+      }
+  
+      if (!this.validarPrecio(this.precio)) {
+        await this.mostrarAlertaError('El Precio del producto debe ser un número entero mayor a 0 y no debe superar los 7 dígitos.');
+        return false;
+      }
+  
+      if (!this.validarStock(this.stock)) {
+        await this.mostrarAlertaError('El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar los 5 dígitos.');
+        return false;
+      }
+  
+      if (this.categoriaId === 0) {
+        await this.mostrarAlertaError('La Categoría es un campo obligatorio.');
+        return false;
+      }
+  
+      if (this.subcategoriaId === 0) {
+        await this.mostrarAlertaError('La Subcategoría es un campo obligatorio.');
+        return false;
+      }
+  
+      if (!this.foto_producto) {
+        await this.mostrarAlertaError('La Foto del producto es obligatoria.');
+        return false;
+      }
+  
+      return true; // Todos los campos son válidos
+    };
 
   async guardarCambios() {
-    if (this.validarCampos()) {
+    if (await this.validarCampos()) {
       try {
         await this.db.modProducto(
           this.productoId,

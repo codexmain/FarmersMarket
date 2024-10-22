@@ -53,13 +53,13 @@
 
       <ion-item>
         <ion-label position="stacked">Nombre de la Empresa</ion-label>
-        <ion-input [(ngModel)]="usuario.nombre_empresa" name="nombre_empresa"
+        <ion-input [disabled]="isDisabled" [(ngModel)]="usuario.nombre_empresa" name="nombre_empresa"
           placeholder="Ingresar Nombre de la Empresa"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Descripción Corta</ion-label>
-        <ion-input [(ngModel)]="usuario.descripcion_corta" name="descripcion_corta"
+        <ion-input [disabled]="isDisabled" [(ngModel)]="usuario.descripcion_corta" name="descripcion_corta"
           placeholder="Ingresar Descripción Corta"></ion-input>
       </ion-item>
 

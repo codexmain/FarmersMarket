@@ -106,18 +106,68 @@ export class ModUsuarioPage implements OnInit {
   }
 
   async actualizarUsuario() {
-    try {
-      const actualizado = await this.dataBase.actualizarUsuarioPorEmail(this.usuario);
-      if (actualizado) {
-        await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
-        this.irHaciaAtras();
-      } else {
-        await this.presentAlert('Error', 'Hubo un problema al actualizar el usuario.');
+    if (await this.validarCampos()) {  // Invocar validación de campos
+      try {
+        const actualizado = await this.dataBase.actualizarUsuarioPorEmail(this.usuario);
+        if (actualizado) {
+          await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
+          this.irHaciaAtras();
+        } else {
+          await this.presentAlert('Error', 'Hubo un problema al actualizar el usuario.');
+        }
+      } catch (error) {
+        console.error('Error al actualizar el usuario:', error);
+        await this.presentAlert('Error', 'Error al actualizar el usuario. Inténtalo más tarde.');
       }
-    } catch (error) {
-      console.error('Error al actualizar el usuario:', error);
-      await this.presentAlert('Error', 'Error al actualizar el usuario. Inténtalo más tarde.');
     }
+  }
+
+  async validarCampos(): Promise<boolean> {
+    // Validar nombres
+    if (!this.usuario.nombre || this.usuario.nombre.length < 2) {
+      await this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    if (!this.usuario.apellido_paterno || this.usuario.apellido_paterno.length < 2) {
+      await this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    // Validar pNombre, sNombre, aPaterno, aMaterno
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
+    if (!namePattern.test(this.usuario.nombre) || !namePattern.test(this.usuario.apellido_paterno) ||
+        (this.usuario.segundo_nombre && !namePattern.test(this.usuario.segundo_nombre)) ||
+        (this.usuario.apellido_materno && !namePattern.test(this.usuario.apellido_materno))) {
+      await this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 carecteres y no contener números.');
+      return false;
+    }
+
+    // Validar empresa
+    if (!this.usuario.nombre_empresa) {
+      await this.presentAlert('Error', 'El nombre de la empresa es obligatorio.');
+      return false;
+    }
+    
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
+    if (!empresaPattern.test(this.usuario.nombre_empresa)) {
+      await this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres, y solo puede contener letras, números y espacios.');
+      return false;
+    }
+
+    // Validar descripción de la empresa
+    if (!this.usuario.descripcion_corta) {
+      await this.presentAlert('Error', 'La descripción de la empresa es obligatoria.');
+      return false;
+    }
+
+    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
+    if (!descEmpresaPattern.test(this.usuario.descripcion_corta)) {
+      await this.presentAlert('Error', 'La descripción de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
+      return false;
+    }
+
+    return true; // Todos los campos son válidos
   }
 
   irHaciaAtras() {

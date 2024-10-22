@@ -11,7 +11,10 @@ import { Camera, CameraResultType } from '@capacitor/camera';
   styleUrls: ['./mod-cuenta.page.scss'],
 })
 export class ModCuentaPage implements OnInit {
+
+  isDisabled = true;
   // Variables del usuario
+
   usuario: any = {
     nombre: '',
     segundo_nombre: '',
@@ -86,6 +89,31 @@ export class ModCuentaPage implements OnInit {
       await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
     }
   }
+
+  async validarNombres(): Promise<boolean> {
+    // Validaciones de nombres y apellidos
+    if (!this.usuario.nombre || this.usuario.nombre.length < 2) {
+      await this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    if (!this.usuario.apellido_paterno || this.usuario.apellido_paterno.length < 2) {
+      await this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
+      return false;
+    }
+
+    // Validar pNombre, sNombre, aPaterno, aMaterno
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
+    if (!namePattern.test(this.usuario.nombre) || !namePattern.test(this.usuario.apellido_paterno) ||
+        (this.usuario.segundo_nombre && !namePattern.test(this.usuario.segundo_nombre)) ||
+        (this.usuario.apellido_materno && !namePattern.test(this.usuario.apellido_materno))) {
+      await this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 carecteres y no contener números.');
+      return false;
+    }
+
+    return true; // Todos los campos son válidos
+  }
+
 
   async cargarRegiones() {
     try {
