@@ -170,17 +170,17 @@ export class ModificarUsuarioPage implements OnInit {
         }
 
             // Validar pNombre, sNombre, aPaterno, aMaterno
-        const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
+        const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
         if (!namePattern.test(this.nombre) || !namePattern.test(this.apellido_paterno) ||
             (this.segundo_nombre && !namePattern.test(this.segundo_nombre)) ||
             (this.apellido_materno && !namePattern.test(this.apellido_materno))) {
-          this.presentAlert('Error', 'Los nombres y apellidos deben tener al menos 2 caracteres y no contener números.');
+          this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
           return;
         }
         // Validar empresa
-        const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
+        const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
         if (this.nombre_empresa && !empresaPattern.test(this.nombre_empresa)) {
-          this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
+          this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.');
           return;
         }
 

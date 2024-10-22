@@ -36,7 +36,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="nombreCtrl.invalid && (nombreCtrl.dirty || nombreCtrl.touched)" class="error-message">
-      El primer nombre es obligatorio y debe tener al menos 2 caracteres.
+      El primer nombre es obligatorio y debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -47,7 +47,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
-      El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
+      El apellido paterno es obligatorio y debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -58,7 +58,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
-      El segundo nombre debe tener al menos 2 caracteres y no contener números.
+      El segundo nombre debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -69,24 +69,24 @@
       </ion-button>
     </ion-item>
     <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
-      El apellido materno debe tener al menos 2 caracteres y no contener números.
+      El apellido materno debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
       <ion-label position="floating">Empresa (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="nombre_empresa" name="nombre_empresa" (ionChange)="onFieldsChange()" #empresaCtrl="ngModel"></ion-input>
-      <ion-button fill="outline" slot="end" (click)="clearEmpresa()">
+      <ion-button fill="outline" slot="end" (click)="clearEmpresa()" (ionChange)="onFieldsChange()">
         <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
       </ion-button>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
-      El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
+      El nombre de la empresa debe entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
     </div>
 
     <ion-item>
       <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
       <ion-input type="text" [(ngModel)]="descripcion_corta" name="descripcion_corta" (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
-      <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()">
+      <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()" (ionChange)="onFieldsChange()">
         <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
       </ion-button>
     </ion-item>
@@ -134,10 +134,6 @@
       <ion-label position="floating">Contraseña</ion-label>
       <ion-input [disabled]="isDisabled" type="password" [(ngModel)]="contrasena" name="contrasena" required minlength="10" #contrasenaCtrl="ngModel"></ion-input>
     </ion-item>
-    <div *ngIf="contrasenaCtrl.invalid && (contrasenaCtrl.dirty || contrasenaCtrl.touched)" class="error-message">
-      La contraseña es obligatoria y debe tener al menos 10 caracteres.
-    </div>
-
   
   </form> 
 </ion-card>

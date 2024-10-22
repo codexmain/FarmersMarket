@@ -224,7 +224,7 @@ export class AddUsuariosPage implements OnInit {
     // Validar empresa
     const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
     if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres.');
+      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios..');
       return;
     }
 
