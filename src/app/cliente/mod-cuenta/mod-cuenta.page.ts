@@ -13,6 +13,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
 export class ModCuentaPage implements OnInit {
   // Variables del usuario
   usuario: any = {
+    id: null,
     nombre: '',
     segundo_nombre: '',
     apellido_paterno: '',
@@ -32,8 +33,10 @@ export class ModCuentaPage implements OnInit {
   regiones: any[] = [];
   comunas: any[] = [];
   direcciones: any[] = [];
-  direccionSeleccionada: any = null;// Dirección seleccionada para modificar
-  direccionAEliminar: any; // Propiedad para la dirección a eliminar
+  direccionSeleccionada: any = null; // Dirección seleccionada para modificar
+  direccionAEliminar: any = null; // Propiedad para la dirección a eliminar
+  id: any; // ID del usuario
+  usuarioId: number=0; // Nueva variable para almacenar el ID del usuario
 
   nuevaDireccion: any = {
     region_id: null,
@@ -47,7 +50,7 @@ export class ModCuentaPage implements OnInit {
     private nativeStorage: NativeStorage,
     private router: Router,
     private navCtrl: NavController
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.cargarDatosUsuario();
@@ -61,6 +64,8 @@ export class ModCuentaPage implements OnInit {
       const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
       if (usuarioData) {
         this.usuario = usuarioData;
+        this.id = usuarioData.id;
+        this.usuarioId = usuarioData.id; // Asignar el ID del usuario a la nueva variable
         this.selectedRegion = usuarioData.region_id;
         this.selectedComuna = usuarioData.comuna_id;
         if (this.selectedRegion !== null) {
@@ -74,7 +79,6 @@ export class ModCuentaPage implements OnInit {
       await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
     }
   }
-
   async cargarRegiones() {
     try {
       this.regiones = await this.dataBase.Regiones();
@@ -120,24 +124,33 @@ export class ModCuentaPage implements OnInit {
   async agregarDireccion() {
     try {
       await this.dataBase.agregarDireccion(
-        this.usuario.id,                        
-        this.nuevaDireccion.comuna_id,           
-        this.nuevaDireccion.direccion               
+        this.usuario.id,
+        this.nuevaDireccion.comuna_id,
+        this.nuevaDireccion.direccion
       );
       await this.cargarDirecciones();
       await this.presentAlert('Éxito', 'Dirección agregada correctamente.');
-      this.nuevaDireccion = {};
+      this.nuevaDireccion = {
+        region_id: null,
+        comuna_id: null,
+        direccion: ''
+      }; // Reiniciar campos
     } catch (error) {
       console.error('Error al agregar la dirección:', error);
       await this.presentAlert('Error', 'No se pudo agregar la dirección.');
     }
   }
-
-  async eliminarDireccion(direccionId: number) {
+  async eliminarDireccion() {
     try {
-      await this.dataBase.eliminarDireccion(direccionId);
-      await this.cargarDirecciones();
-      await this.presentAlert('Éxito', 'Dirección eliminada correctamente.');
+      if (this.direccionAEliminar) {
+        // Usa la nueva variable usuarioId para pasar el ID
+        await this.dataBase.eliminarDireccion(this.direccionAEliminar.id, this.usuarioId); 
+        await this.cargarDirecciones(); // Recarga las direcciones
+        await this.presentAlert('Éxito', 'Dirección eliminada correctamente.');
+        this.direccionAEliminar = null; // Reinicia la selección
+      } else {
+        await this.presentAlert('Error', 'Seleccione una dirección para eliminar.');
+      }
     } catch (error) {
       console.error('Error al eliminar la dirección:', error);
       await this.presentAlert('Error', 'No se pudo eliminar la dirección.');

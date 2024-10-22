@@ -58,6 +58,7 @@ export class DataBaseService {
             usuario_id INTEGER NOT NULL,
             comuna_id INTEGER NOT NULL,
             direccion TEXT NOT NULL,
+            preferida INTEGER DEFAULT 0,
             FOREIGN KEY (usuario_id) REFERENCES usuario(id),
             FOREIGN KEY (comuna_id) REFERENCES comuna(id),
             PRIMARY KEY (id, usuario_id)  -- Llave compuesta
@@ -320,10 +321,10 @@ export class DataBaseService {
             (4,'Albert','Andrés','Vargas','Mansilla','example.Seller2@gmail.com','123456','Los Frutales de Mansilla','Ofrecemos cosechas frescas de frutales, con metodología regenerativa biointensiva',NULL,'activa','2024-10-04 22:41:12',2),
             (5,'Ignacio','Javier','Fuenzalida','Chandia','example.Admin@gmail.com','123456',NULL,NULL,NULL,'activa','2024-10-04 22:41:12',3);`;
 
-  registroDireccion: string = `INSERT OR IGNORE INTO direccion (id,usuario_id,comuna_id,direccion) VALUES
-            (1,3,51,'El Sauce 1200.'),
-            (1,2,44,'Av. Independencia 4599'),
-            (1,4,26,'Mena 665.');`;
+  registroDireccion: string = `INSERT OR IGNORE INTO direccion (id,usuario_id,comuna_id,direccion,preferida ) VALUES
+            (1,3,51,'El Sauce 1200.',0),
+            (1,2,44,'Av. Independencia 4599',0),
+            (1,4,26,'Mena 665.',0);`;
 
 
   registroProducto: string = `INSERT OR IGNORE INTO producto (id,proveedor_id,nombre,descripcion,precio,stock,organico,foto_producto,subcategoria_id,fecha_agregado) VALUES
@@ -2284,27 +2285,36 @@ JOIN
     }
   }
   async agregarDireccion(usuario_id: number, comuna_id: number, direccion: string) {
-    const query = `INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?);`;
+    // Obtenemos el siguiente ID, puedes ajustar esto si tienes otro método para manejar IDs
+    const queryID = `SELECT MAX(id) as maxId FROM direccion WHERE usuario_id = ?;`;
     try {
-      await this.database.executeSql(query, [usuario_id, comuna_id, direccion]);
+      const result = await this.database.executeSql(queryID, [usuario_id]);
+      const maxId = result.rows.item(0).maxId || 0; // Si no hay IDs, comenzamos desde 0
+      const nuevoId = maxId + 1; // Incrementar para nuevo ID
+  
+      const query = `INSERT INTO direccion (id, usuario_id, comuna_id, direccion, preferida) VALUES (?, ?, ?, ?, 0);`;
+      await this.database.executeSql(query, [nuevoId, usuario_id, comuna_id, direccion]);
     } catch (error) {
       console.error('Error al agregar dirección:', error);
     }
   }
 
-  async eliminarDireccion(id: number) {
-    const query = `DELETE FROM direccion WHERE id = ?;`;
+  async eliminarDireccion(id: number, usuario_id: number) {
+    const query = `DELETE FROM direccion WHERE id = ? AND usuario_id = ?;`;
     try {
-      await this.database.executeSql(query, [id]);
+      await this.database.executeSql(query, [id, usuario_id]);
     } catch (error) {
       console.error('Error al eliminar la dirección:', error);
+      throw error; // Opcional: lanzar el error para que el componente pueda manejarlo
     }
   }
 
   async establecerDireccionPreferida(id: number, usuario_id: number) {
     try {
+      // Resetear preferidas a 0
       await this.database.executeSql(`UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`, [usuario_id]);
-      await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ?;`, [id]);
+      // Establecer la nueva dirección como preferida
+      await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ? AND usuario_id = ?;`, [id, usuario_id]);
     } catch (error) {
       console.error('Error al establecer la dirección preferida:', error);
     }
