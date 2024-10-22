@@ -9,7 +9,6 @@
 
 <ion-content>
   <ion-card>
-    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filtrarProductos()" placeholder="Buscar productos..."></ion-searchbar>
     <ng-container *ngIf="filtrados && filtrados.length > 0; else noProducts">
       <ion-list>
         <ion-item *ngFor="let producto of filtrados">
@@ -22,7 +21,6 @@
               <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-card-subtitle>{{ producto.precio }}</ion-card-subtitle>
               <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
               <p><strong>Stock:</strong> {{ producto.stock }}</p>
               <ion-button color="primary" (click)="verDetalle(producto.id)">

@@ -1691,13 +1691,15 @@ JOIN
   }
 
   async getAllProductos() {
-    const res = await this.database.executeSql('SELECT * FROM productos', []);
+    const res = await this.database.executeSql('SELECT * FROM producto', []); // Asegúrate de que el nombre de la tabla sea correcto
     const productos = [];
     for (let i = 0; i < res.rows.length; i++) {
       productos.push(res.rows.item(i));
     }
     return productos;
   }
+
+  
 
   public async getProductos(): Promise<any[]> {
     try {
@@ -2367,6 +2369,52 @@ async agregarDirec(usuarioId: number, comunaId: number, direccion: string) {
     await this.database.executeSql(query, [usuarioId, comunaId, direccion]);
   } catch (error) {
     console.error('Error al agregar dirección:', error);
+  }
+}
+
+async actualizarUsuarioEmail(usuario: any): Promise<boolean> {
+  try {
+    // Actualiza la información del usuario
+    const sql = `
+    UPDATE usuario
+    SET 
+      nombre = ?, 
+      segundo_nombre = ?, 
+      apellido_paterno = ?, 
+      apellido_materno = ?, 
+      nombre_empresa = ?, 
+      descripcion_corta = ?, 
+      foto_perfil = ?,  
+      estado_cuenta = ?, 
+      tipo_usuario_id = ?
+    WHERE email = ?`; // No se cambia el email
+
+    const result = await this.database.executeSql(sql, [
+      usuario.nombre,
+      usuario.segundo_nombre || null,
+      usuario.apellido_paterno,
+      usuario.apellido_materno || null,
+      usuario.nombre_empresa || null,
+      usuario.descripcion_corta || null,
+      usuario.foto_perfil || null,
+      usuario.estado_cuenta,
+      usuario.tipo_usuario_id,
+      usuario.email // Se utiliza el email para identificar al usuario
+    ]);
+
+    if (result.rowsAffected > 0) {
+      // Luego de actualizar el usuario, actualizamos la dirección si se proporciona
+      const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
+      if (usuarioId) {
+        // Asegúrate de que los campos comuna_id y direccion están definidos en el objeto usuario
+        return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
+      }
+    }
+
+    return false; // Retorna false si no se pudo actualizar
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    return false;
   }
 }
 
