@@ -234,4 +234,19 @@ export class ModCuentaPage implements OnInit {
       console.error('Error al tomar la foto:', error);
     }
   }
+
+  clearPNombre(){
+    this.usuario.nombre = '';
+  }
+  clearSNombre(){
+    this.usuario.segundo_nombre = '';
+  }
+
+  clearAPaterno(){
+    this.usuario.apellido_paterno = '';
+  }
+  clearAMaterno(){
+    this.usuario.apellido_materno = '';
+  }
+
 }

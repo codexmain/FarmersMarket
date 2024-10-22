@@ -84,13 +84,32 @@ export class AddProventasPage implements OnInit {
       return false;
     }
 
+    if (this.nombre.length < 3 || this.nombre.length > 40) {
+      await this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
+      return false;
+    }
+
+    if (this.descripcion && 
+      (this.descripcion.length < 10 || this.descripcion.length > 255)) {
+       this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
+       return false;
+   }
+
     if (!this.precio) {
       await this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');
+      return false;
+    }
+    if (!this.validarPrecio(this.precio)) {
+      await this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
       return false;
     }
 
     if (this.stock === null || this.stock === undefined) {
       await this.presentAlert('Error', 'El Stock/Existencias es un campo obligatorio.');
+      return false;
+    }
+    if (!this.validarStock(this.stock)) {
+      await this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar las 5 cifras.');
       return false;
     }
 
@@ -106,21 +125,6 @@ export class AddProventasPage implements OnInit {
 
     if (!this.subcategoriaId) {
       await this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
-      return false;
-    }
-
-    if (this.nombre.length < 3 || this.nombre.length > 40) {
-      await this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
-      return false;
-    }
-
-    if (!this.validarPrecio(this.precio)) {
-      await this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
-      return false;
-    }
-
-    if (!this.validarStock(this.stock)) {
-      await this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar las 5 cifras.');
       return false;
     }
 
@@ -193,6 +197,14 @@ export class AddProventasPage implements OnInit {
       buttons: ['OK']
     });
     await alert.present();
+  }
+
+  clearProductName(){
+    this.nombre = '';
+  }
+
+  clearProductDesc(){
+    this.descripcion = '';
   }
 
 

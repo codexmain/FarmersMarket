@@ -18,7 +18,7 @@
   <form id="addProductForm" (ngSubmit)="agregarProducto()">
 
     <ion-item style="align-items: center; flex-direction: column;">
-      <ion-button (click)="takePicture()">Foto Perfil</ion-button><br>
+      <ion-button (click)="takePicture()">Foto Producto</ion-button><br>
 
       <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
         <ion-avatar
@@ -66,7 +66,7 @@
       <ion-input type="number" [(ngModel)]="precio" name="precio" required #productPriceCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="productPriceCtrl.invalid && (productPriceCtrl.dirty || productPriceCtrl.touched)" class="error-message">
-      El Precio del producto es obligatorio y deben ser numeros enteros positivos.
+      El Precio del producto es obligatorio y deben ser numeros enteros positivos de hasta 7 cifras.
     </div>
 
     <ion-item>
@@ -74,7 +74,7 @@
       <ion-input type="number" [(ngModel)]="stock" name="stock" required #stockCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="stockCtrl.invalid && (stockCtrl.dirty || stockCtrl.touched)" class="error-message">
-      El Stock/Existencias del Producto es obligatorio y debe ser un número entero o cero.
+      Las Existencias del Producto es obligatorio y debe ser un número entero de hasta 5 cifras o cero.
     </div>  
 
     <ion-item>
