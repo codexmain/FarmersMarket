@@ -211,20 +211,20 @@ export class AddUsuariosPage implements OnInit {
   }
 
     // Validar pNombre, sNombre, aPaterno, aMaterno
-    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,}$/;
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
     if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
         (this.sNombre && !namePattern.test(this.sNombre)) ||
         (this.aMaterno && !namePattern.test(this.aMaterno))) {
-      this.presentAlert('Error', 'Los nombres y apellidos deben tener al menos 2 caracteres y no contener números.');
+      this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
       return;
     }
  
 
 
     // Validar empresa
-    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,}$/;
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
     if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.');
+      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres.');
       return;
     }
 
@@ -262,7 +262,7 @@ export class AddUsuariosPage implements OnInit {
     return;
   }
 
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.password)) {
+  if (!/[!¡@#$%^&*(),.¿?":{}|<>=;'°]/.test(this.password)) {
     this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
     return;
   }
@@ -318,7 +318,7 @@ export class AddUsuariosPage implements OnInit {
   }
 
   async reverseGeocode(lat: number, lng: number) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIKEY`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDMAPS`);
     const data = await response.json();
     if (data.results.length > 0) {
       this.direccion = data.results[0].formatted_address;
@@ -351,10 +351,6 @@ export class AddUsuariosPage implements OnInit {
   }
   clearMail(){
     this.email = '';
-
-  }
-  clearClave(){
-    this.password = '';
 
   }
   clearDirr(){

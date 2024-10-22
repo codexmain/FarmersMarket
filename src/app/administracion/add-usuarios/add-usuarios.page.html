@@ -36,7 +36,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
-      El primer nombre es obligatorio y debe tener al menos 2 caracteres.
+      El primer nombre es obligatorio y debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -47,7 +47,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
-      El apellido paterno es obligatorio y debe tener al menos 2 caracteres.
+      El apellido paterno es obligatorio y debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -58,7 +58,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
-      El segundo nombre debe tener al menos 2 caracteres y no contener números.
+      El segundo nombre debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -69,7 +69,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
-      El apellido materno debe tener al menos 2 caracteres y no contener números.
+      El apellido materno debe tener entre 2 y 40 caracteres.
     </div>
 
     <ion-item>
@@ -80,7 +80,7 @@
       </ion-button>
     </ion-item>
     <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
-      El nombre de la empresa debe tener al menos 3 caracteres y solo puede contener letras, números y espacios.
+      El nombre de la empresa debe entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
     </div>
 
     <ion-item>
@@ -134,7 +134,11 @@
       </ion-button>
     </ion-item>
     <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
-      La contraseña es obligatoria y debe tener al menos 10 caracteres.
+      Requisitos Contraseña: 
+              Entre 10 y 30 caracteres.
+              Minimo 1 caracter especial.
+              No tener caracteres o numeros consecutivos.
+              Tener 2 letras mayusculas.
     </div>
 
     <ion-item>
@@ -161,7 +165,7 @@
 
     <ion-item>
       <ion-label position="floating">Dirección</ion-label>
-      <ion-input type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Ubicación manual o el marcador (automatico)"></ion-input>
+      <ion-input id="autoscroll-input" type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Escribe la ubicación o usa el Marcador (automatico)"></ion-input>
       <ion-button fill="outline" slot="end" (click)="clearDirr()">
         <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
       </ion-button>

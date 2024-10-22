@@ -198,7 +198,7 @@ export class RegisterPage implements OnInit {
       return false;
     }
     
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.password)) {
+    if (!/[!¡@#$%^&*(),.¿?":{}|<>=;'°]/.test(this.password)) {
       this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
       return false;
     }
@@ -271,13 +271,48 @@ export class RegisterPage implements OnInit {
   }
 
   async reverseGeocode(lat: number, lng: number) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDGMAPS`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDMAPS`);
     const data = await response.json();
     if (data.results.length > 0) {
       this.direccion = data.results[0].formatted_address;
     } else {
       this.presentToast('No se pudo obtener la dirección. Intenta nuevamente.');
     }
+  }
+
+  clearPNombre(){
+    this.pNombre = '';
+  }
+  clearSNombre(){
+    this.sNombre = '';
+  }
+
+  clearAPaterno(){
+    this.aPaterno = '';
+  }
+  clearAMaterno(){
+    this.aMaterno = '';
+
+  }
+  clearEmpresa(){
+    this.empresa = '';
+
+  }
+  clearDescEmpresa(){
+    this.descripcion_corta = '';
+
+  }
+  clearMail(){
+    this.email = '';
+
+  }
+  clearClave(){
+    this.password = '';
+
+  }
+  clearDirr(){
+    this.direccion = '';
+
   }
 
 }
