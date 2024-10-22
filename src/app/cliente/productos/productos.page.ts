@@ -11,6 +11,8 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 export class ProductosPage implements OnInit {
   productos: any[] = []; // Array para almacenar productos
   usuario: any; // Variable para almacenar los datos del usuario
+  filtrados: any[] = []; // Lista de productos filtrados
+  searchTerm: string = ''; // Término de búsqueda
 
   constructor(
     private router: Router,
@@ -22,7 +24,7 @@ export class ProductosPage implements OnInit {
     await this.cargarDatosUsuario(); // Cargar datos del usuario
     if (this.usuario) {
       const regionId = this.usuario.region_id; // Obtener ID de la región del usuario
-      this.productos = await this.dbService.getProductosPorRegion(regionId); // Obtener productos filtrados por región
+      this.productos = await this.dbService.getAllProductos(); // Obtener productos filtrados por región
     }
   }
 
@@ -41,5 +43,13 @@ export class ProductosPage implements OnInit {
 
   verDetalle(productoId: number) {
     this.router.navigate([`/pro-detalle`, productoId]); // Navegar a la página de detalles del producto
+  }
+
+  filtrarProductos() {
+    // Filtrar productos según el término de búsqueda
+    this.filtrados = this.productos.filter(producto => 
+      producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
+      producto.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
   }
 }
