@@ -15,8 +15,9 @@ export class ComprasPage implements OnInit {
   constructor(private dbService: DataBaseService, private nativeStorage: NativeStorage) { }
 
   async ngOnInit() {
-    this.email = await this.nativeStorage.getItem('userEmail'); // Obtener el email del NativeStorage
-    this.productosComprados = await this.dbService.getProductosCompradosPorUsuario(this.email);
+    this.email = await this.nativeStorage.getItem('userEmail');
+    this.productosComprados = await this.dbService.getProductosCompradosUsuario(this.email);
     this.carrosComprados = await this.dbService.getCarrosPorUsuario(this.email);
+
   }
 }

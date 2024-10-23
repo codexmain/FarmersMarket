@@ -2230,53 +2230,58 @@ JOIN
 
   //REGVENTAS
 
-  // Obtener productos vendidos por el proveedor (vendedor)
-  async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
-    try {
-      // Obtener el id del proveedor utilizando el email
-      const usuario = await this.database.executeSql(
-        'SELECT id FROM usuario WHERE email = ?',
-        [emailVendedor]
-      );
+ // Obtener productos vendidos por el proveedor (vendedor)
+async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
+  try {
+    // Obtener el id del proveedor utilizando el email
+    const usuario = await this.database.executeSql(
+      'SELECT id FROM usuario WHERE email = ?',
+      [emailVendedor]
+    );
 
-      if (usuario.rows.length === 0) {
-        console.error('Proveedor no encontrado.');
-        return [];
-      }
-
-      const proveedorId = usuario.rows.item(0).id;
-
-      // Obtener detalles de la venta usando el proveedor_id
-      const query = `
-          SELECT 
-              p.id AS producto_id,
-              p.nombre,
-              p.precio,
-              dc.cantidad,
-              dc.subtotal,
-              (SELECT email FROM usuario WHERE id = cc.usuario_id) AS compradorEmail
-          FROM 
-              detalle_carro_compra dc
-          JOIN 
-              producto p ON dc.producto_id = p.id
-          JOIN 
-              carro_compra cc ON dc.carro_id = cc.id
-          WHERE 
-              p.proveedor_id = ?;
-      `;
-
-      const result = await this.database.executeSql(query, [proveedorId]);
-      const productosVendidos = [];
-      for (let i = 0; i < result.rows.length; i++) {
-        productosVendidos.push(result.rows.item(i));
-      }
-
-      return productosVendidos;
-    } catch (error) {
-      console.error('Error al obtener productos vendidos por vendedor:', error);
-      throw error;
+    if (usuario.rows.length === 0) {
+      console.error('Proveedor no encontrado.');
+      return [];
     }
+
+    const proveedorId = usuario.rows.item(0).id;
+
+    // Obtener detalles de la venta usando el proveedor_id
+    const query = `
+      SELECT 
+        p.id AS producto_id,
+        p.nombre,
+        p.descripcion,
+        p.foto_producto,
+        p.precio,
+        dc.cantidad, 
+        dc.subtotal, 
+        cc.fecha_creacion, 
+        cc.estado, 
+        cc.total,
+        (SELECT email FROM usuario WHERE id = cc.usuario_id) AS compradorEmail
+      FROM 
+        detalle_carro_compra dc
+      JOIN 
+        producto p ON dc.producto_id = p.id
+      JOIN 
+        carro_compra cc ON dc.carro_id = cc.id
+      WHERE 
+        p.proveedor_id = ?;
+    `;
+
+    const result = await this.database.executeSql(query, [proveedorId]);
+    const productosVendidos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productosVendidos.push(result.rows.item(i));
+    }
+
+    return productosVendidos;
+  } catch (error) {
+    console.error('Error al obtener productos vendidos por vendedor:', error);
+    throw error;
   }
+}
 
 
   //MOD-CUENTA
@@ -2427,6 +2432,67 @@ async actualizarUsuarioEmail(usuario: any): Promise<boolean> {
   }
 }
 
+async getProductosCompradosUsuario(email: string): Promise<any[]> {
+  const query = `
+    SELECT 
+      p.id AS producto_id,
+      p.nombre,
+      p.descripcion,
+      p.foto_producto,
+      p.precio,
+      dc.cantidad, 
+      dc.subtotal, 
+      c.fecha_creacion, 
+      c.estado, 
+      c.total
+    FROM 
+      detalle_carro_compra dc
+    JOIN 
+      producto p ON dc.producto_id = p.id
+    JOIN 
+      carro_compra c ON dc.carro_id = c.id
+    WHERE 
+      c.usuario_id = (SELECT id FROM usuario WHERE email = ?);
+  `;
+
+  const result = await this.database.executeSql(query, [email]);
+
+  let productos = [];
+  for (let i = 0; i < result.rows.length; i++) {
+    productos.push(result.rows.item(i));
+  }
+  return productos;
+}
+
+async obtenerCategoriaNombre(categoriaId: any) {
+  const query = `SELECT nombre FROM categoria WHERE id = ?`;
+  try {
+      const resultado = await this.database.executeSql(query, [categoriaId]);
+      if (resultado.rows.length > 0) {
+          return resultado.rows.item(0).nombre;
+      } else {
+          return null; // No se encontró la categoría
+      }
+  } catch (error) {
+      console.error('Error al obtener el nombre de la categoría:', error);
+      throw error; // Propagar el error
+  }
+}
+
+async obtenerSubcategoriaNombre(subcategoriaId: any) {
+  const query = `SELECT nombre FROM subcategoria WHERE id = ?`;
+  try {
+      const resultado = await this.database.executeSql(query, [subcategoriaId]);
+      if (resultado.rows.length > 0) {
+          return resultado.rows.item(0).nombre;
+      } else {
+          return null; // No se encontró la subcategoría
+      }
+  } catch (error) {
+      console.error('Error al obtener el nombre de la subcategoría:', error);
+      throw error; // Propagar el error
+  }
+}
 
 
 }

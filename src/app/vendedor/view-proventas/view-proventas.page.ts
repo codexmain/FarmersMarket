@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service';
-import { AlertController } from '@ionic/angular';
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-view-proventas',
@@ -10,92 +9,177 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
   styleUrls: ['./view-proventas.page.scss'],
 })
 export class ViewProventasPage implements OnInit {
-  isDisabled = true;
-  producto: any; // para la transferencia de argumentos de navParams
-
-  proveedor_id!: number;
-  nombre_producto: string = '';
-  descripcion_producto: string = '';
-  precio!: number;
+  productoId: number = 0;
+  nombre: string = '';
+  descripcion: string = '';
+  precio: number = 0;
   stock: number = 0;
-  organico: number = 0; // default de organico en false
-  categoria_id!: number;
-  subcategoria_id: number | undefined;
-  photo: string = ''; // Ruta de la foto
+  organico: number = 0; // 0 = No orgánico, 1 = Orgánico
+  categoriaId: number = 0;
+  subcategoriaId: number = 0;
+  foto_producto: string = ''; // Nueva propiedad para la foto
+  categoriaNombre: string = ''; // Nueva propiedad para el nombre de la categoría
+  subcategoriaNombre: string = ''; // Nueva propiedad para el nombre de la subcategoría
 
-  arrayCmbProvedores: any = [];
-  arrayCmbCategorias: any = [];
-  arrayCmbSubcategorias: any = [];
-
+  
   constructor(
     private route: ActivatedRoute,
-    private bd: DataBaseService,
-    private nativeStorage: NativeStorage,
-    private alertController: AlertController
+    private db: DataBaseService,
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private router: Router
   ) {}
 
-  ngOnInit() {
-    // Cargar producto desde Native Storage
-    this.cargarProducto();
-
-    // Cargar proveedores, categorías y subcategorías
-    this.bd.dbState().subscribe(data => {
-      if (data) {
-        this.cargarCombos();
-      }
-    });
+  async ngOnInit() {
+    this.productoId = +this.route.snapshot.paramMap.get('productoId')!;
+    await this.obtenerProducto(this.productoId);
   }
 
-  async cargarProducto() {
-    try {
-      const productoId = Number(this.route.snapshot.paramMap.get('id')); // Obtener el ID del producto de la ruta
+  
 
-      // Aquí se obtiene el producto desde el Native Storage
-      const productoData = await this.nativeStorage.getItem('producto_' + productoId);
-      if (productoData) {
-        this.producto = productoData;
-        this.proveedor_id = this.producto.proveedor_id;
-        this.nombre_producto = this.producto.nombre_producto;
-        this.descripcion_producto = this.producto.descripcion_producto;
-        this.precio = this.producto.precio;
-        this.stock = this.producto.stock;
-        this.organico = this.producto.organico;
-        this.categoria_id = this.producto.categoria_id;
-        this.subcategoria_id = this.producto.subcategoria_id;
-        this.photo = this.producto.photo;
-      } else {
-        await this.presentAlert('Error', 'No se encontró el producto.');
-      }
+  async obtenerProducto(productoId: number) {
+    try {
+      const producto = await this.db.obtenerProducto(productoId);
+      this.nombre = producto.nombre;
+      this.descripcion = producto.descripcion;
+      this.precio = producto.precio;
+      this.stock = producto.stock;
+      this.organico = producto.organico;
+      this.categoriaId = producto.categoria_id;
+      this.subcategoriaId = producto.subcategoria_id;
+      this.foto_producto = producto.foto_producto; // Asignar la foto del producto
+      this.categoriaNombre = await this.db.obtenerCategoriaNombre(this.categoriaId); // Obtener el nombre de la categoría
+      this.subcategoriaNombre = await this.db.obtenerSubcategoriaNombre(this.subcategoriaId); // Obtener el nombre de la subcategoría
     } catch (error) {
-      console.error('Error al cargar el producto:', error);
-      await this.presentAlert('Error', 'Hubo un problema al cargar los datos del producto.');
+      console.error('Error al obtener el producto:', error);
+      this.mostrarAlertaError('No se pudo cargar el producto.');
+    }
+  }
+  
+
+
+      // Validar precio
+    validarPrecio(precio: number): boolean {
+      const esEntero = Number.isInteger(precio);
+      const esValido = esEntero && precio > 0 && precio <= 9999999;
+      return esValido;
+    }
+  
+    // Validar stock
+    validarStock(stock: number): boolean {
+      const esEntero = Number.isInteger(stock);
+      const esValido = esEntero && stock >= 0 && stock <= 99999; // Longitud de cinco, mayor o igual a cero
+      return esValido;
+    }
+
+
+
+    async validarCampos(): Promise<boolean> {
+
+      if (!this.nombre.trim()) {
+        await this.mostrarAlertaError('El Nombre del Producto es un campo obligatorio.');
+        return false;
+      }
+      if (this.nombre.length < 3 || this.nombre.length > 40) {
+        await this.mostrarAlertaError('El Nombre del producto debe tener entre 3 y 40 caracteres.');
+        return false;
+      }
+
+      if (this.descripcion && 
+        (this.descripcion.length < 10 || this.descripcion.length > 255)) {
+         this.mostrarAlertaError('La Descripción del producto debe tener entre 10 y 255 caracteres.');
+         return false;
+      }
+
+      if (!this.precio) {
+        await this.mostrarAlertaError('El Precio del producto es un campo obligatorio.');
+        return false;
+      }
+
+      
+      if (!this.validarPrecio(this.precio)) {
+        await this.mostrarAlertaError('El Precio del producto debe ser un número entero mayor a 0 y no debe superar los 7 dígitos.');
+        return false;
+      }
+
+      if (this.stock === null || this.stock === undefined) {
+        await this.mostrarAlertaError('El Stock/Existencias es un campo obligatorio.');
+        return false;
+      }
+
+      if (!this.validarStock(this.stock)) {
+        await this.mostrarAlertaError('El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar los 5 dígitos.');
+        return false;
+      }
+
+      if (this.organico === null || this.organico === undefined) {
+        await this.mostrarAlertaError('La procedencia del producto (Orgánico/No Orgánico) es un campo obligatorio.');
+        return false;
+      }
+  
+      if (this.categoriaId === 0) {
+        await this.mostrarAlertaError('La Categoría es un campo obligatorio.');
+        return false;
+      }
+  
+      if (this.subcategoriaId === 0) {
+        await this.mostrarAlertaError('La Subcategoría es un campo obligatorio.');
+        return false;
+      }
+
+      return true; // Todos los campos son válidos
+    };
+
+
+  async guardarCambios() {
+    if (await this.validarCampos()) {
+      try {
+        await this.db.modProducto(
+          this.productoId,
+          this.nombre,
+          this.descripcion,
+          this.precio,
+          this.stock,
+          this.organico,
+          this.subcategoriaId,
+          this.foto_producto
+        );
+        this.mostrarToast('Producto modificado exitosamente.', 'success');
+        this.router.navigate(['/proventas']);
+      } catch (error) {
+        console.error('Error al modificar el producto:', error);
+        this.mostrarAlertaError('No se pudo modificar el producto.');
+      }
     }
   }
 
-  cargarCombos() {
-    this.bd.fetchCmbProveedores().subscribe(res => {
-      this.arrayCmbProvedores = res;
-    });
+ 
 
-    this.bd.fetchCategorias().subscribe(res => {
-      this.arrayCmbCategorias = res;
-    });
-
-    this.bd.fetchCmbSubCategorias().subscribe(res => {
-      this.arrayCmbSubcategorias = res;
-    });
-  }
-
-  dismiss() {
-    // Cierra el modal
-  }
-
-  async presentAlert(header: string, message: string) {
+  async mostrarAlertaError(mensaje: string) {
     const alert = await this.alertController.create({
-      header: header,
-      message: message,
-      buttons: ['OK']
+      header: 'Error',
+      message: mensaje,
+      buttons: ['OK'],
     });
     await alert.present();
   }
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color: color,
+    });
+    await toast.present();
+  }
+
+  clearProductName(){
+    this.nombre = '';
+  }
+
+  clearProductDesc(){
+    this.descripcion = '';
+  }
+
+  
 }
