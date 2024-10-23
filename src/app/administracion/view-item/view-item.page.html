@@ -22,6 +22,12 @@
 
     <ion-item style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
       <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
+          <!-- Mostrar imagen tomada con la cámara si está disponible -->
+          <img *ngIf="photo"
+              [src]="photo"
+              alt="Foto Tomada con Cámara"
+              style="width: 100%; height: 100%; object-fit: cover;" />
+
           <!-- Mostrar imagen del producto si existe -->
           <img *ngIf="producto.foto_producto && producto.foto_producto !== ''"
                [src]="producto.foto_producto"
@@ -95,11 +101,6 @@
               </ng-container>
           </ng-container>
   
-          <!-- Mostrar imagen tomada con la cámara si está disponible -->
-          <img *ngIf="photo"
-               [src]="photo"
-               alt="Foto Tomada con Cámara"
-               style="width: 100%; height: 100%; object-fit: cover;" />
       </ion-avatar>
   </ion-item>
 

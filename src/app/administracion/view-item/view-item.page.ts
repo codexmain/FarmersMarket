@@ -14,8 +14,8 @@ export class ViewItemPage implements OnInit {
   nombre_producto: string = '';
   descripcion_producto: string = '';
   precio!: number;
-  stock: number;
-  organico: number; //default de organico en false
+  stock: any;
+  organico: any; //default de organico en false
   categoria_id!: number;
   subcategoria_id: number | undefined;
   photo: string = ''; // Ruta de la foto
