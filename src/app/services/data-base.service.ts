@@ -106,6 +106,7 @@ export class DataBaseService {
             producto_id INTEGER NOT NULL,
             cantidad INTEGER NOT NULL,
             subtotal INTEGER NOT NULL,
+            producto_identificador TEXT,
             FOREIGN KEY (carro_id) REFERENCES carro_compra(id),
             FOREIGN KEY (producto_id) REFERENCES producto(id),
             PRIMARY KEY (id, carro_id)
@@ -1754,7 +1755,6 @@ JOIN
     }
   }
 
-  //PRO-DETALLE Y CARRITO
   async getCarroCompra(usuarioId: number) {
     const result = await this.database.executeSql(
       'SELECT * FROM carro_compra WHERE usuario_id = ? AND estado = "creado"',
@@ -1775,10 +1775,11 @@ JOIN
     return detalles;
   }
 
-  async eliminarProductoDelCarro(detalleId: number) {
+  // Eliminar producto usando el identificador único
+  async eliminarProductoDelCarro(productoIdentificador: string, carroId: number) {
     await this.database.executeSql(
-      'DELETE FROM detalle_carro_compra WHERE id = ?',
-      [detalleId]
+      'DELETE FROM detalle_carro_compra WHERE producto_identificador = ? AND carro_id = ?',
+      [productoIdentificador, carroId]
     );
   }
 
@@ -1789,7 +1790,6 @@ JOIN
     );
   }
 
-  // En tu servicio de base de datos (data-base.service.ts)
   async getUsuarioEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
@@ -1812,7 +1812,6 @@ JOIN
     });
   }
 
-
   async getProducto(productoId: number): Promise<any> {
     const result = await this.database.executeSql(
       'SELECT * FROM producto WHERE id = ?',
@@ -1828,11 +1827,18 @@ JOIN
     );
   }
 
+  // Agregar producto al carro y generar un identificador único
   async agregarProductoAlCarro(carroId: number, productoId: number, cantidad: number, subtotal: number) {
+    const productoIdentificador = this.generarIdentificadorUnico(); // Generar identificador único
     await this.database.executeSql(
-      'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal) VALUES (?, ?, ?, ?)',
-      [carroId, productoId, cantidad, subtotal]
+      'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal, producto_identificador) VALUES (?, ?, ?, ?, ?)',
+      [carroId, productoId, cantidad, subtotal, productoIdentificador]
     );
+  }
+
+  // Generar un identificador único para cada producto
+  private generarIdentificadorUnico(): string {
+    return 'producto_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
 
   async reducirStock(productoId: number, cantidad: number) {
@@ -1861,6 +1867,9 @@ JOIN
         });
     });
   }
+
+
+
 
   async getProductosCompradosPorUsuario(email: string): Promise<any[]> {
     // Obtener el usuario
