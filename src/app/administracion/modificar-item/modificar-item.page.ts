@@ -17,8 +17,8 @@ export class ModificarItemPage implements OnInit {
   nombre_producto: string = '';
   descripcion_producto: string = '';
   precio!: number;
-  stock: number = 0;
-  organico: number = 0; //default de organico en false
+  stock: any;
+  organico: any; //default de organico en false
   categoria_id!: number;
   subcategoria_id: number | undefined;
   photo: string = ''; // Ruta de la foto
@@ -233,6 +233,8 @@ export class ModificarItemPage implements OnInit {
     });
     toast.present();
   }
+
+
 
 
 

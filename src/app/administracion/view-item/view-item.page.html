@@ -22,10 +22,87 @@
 
     <ion-item style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
       <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
-        <img *ngIf="photo" [src]="photo" alt="avatar"
-          style="width: 100%; height: 100%; object-fit: cover;" />
+          <!-- Mostrar imagen tomada con la cámara si está disponible -->
+          <img *ngIf="photo"
+              [src]="photo"
+              alt="Foto Tomada con Cámara"
+              style="width: 100%; height: 100%; object-fit: cover;" />
+
+          <!-- Mostrar imagen del producto si existe -->
+          <img *ngIf="producto.foto_producto && producto.foto_producto !== ''"
+               [src]="producto.foto_producto"
+               alt="Foto del Producto"
+               style="width: 100%; height: 100%; object-fit: cover;" />
+  
+          <!-- Mostrar imagen por defecto según el ID -->
+          <ng-container *ngIf="!producto.foto_producto || producto.foto_producto === ''">
+              <ng-container *ngIf="producto.id === 1">
+                  <img src="../../assets/imgProductos/producto1.png" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 2">
+                  <img src="../../assets/imgProductos/producto2.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 3">
+                  <img src="../../assets/imgProductos/producto3.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 4">
+                  <img src="../../assets/imgProductos/producto4.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 5">
+                  <img src="../../assets/imgProductos/producto5.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 6">
+                  <img src="../../assets/imgProductos/producto6.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 7">
+                  <img src="../../assets/imgProductos/producto7.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 8">
+                  <img src="../../assets/imgProductos/producto8.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 9">
+                  <img src="../../assets/imgProductos/producto9.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 10">
+                  <img src="../../assets/imgProductos/producto10.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 11">
+                  <img src="../../assets/imgProductos/producto11.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 12">
+                  <img src="../../assets/imgProductos/producto12.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 13">
+                  <img src="../../assets/imgProductos/producto13.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 14">
+                  <img src="../../assets/imgProductos/producto14.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 15">
+                  <img src="../../assets/imgProductos/producto15.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 16">
+                  <img src="../../assets/imgProductos/producto16.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 17">
+                  <img src="../../assets/imgProductos/producto17.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 18">
+                  <img src="../../assets/imgProductos/producto18.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 19">
+                  <img src="../../assets/imgProductos/producto19.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 20">
+                  <img src="../../assets/imgProductos/producto20.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="producto.id === 21">
+                  <img src="../../assets/imgProductos/producto21.jpg" alt="Imagen por Defecto" style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+          </ng-container>
+  
       </ion-avatar>
-    </ion-item>
+  </ion-item>
 
     <ion-item>
       <ion-label position="floating">Nombre Producto</ion-label>

@@ -14,8 +14,8 @@ export class ViewItemPage implements OnInit {
   nombre_producto: string = '';
   descripcion_producto: string = '';
   precio!: number;
-  stock: number = 0;
-  organico: number = 0; //default de organico en false
+  stock: any;
+  organico: any; //default de organico en false
   categoria_id!: number;
   subcategoria_id: number | undefined;
   photo: string = ''; // Ruta de la foto
@@ -56,6 +56,7 @@ export class ViewItemPage implements OnInit {
     this.subcategoria_id = this.producto.subcategoria_id;
     this.photo = this.producto.photo;
 
+
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
       if(data){
@@ -76,6 +77,8 @@ export class ViewItemPage implements OnInit {
     
 
   }
+
+
 
   dismiss() {
     this.modalController.dismiss();
