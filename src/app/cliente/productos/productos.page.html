@@ -8,34 +8,50 @@
 </ion-header>
 
 <ion-content>
+  <ion-grid>
+    <ion-searchbar 
+    placeholder="Buscar Producto(s)"
+    [(ngModel)]="searchTerm" 
+    (ionInput)="searchItems()">
+  </ion-searchbar>
+  </ion-grid>
   <ion-card>
-    <ng-container *ngIf="filtrados && filtrados.length > 0; else noProducts">
-      <ion-list>
-        <ion-item *ngFor="let producto of filtrados">
-          <ion-card>
-            <ion-card-header>
-              <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
-                <img *ngIf="producto.foto_producto" [src]="producto.foto_producto" alt="avatar" />
-              </ion-avatar>
-              <ion-card-title>{{ producto.nombre }}</ion-card-title>
-              <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
-            </ion-card-header>
-            <ion-card-content>
-              <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
-              <p><strong>Stock:</strong> {{ producto.stock }}</p>
-              <ion-button color="primary" (click)="verDetalle(producto.id)">
-                Acceder
-              </ion-button>
-            </ion-card-content>
-          </ion-card>
-        </ion-item>
-      </ion-list>
-    </ng-container>
-
-    <ng-template #noProducts>
-      <ion-text color="danger">
-        <ion-card class="ion-text-center">No se encontró información de productos</ion-card>
-      </ion-text>
-    </ng-template>
+    <ion-list>
+      <ion-item *ngFor="let producto of filtrados">
+        <ion-card-content>
+          <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
+            <img *ngIf="producto.foto_producto" [src]="producto.foto_producto" alt="avatar" />
+          </ion-avatar>
+          <ion-card-title>{{ producto.nombre }}</ion-card-title>
+          <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
+          <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
+          <p><strong>Stock:</strong> {{ producto.stock }}</p>
+          <ion-button color="primary" (click)="verDetalle(producto.id)">
+            Acceder
+          </ion-button>
+        </ion-card-content>
+      </ion-item>
+      <ion-item *ngIf="filtrados && filtrados.length === 0">
+        <ion-label>
+          <h5>Ups... Producto no encontrado.</h5>
+          <P>Deje la barra de búsqueda vacía o busque nuevamente lo que desea.</P>
+        </ion-label>
+      </ion-item>
+    </ion-list>
   </ion-card>
+
+  <!-- Mostrar mensaje cuando no haya resultados -->
+  <ng-template #noResultados>
+    <ion-text color="danger">
+      <ion-card class="ion-text-center">
+        No se encontraron productos.
+      </ion-card>
+    </ion-text>
+  </ng-template>
+</ion-content>
+
+<ion-content *ngIf="!productos || productos.length === 0">
+  <ion-text color="danger">
+    <ion-card class="ion-text-center">No hay productos disponibles</ion-card>
+  </ion-text>
 </ion-content>
