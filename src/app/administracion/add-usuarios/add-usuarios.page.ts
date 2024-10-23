@@ -353,6 +353,10 @@ export class AddUsuariosPage implements OnInit {
     this.email = '';
 
   }
+  clearClave(){
+    this.password = '';
+
+  }
   clearDirr(){
     this.direccion = '';
 
