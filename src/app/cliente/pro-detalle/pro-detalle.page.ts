@@ -52,10 +52,14 @@ export class ProDetallePage implements OnInit {
 
     // Agregar producto al carro
     await this.dbService.agregarProductoAlCarro(carroId, this.producto.id, this.cantidad, this.subtotal);
-    this.irHaciaAtras()
     
     // Mostrar alerta
     this.alertOpen = true;
+  }
+
+  cerrarAlerta() {
+    this.alertOpen = false;
+    this.irHaciaAtras();  // Llamamos la función al cerrar el alert
   }
 
   async crearCarro() {

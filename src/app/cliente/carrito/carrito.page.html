@@ -19,28 +19,27 @@
           <ion-card-subtitle>{{ detalle.descripcion }}</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
+          <p><strong>Precio:</strong> $ {{ detalle.precio | currency }}</p>
           <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
           <p><strong>Subtotal:</strong> {{ detalle.subtotal | currency }}</p>
+          <ion-button color="danger" (click)="eliminarProducto(detalle.producto_identificador)">
+            Eliminar
+          </ion-button>
         </ion-card-content>
       </ion-card>
-      <ion-button color="danger" (click)="eliminarProducto(detalle.id)">
-        Eliminar
-      </ion-button>
     </ion-item>
   </ion-list>
 
-  <ion-card>
-    <ion-text *ngIf="detalles.length === 0" color="danger">
-      <ion-card class="ion-text-center">No hay productos en el carrito</ion-card>
-    </ion-text>
-
-    <ion-item>
-      <ion-label>Total:</ion-label>
-      <ion-label>$ {{ totalCompra }}</ion-label>
-    </ion-item>
-
-    <ion-button expand="full" (click)="confirmarCompra()" color="success">
-      Confirmar Compra
-    </ion-button>
+  <ion-card *ngIf="detalles.length === 0" class="ion-text-center">
+    <ion-text color="danger">No hay productos en el carrito</ion-text>
   </ion-card>
+
+  <ion-item>
+    <ion-label>Total:</ion-label>
+    <ion-label>$ {{ totalCompra | currency }}</ion-label>
+  </ion-item>
+
+  <ion-button expand="full" (click)="confirmarCompra()" color="success">
+    Confirmar Compra
+  </ion-button>
 </ion-content>

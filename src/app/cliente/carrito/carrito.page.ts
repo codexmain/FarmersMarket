@@ -11,7 +11,7 @@ import { AlertController } from '@ionic/angular';
 export class CarritoPage implements OnInit {
   carro: any; // Para almacenar el carro de compras
   detalles: any[] = []; // Para almacenar los detalles de los productos en el carro
-  usuarioId: number=0; // Almacena el ID del usuario
+  usuarioId: number = 0; // Almacena el ID del usuario
   totalCompra: number = 0; // Para almacenar el total de la compra
 
   constructor(
@@ -50,9 +50,10 @@ export class CarritoPage implements OnInit {
     this.totalCompra = this.detalles.reduce((total, detalle) => total + detalle.subtotal, 0);
   }
 
-  async eliminarProducto(detalleId: number) {
-    await this.dbService.eliminarProductoDelCarro(detalleId);
-    this.detalles = this.detalles.filter(detalle => detalle.id !== detalleId);
+  // Eliminar producto usando el identificador único
+  async eliminarProducto(productoIdentificador: string) {
+    await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
+    this.detalles = this.detalles.filter(detalle => detalle.producto_identificador !== productoIdentificador);
     this.calcularTotal();
     this.presentAlert('Producto eliminado', 'El producto ha sido eliminado del carrito.');
   }
