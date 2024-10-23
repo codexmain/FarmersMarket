@@ -97,7 +97,7 @@
     </ion-card-content>
     <ion-item>
       <ion-label class="ion-text-left"><strong>Escoger Cantidad: </strong></ion-label>
-      <ion-input class="ion-text-right" type="number" [(ngModel)]="cantidad" min="0" [max]="producto.stock"
+      <ion-input class="ion-text-right" type="number" [(ngModel)]="cantidad" min="1" [max]="producto.stock"
         (ionInput)="actualizarSubtotal()">
       </ion-input>
     </ion-item>

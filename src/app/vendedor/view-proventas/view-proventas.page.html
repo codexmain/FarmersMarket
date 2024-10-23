@@ -7,63 +7,151 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="false">
+<ion-content>
   <ion-card>
-    <ion-card-header class="custom-card-header">Detalles Producto</ion-card-header>
+    <form (ngSubmit)="guardarCambios()">
+      <ion-item style="align-items: center; flex-direction: column;">
 
-    <ion-item>
-      <ion-label>Seleccionar Vendedor:</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="proveedor_id" name="proveedor_id">
-        <ion-select-option *ngFor="let vendedor of arrayCmbProvedores" [value]="vendedor.id">{{ vendedor.nombre_empresa }}</ion-select-option>
-      </ion-select>
-    </ion-item>
 
-    <ion-item style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
-      <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
-        <img *ngIf="photo" [src]="photo" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;" />
-      </ion-avatar>
-    </ion-item>
+        <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
+          <ion-avatar
+            style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="foto_producto && foto_producto !== ''" [src]="foto_producto" alt="Foto del Producto"
+              style="width: 100%; height: 100%; object-fit: cover;" />
 
-    <ion-item>
-      <ion-label position="floating">Nombre Producto</ion-label>
-      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="nombre_producto" name="nombre_producto"></ion-input>
-    </ion-item>
+            <!-- Mostrar imagen por defecto según el ID -->
+            <ng-container *ngIf="!foto_producto || foto_producto === ''">
+              <ng-container *ngIf="productoId === 1">
+                <img src="../../assets/imgProductos/producto1.png" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 2">
+                <img src="../../assets/imgProductos/producto2.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 3">
+                <img src="../../assets/imgProductos/producto3.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 4">
+                <img src="../../assets/imgProductos/producto4.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 5">
+                <img src="../../assets/imgProductos/producto5.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 6">
+                <img src="../../assets/imgProductos/producto6.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 7">
+                <img src="../../assets/imgProductos/producto7.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 8">
+                <img src="../../assets/imgProductos/producto8.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 9">
+                <img src="../../assets/imgProductos/producto9.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 10">
+                <img src="../../assets/imgProductos/producto10.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 11">
+                <img src="../../assets/imgProductos/producto11.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 12">
+                <img src="../../assets/imgProductos/producto12.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 13">
+                <img src="../../assets/imgProductos/producto13.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 14">
+                <img src="../../assets/imgProductos/producto14.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 15">
+                <img src="../../assets/imgProductos/producto15.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 16">
+                <img src="../../assets/imgProductos/producto16.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 17">
+                <img src="../../assets/imgProductos/producto17.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 18">
+                <img src="../../assets/imgProductos/producto18.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 19">
+                <img src="../../assets/imgProductos/producto19.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 20">
+                <img src="../../assets/imgProductos/producto20.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+              <ng-container *ngIf="productoId === 21">
+                <img src="../../assets/imgProductos/producto21.jpg" alt="Imagen por Defecto"
+                  style="width: 100%; height: 100%; object-fit: cover;" />
+              </ng-container>
+            </ng-container>
 
-    <ion-item>
-      <ion-label position="floating">Descripción Producto</ion-label>
-      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="descripcion_producto" name="descripcion_producto"></ion-input>
-    </ion-item>
+            <img *ngIf="foto_producto" [src]="foto_producto" alt="avatar"
+              style="width: 100%; height: 100%; object-fit: cover;" />
+          </ion-avatar>
+        </div>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Precio Producto (CLP)</ion-label>
-      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="precio" name="precio"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Nombre del Producto</ion-label>
+        <ion-input [(ngModel)]="nombre" name="nombre" disabled></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Stock/Existencias del Producto</ion-label>
-      <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="stock" name="stock"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-input [(ngModel)]="descripcion" name="descripcion" disabled></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>El Producto Es Orgánico:</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="organico" name="organico">
-        <ion-select-option value=0>No es Orgánico</ion-select-option>
-        <ion-select-option value=1>Es Orgánico</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-input type="number" [(ngModel)]="precio" name="precio" disabled></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Seleccionar Categoría:</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="categoria_id" name="categoria_id">
-        <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Stock</ion-label>
+        <ion-input type="number" [(ngModel)]="stock" name="stock" disabled></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Seleccionar SubCategoría:</ion-label>
-      <ion-select [disabled]="isDisabled" [(ngModel)]="subcategoria_id" name="subcategoria_id">
-        <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <ion-item>
+        <ion-label>¿Producto Orgánico?: </ion-label>
+        <ion-label *ngIf="organico === 1; else noOrganico">  Es Orgánico</ion-label>
+        <ng-template #noOrganico>
+          <ion-label>  No es Orgánico</ion-label>
+        </ng-template>
+      </ion-item>
+      
+
+      <ion-item>
+        <ion-label>Categoría: </ion-label>
+        <ion-input [(ngModel)]="  categoriaNombre" disabled></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Subcategoría: </ion-label>
+        <ion-input [(ngModel)]="  subcategoriaNombre" disabled></ion-input>
+      </ion-item>
+
+    </form>
   </ion-card>
 </ion-content>

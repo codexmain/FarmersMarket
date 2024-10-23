@@ -8,7 +8,7 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
   styleUrls: ['./regventas.page.scss'],
 })
 export class RegventasPage implements OnInit {
-  productosVendidos: any[] = [];
+  productosComprados: any[] = [];
   emailVendedor: string = '';
 
   constructor(
@@ -25,7 +25,7 @@ export class RegventasPage implements OnInit {
       // Verificar si se obtuvo un email válido
       if (this.emailVendedor) {
         // Obtener productos vendidos por vendedor
-        this.productosVendidos = await this.dbService.getProductosVendidosVendedor(this.emailVendedor);
+        this.productosComprados = await this.dbService.getProductosVendidosVendedor(this.emailVendedor);
       } else {
         console.warn('No se encontró un email en Native Storage.');
       }

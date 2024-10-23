@@ -40,9 +40,25 @@ export class CarritoPage implements OnInit {
     this.carro = await this.dbService.getCarroCompra(this.usuarioId);
     if (this.carro) {
       this.detalles = await this.dbService.getDetallesCarro(this.carro.id);
+      
+      // Cargar precios de los productos
+      await this.cargarPreciosProductos();
+      
       this.calcularTotal();
     } else {
       console.log('No hay productos en el carrito.');
+    }
+  }
+
+  async cargarPreciosProductos() {
+    for (const detalle of this.detalles) {
+      const producto = await this.dbService.getProducto(detalle.producto_id);
+      if (producto) {
+        detalle.nombre = producto.nombre;
+        detalle.descripcion = producto.descripcion;
+        detalle.precio = producto.precio; // Asignar el precio del producto al detalle
+        detalle.subtotal = detalle.precio * detalle.cantidad; // Actualiza el subtotal
+      }
     }
   }
 
@@ -50,7 +66,6 @@ export class CarritoPage implements OnInit {
     this.totalCompra = this.detalles.reduce((total, detalle) => total + detalle.subtotal, 0);
   }
 
-  // Eliminar producto usando el identificador único
   async eliminarProducto(productoIdentificador: string) {
     await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
     this.detalles = this.detalles.filter(detalle => detalle.producto_identificador !== productoIdentificador);
