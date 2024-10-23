@@ -11,36 +11,48 @@
   <ion-card>
     <form (ngSubmit)="actualizarUsuario()">
       <ion-item style="align-items: center; flex-direction: column;">
-        <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
+        <ion-button (click)="takePicture()">Cambiar Foto</ion-button><br>
+    
         <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
-          <ion-avatar
-            style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
-            <img *ngIf="usuario.foto_perfil" [src]="usuario.foto_perfil" alt="avatar"
-              style="width: 100%; height: 100%; object-fit: cover;" />
+          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="usuario.foto_perfil" 
+                 [src]="usuario.foto_perfil" 
+                 alt="avatar" 
+                 style="width: 100%; height: 100%; object-fit: cover;"/>
           </ion-avatar>
         </div>
       </ion-item>
 
-      <!-- Campos de datos personales -->
       <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
-        <ion-input [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ingresar Nombre" #nombreCtrl="ngModel"></ion-input>
+        <ion-input [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ingresar Nombre" #pNombreCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearPNombre()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
-      <div *ngIf="nombreCtrl.invalid && (nombreCtrl.dirty || nombreCtrl.touched)" class="error-message">
+      <div *ngIf="pNombreCtrl.invalid && (pNombreCtrl.dirty || pNombreCtrl.touched)" class="error-message">
         El primer nombre es obligatorio y debe tener entre 2 y 40 caracteres.
       </div>
+
 
       <ion-item>
         <ion-label position="stacked">Segundo Nombre (Opcional)</ion-label>
         <ion-input [(ngModel)]="usuario.segundo_nombre" name="segundo_nombre" placeholder="Ingresar Segundo Nombre" #sNombreCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearSNombre()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
       <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
         El segundo nombre debe tener entre 2 y 40 caracteres.
       </div>
+      
 
       <ion-item>
         <ion-label position="stacked">Apellido Paterno</ion-label>
         <ion-input [(ngModel)]="usuario.apellido_paterno" name="apellido_paterno" required placeholder="Ingresar Apellido Paterno" #aPaternoCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearAPaterno()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
       <div *ngIf="aPaternoCtrl.invalid && (aPaternoCtrl.dirty || aPaternoCtrl.touched)" class="error-message">
         El apellido paterno es obligatorio y debe tener entre 2 y 40 caracteres.
@@ -49,6 +61,9 @@
       <ion-item>
         <ion-label position="stacked">Apellido Materno (Opcional)</ion-label>
         <ion-input [(ngModel)]="usuario.apellido_materno" name="apellido_materno" placeholder="Ingresar Apellido Materno" #aMaternoCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearAMaterno()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
       <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
         El apellido materno debe tener entre 2 y 40 caracteres.
@@ -61,80 +76,69 @@
 
       <ion-item>
         <ion-label position="stacked">Nombre de la Empresa</ion-label>
-        <ion-input [disabled]="isDisabled" [(ngModel)]="usuario.nombre_empresa" name="nombre_empresa"
-          placeholder="Ingresar Nombre de la Empresa"></ion-input>
+        <ion-input [(ngModel)]="usuario.nombre_empresa" name="nombre_empresa" placeholder="Ingresar Nombre de la Empresa" #empresaCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearEmpresa()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
+      <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
+        El nombre de la empresa debe entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
+      </div>
 
       <ion-item>
         <ion-label position="stacked">Descripción Corta</ion-label>
-        <ion-input [disabled]="isDisabled" [(ngModel)]="usuario.descripcion_corta" name="descripcion_corta"
-          placeholder="Ingresar Descripción Corta"></ion-input>
+        <ion-input [(ngModel)]="usuario.descripcion_corta" name="descripcion_corta" placeholder="Ingresar Descripción Corta" #descEmpresaCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
       </ion-item>
+      <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
+        La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
+      </div>
 
-      <!-- Selector de Dirección Actual -->
-      <ion-item>
-        <ion-label>Dirección Actual</ion-label>
-        <ion-select [(ngModel)]="direccionSeleccionada" name="direccionSeleccionada" (ionChange)="cambiarDireccion()">
-          <ion-select-option *ngFor="let dir of direcciones" [value]="dir">
-            {{ dir.direccion }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-button style="margin: 20px 20px;" expand="full" type="submit">Actualizar</ion-button>
-    </form>
-  </ion-card><br>
-
-  <!-- Agregar Nueva Dirección -->
-  <ion-card>
-    <ion-item-divider>
-      <ion-label>Agregar Nueva Dirección</ion-label>
-    </ion-item-divider>
-    <form (ngSubmit)="agregarDireccion()">
       <ion-item>
         <ion-label>Región</ion-label>
-        <ion-select [(ngModel)]="nuevaDireccion.region_id" name="region_id"
-          (ionChange)="cargarcomunas(nuevaDireccion.region_id)" required>
+        <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region" required  #regionCtrl="ngModel">
           <ion-select-option *ngFor="let region of regiones" [value]="region.id">
             {{ region.nombre }}
           </ion-select-option>
         </ion-select>
       </ion-item>
+      <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
+        La región es obligatoria.
+      </div>
+
+
 
       <ion-item>
         <ion-label>Comuna</ion-label>
-        <ion-select [(ngModel)]="nuevaDireccion.comuna_id" name="comuna_id" required>
+        <ion-select [(ngModel)]="usuario.comuna_id" name="comuna" #comunaCtrl="ngModel" required [disabled]="!usuario.region_id">
           <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
             {{ comuna.nombre }}
           </ion-select-option>
         </ion-select>
       </ion-item>
+      <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
+        La comuna es obligatoria.
+      </div>    
+
 
       <ion-item>
-        <ion-label position="floating">Dirección</ion-label>
-        <ion-input [(ngModel)]="nuevaDireccion.direccion" name="direccion" required></ion-input>
+        <ion-label position="stacked">Dirección</ion-label>
+        <ion-input id="autoscroll-input" [(ngModel)]="usuario.direccion" name="direccion" required placeholder="Escribe la ubicación o usa el Marcador (automatico)" #dirCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearDirr()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
+        <ion-button fill="outline" slot="end" (click)="useCurrentLocation()">
+          <ion-icon name="location-sharp"></ion-icon>
+        </ion-button>
       </ion-item>
+      <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">
+        La dirección es obligatoria y debe tener un formato válido.
+      </div>
 
-      <ion-button expand="block" type="submit">Agregar Dirección</ion-button>
+
+      <ion-button style="margin: 20px 20px;" expand="full" type="submit">Actualizar</ion-button>
     </form>
-  </ion-card>
-
-  <!-- Eliminar Dirección -->
-  <ion-card>
-    <ion-item-divider>
-      <ion-label>Eliminar Dirección Existente</ion-label>
-    </ion-item-divider>
-
-    <form (ngSubmit)="eliminarDireccion()">
-      <ion-item>
-          <ion-label>Seleccione Dirección</ion-label>
-          <ion-select [(ngModel)]="direccionAEliminar" name="direccionAEliminar" required>
-              <ion-select-option *ngFor="let direccion of direcciones" [value]="direccion.id">
-                  {{ direccion.direccion }}
-              </ion-select-option>
-          </ion-select>
-      </ion-item>
-      <ion-button expand="block" type="submit">Eliminar Dirección</ion-button>
-  </form>
   </ion-card>
 </ion-content>
