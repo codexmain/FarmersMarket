@@ -14,15 +14,21 @@ export class ProductosPage implements OnInit {
   searchTerm: string = ''; // Término de búsqueda
   usuario: any; // Variable para almacenar los datos del usuario
 
+
   constructor(
     private router: Router,
     private dbService: DataBaseService,
     private nativeStorage: NativeStorage
-  ) {}
+  ) { }
 
   async ngOnInit() {
     await this.cargarDatosUsuario(); // Cargar datos del usuario
     await this.cargarProductos(); // Cargar productos
+  }
+
+  async ionViewWillEnter() {
+    await this.cargarProductos();
+    await this.cargarDatosUsuario();
   }
 
   async cargarDatosUsuario() {
@@ -51,16 +57,19 @@ export class ProductosPage implements OnInit {
     this.router.navigate([`/pro-detalle`, productoId]); // Navegar a la página de detalles del producto
   }
 
-  filtrarProductos() {
-    // Verifica si el término de búsqueda está vacío
+  searchItems() {
+    // Si el término de búsqueda está vacío, mostrar todos los productos
     if (this.searchTerm.trim() === '') {
-      this.filtrados = this.productos; // Restablecer a todos los productos
+      this.filtrados = this.productos.slice(1);
     } else {
-      // Filtrar productos según el término de búsqueda
-      this.filtrados = this.productos.filter(producto =>
+      // Filtrar por nombre o descripción
+      const resultados = this.productos.slice(1).filter(producto =>
         producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         producto.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
+      // Si no se encuentran productos, establecer lista vacía
+      this.filtrados = resultados.length > 0 ? resultados : [];
+
     }
   }
 }
