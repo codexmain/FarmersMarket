@@ -43,6 +43,7 @@ export class ProInicioPage implements OnInit {
       console.error('Error al cargar los productos:', error);
     }
   }
+  
 
 
   verDetalle(productoId: number) {

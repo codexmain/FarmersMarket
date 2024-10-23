@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataBaseService } from '../../services/data-base.service'; 
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-pro-detalle',
@@ -21,7 +21,8 @@ export class ProDetallePage implements OnInit {
     private router: Router,
     private dbService: DataBaseService,
     private nativeStorage: NativeStorage,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private navCtrl: NavController // Para regresar a la página anterior
   ) {}
 
   async ngOnInit() {
@@ -29,6 +30,9 @@ export class ProDetallePage implements OnInit {
     this.producto = await this.dbService.getProducto(productoId); // Función para obtener el producto
     await this.obtenerUsuarioId();
     this.actualizarSubtotal(); // Calcular el subtotal inicial
+  }
+  irHaciaAtras() {
+    this.navCtrl.pop(); // Regresa a la página anterior
   }
 
   async obtenerUsuarioId() {
@@ -48,6 +52,7 @@ export class ProDetallePage implements OnInit {
 
     // Agregar producto al carro
     await this.dbService.agregarProductoAlCarro(carroId, this.producto.id, this.cantidad, this.subtotal);
+    this.irHaciaAtras()
     
     // Mostrar alerta
     this.alertOpen = true;
