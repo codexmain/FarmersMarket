@@ -290,6 +290,9 @@ export class ModUsuarioPage implements OnInit {
     this.usuario.direccion = '';
 
   }
+  clearClave() {
+    this.usuario.clave = '';
+  }
 
   async useCurrentLocation() {
     try {

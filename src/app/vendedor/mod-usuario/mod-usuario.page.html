@@ -36,8 +36,8 @@
 
 
       <ion-item>
-        <ion-label position="stacked" #pNombreCtrl="ngModel">Segundo Nombre (Opcional)</ion-label>
-        <ion-input [(ngModel)]="usuario.segundo_nombre" name="segundo_nombre" placeholder="Ingresar Segundo Nombre"></ion-input>
+        <ion-label position="stacked">Segundo Nombre (Opcional)</ion-label>
+        <ion-input [(ngModel)]="usuario.segundo_nombre" name="segundo_nombre" placeholder="Ingresar Segundo Nombre" #sNombreCtrl="ngModel"></ion-input>
         <ion-button fill="outline" slot="end" (click)="clearSNombre()">
           <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
         </ion-button>
@@ -98,7 +98,7 @@
 
       <ion-item>
         <ion-label>Región</ion-label>
-        <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region" required  #regionCtrl="ngModel>
+        <ion-select [(ngModel)]="usuario.region_id" (ionChange)="cargarcomunas($event.detail.value)" name="region" required  #regionCtrl="ngModel">
           <ion-select-option *ngFor="let region of regiones" [value]="region.id">
             {{ region.nombre }}
           </ion-select-option>
