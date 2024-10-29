@@ -16,6 +16,7 @@ import { LocationValidationService } from 'src/app/services/location-validation.
 export class ModCuentaPage implements OnInit {
 
   // Variables del usuario
+  isDisabled = true;
   usuario: any = {
     nombre: '',
     segundo_nombre: '',
@@ -151,11 +152,7 @@ export class ModCuentaPage implements OnInit {
       return false;
     }
 
-    // Validar empresa
-    if (!this.usuario.nombre_empresa) {
-      await this.presentAlert('Error', 'El nombre de la empresa es obligatorio.');
-      return false;
-    }
+   
     
     const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
     if (!empresaPattern.test(this.usuario.nombre_empresa)) {
@@ -164,11 +161,7 @@ export class ModCuentaPage implements OnInit {
     }
     
 
-    // Validar descripción de la empresa
-    if (!this.usuario.descripcion_corta) {
-      await this.presentAlert('Error', 'La descripción de la empresa es obligatoria.');
-      return false;
-    }
+    
 
     const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
     if (!descEmpresaPattern.test(this.usuario.descripcion_corta)) {
