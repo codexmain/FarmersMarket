@@ -18,6 +18,12 @@ import { CmbComuna } from './cmb-comuna';
 export class DataBaseService {
   public database!: SQLiteObject;
 
+ //agregado de la tabla amonestaciones
+ tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            descripcion TEXT NOT NULL
+          );`; 
+
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,11 +53,14 @@ export class DataBaseService {
             nombre_empresa TEXT,
             descripcion_corta TEXT, 
             foto_perfil TEXT,
-            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
+            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada', 'amonestada')) DEFAULT 'activa' NOT NULL, 
+            amonestacion_id INTEGER,
+            detalle_amonestacion TEXT,
             fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
             tipo_usuario_id INTEGER NOT NULL,
-            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
-          );`;
+            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id),
+            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
+          );`; //aca se le agrego el amonestada, para el tema de que modifque si es inapropiado un campo
 
   tblDireccion: string = `CREATE TABLE IF NOT EXISTS direccion(
             id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
@@ -66,13 +75,15 @@ export class DataBaseService {
 
   tblCategoria: string = `CREATE TABLE IF NOT EXISTS categoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL UNIQUE
+            nombre TEXT NOT NULL UNIQUE,
+            estado_categoria TEXT CHECK(estado_categoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL
           );`;
 
   tblSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             categoria_id INTEGER NOT NULL,
+            estado_subcategoria TEXT CHECK(estado_categoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL,
             FOREIGN KEY (categoria_id) REFERENCES categoria(id)
           );`;
 
@@ -87,8 +98,12 @@ export class DataBaseService {
             foto_producto TEXT,
             subcategoria_id INTEGER NOT NULL,
             fecha_agregado TEXT DEFAULT(datetime('now')),
+            estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada', 'amonestada')) DEFAULT 'activa' NOT NULL, 
+            amonestacion_id INTEGER,
+            detalle_amonestacion TEXT,
             FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
-            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
+            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id),
+            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
           );`;
 
   tblCarroCompra: string = `CREATE TABLE IF NOT EXISTS carro_compra (
@@ -841,7 +856,7 @@ JOIN
   seleccionarCbmProveedores() {
     return this.database
       .executeSql(
-        'SELECT id, nombre_empresa FROM usuario WHERE nombre_empresa NOTNULL AND id > 1',
+        'SELECT id, nombre_empresa FROM usuario WHERE estado_cuenta = "activa" AND nombre_empresa NOTNULL AND id > 1',
         []
       )
       .then((res) => {
@@ -866,7 +881,7 @@ JOIN
   seleccionarCmbSubCategorias(id: number) {
     return this.database
       .executeSql(
-        'SELECT id, nombre FROM subcategoria WHERE categoria_id = ?',
+        'SELECT id, nombre FROM subcategoria WHERE estado_subcategoria = "activa" AND categoria_id = ?',
         [id]
       )
       .then((res) => {
@@ -887,6 +902,9 @@ JOIN
         this.listadoCmbSubCategorias.next(items as any);
       });
   }
+
+  //se debe agregar el combobox de categoría, ya que el otro como queda con otro parametro más no sirve, hay que conectarlo con el ts respectivo despues
+
 
   seleccionarCmbTipUsuario() {
     return this.database
