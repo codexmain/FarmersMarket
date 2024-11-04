@@ -97,6 +97,8 @@
           </ion-avatar>
           <ion-card-title>{{ producto.nombre }}</ion-card-title>
           <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
+          <p><strong>Proveedor:</strong> {{ producto.nombre_proveedor }}</p>
+          <p><strong>Empresa:</strong> {{ producto.empresa_proveedor }}</p>
           <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
           <p><strong>Stock:</strong> {{ producto.stock }}</p>
           <ion-button color="primary" (click)="verDetalle(producto.id)">

@@ -18,11 +18,11 @@ import { CmbComuna } from './cmb-comuna';
 export class DataBaseService {
   public database!: SQLiteObject;
 
- //agregado de la tabla amonestaciones
- tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
+  //agregado de la tabla amonestaciones
+  tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             descripcion TEXT NOT NULL
-          );`; 
+          );`;
 
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
@@ -83,7 +83,7 @@ export class DataBaseService {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             categoria_id INTEGER NOT NULL,
-            estado_subcategoria TEXT CHECK(estado_categoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL,
+            estado_subcategoria TEXT CHECK(estado_subcategoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL,
             FOREIGN KEY (categoria_id) REFERENCES categoria(id)
           );`;
 
@@ -469,6 +469,7 @@ export class DataBaseService {
   async crearTablas() {
     try {
       //ejecuto la creación de Tablas
+      await this.database.executeSql(this.tblAmonestaciones, []);
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
       await this.database.executeSql(this.tblTipoUsuario, []);
@@ -1718,7 +1719,7 @@ JOIN
     return productos;
   }
 
-  
+
 
   public async getProductos(): Promise<any[]> {
     try {
@@ -1739,6 +1740,33 @@ JOIN
       return productos;
     } catch (error) {
       console.error('Error al obtener los productos:', error);
+      return [];
+    }
+  }
+
+
+  //obtener productos con el nombre del proveedor y empresa asociada
+  public async getProductosConProveedor(): Promise<any[]> {
+    try {
+      const query = `
+      SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
+             p.organico, p.foto_producto, s.nombre AS subcategoria, 
+             u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
+      FROM producto p
+      JOIN usuario u ON p.proveedor_id = u.id
+      JOIN subcategoria s ON p.subcategoria_id = s.id;
+    `;
+
+      const result = await this.database.executeSql(query, []);
+      const productos = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        productos.push(result.rows.item(i));
+      }
+
+      console.log('Productos con proveedor obtenidos:', productos);
+      return productos;
+    } catch (error) {
+      console.error('Error al obtener productos con proveedor:', error);
       return [];
     }
   }
@@ -2180,13 +2208,13 @@ JOIN
   //MOD-PROVENTAS
 
   async modProducto(
-    productoId: number, 
-    nombre: string, 
-    descripcion: string, 
-    precio: number, 
-    stock: number, 
-    organico: number, 
-    subcategoriaId: number, 
+    productoId: number,
+    nombre: string,
+    descripcion: string,
+    precio: number,
+    stock: number,
+    organico: number,
+    subcategoriaId: number,
     foto_producto: string
   ): Promise<void> {
     const query = `
@@ -2194,7 +2222,7 @@ JOIN
       SET nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, subcategoria_id = ?, foto_producto = ?
       WHERE id = ?
     `;
-  
+
     return new Promise((resolve, reject) => {
       this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto, productoId])
         .then(() => resolve())
@@ -2248,24 +2276,24 @@ JOIN
 
   //REGVENTAS
 
- // Obtener productos vendidos por el proveedor (vendedor)
-async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
-  try {
-    // Obtener el id del proveedor utilizando el email
-    const usuario = await this.database.executeSql(
-      'SELECT id FROM usuario WHERE email = ?',
-      [emailVendedor]
-    );
+  // Obtener productos vendidos por el proveedor (vendedor)
+  async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
+    try {
+      // Obtener el id del proveedor utilizando el email
+      const usuario = await this.database.executeSql(
+        'SELECT id FROM usuario WHERE email = ?',
+        [emailVendedor]
+      );
 
-    if (usuario.rows.length === 0) {
-      console.error('Proveedor no encontrado.');
-      return [];
-    }
+      if (usuario.rows.length === 0) {
+        console.error('Proveedor no encontrado.');
+        return [];
+      }
 
-    const proveedorId = usuario.rows.item(0).id;
+      const proveedorId = usuario.rows.item(0).id;
 
-    // Obtener detalles de la venta usando el proveedor_id
-    const query = `
+      // Obtener detalles de la venta usando el proveedor_id
+      const query = `
       SELECT 
         p.id AS producto_id,
         p.nombre,
@@ -2288,18 +2316,18 @@ async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
         p.proveedor_id = ?;
     `;
 
-    const result = await this.database.executeSql(query, [proveedorId]);
-    const productosVendidos = [];
-    for (let i = 0; i < result.rows.length; i++) {
-      productosVendidos.push(result.rows.item(i));
-    }
+      const result = await this.database.executeSql(query, [proveedorId]);
+      const productosVendidos = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        productosVendidos.push(result.rows.item(i));
+      }
 
-    return productosVendidos;
-  } catch (error) {
-    console.error('Error al obtener productos vendidos por vendedor:', error);
-    throw error;
+      return productosVendidos;
+    } catch (error) {
+      console.error('Error al obtener productos vendidos por vendedor:', error);
+      throw error;
+    }
   }
-}
 
 
   //MOD-CUENTA
@@ -2325,7 +2353,7 @@ async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
       const result = await this.database.executeSql(queryID, [usuario_id]);
       const maxId = result.rows.item(0).maxId || 0; // Si no hay IDs, comenzamos desde 0
       const nuevoId = maxId + 1; // Incrementar para nuevo ID
-  
+
       const query = `INSERT INTO direccion (id, usuario_id, comuna_id, direccion, preferida) VALUES (?, ?, ?, ?, 0);`;
       await this.database.executeSql(query, [nuevoId, usuario_id, comuna_id, direccion]);
     } catch (error) {
@@ -2365,7 +2393,7 @@ async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
       JOIN region r ON c.region_id = r.id
       WHERE u.email = ?;
     `;
-  
+
     try {
       const result = await this.database.executeSql(query, [email]);
       if (result.rows.length > 0) {
@@ -2381,33 +2409,33 @@ async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
   }
 
   async obtenerDireccionesUsuario(usuarioId: number): Promise<any[]> {
-  const query = 'SELECT * FROM direccion WHERE usuario_id = ?';
-  try {
-    const result = await this.database.executeSql(query, [usuarioId]);
-    const direcciones = [];
-    for (let i = 0; i < result.rows.length; i++) {
-      direcciones.push(result.rows.item(i));
+    const query = 'SELECT * FROM direccion WHERE usuario_id = ?';
+    try {
+      const result = await this.database.executeSql(query, [usuarioId]);
+      const direcciones = [];
+      for (let i = 0; i < result.rows.length; i++) {
+        direcciones.push(result.rows.item(i));
+      }
+      return direcciones;
+    } catch (error) {
+      console.error('Error al obtener direcciones:', error);
+      return [];
     }
-    return direcciones;
-  } catch (error) {
-    console.error('Error al obtener direcciones:', error);
-    return [];
   }
-}
-  
-async agregarDirec(usuarioId: number, comunaId: number, direccion: string) {
-  const query = 'INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?)';
-  try {
-    await this.database.executeSql(query, [usuarioId, comunaId, direccion]);
-  } catch (error) {
-    console.error('Error al agregar dirección:', error);
-  }
-}
 
-async actualizarUsuarioEmail(usuario: any): Promise<boolean> {
-  try {
-    // Actualiza la información del usuario
-    const sql = `
+  async agregarDirec(usuarioId: number, comunaId: number, direccion: string) {
+    const query = 'INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?)';
+    try {
+      await this.database.executeSql(query, [usuarioId, comunaId, direccion]);
+    } catch (error) {
+      console.error('Error al agregar dirección:', error);
+    }
+  }
+
+  async actualizarUsuarioEmail(usuario: any): Promise<boolean> {
+    try {
+      // Actualiza la información del usuario
+      const sql = `
     UPDATE usuario
     SET 
       nombre = ?, 
@@ -2421,37 +2449,37 @@ async actualizarUsuarioEmail(usuario: any): Promise<boolean> {
       tipo_usuario_id = ?
     WHERE email = ?`; // No se cambia el email
 
-    const result = await this.database.executeSql(sql, [
-      usuario.nombre,
-      usuario.segundo_nombre || null,
-      usuario.apellido_paterno,
-      usuario.apellido_materno || null,
-      usuario.nombre_empresa || null,
-      usuario.descripcion_corta || null,
-      usuario.foto_perfil || null,
-      usuario.estado_cuenta,
-      usuario.tipo_usuario_id,
-      usuario.email // Se utiliza el email para identificar al usuario
-    ]);
+      const result = await this.database.executeSql(sql, [
+        usuario.nombre,
+        usuario.segundo_nombre || null,
+        usuario.apellido_paterno,
+        usuario.apellido_materno || null,
+        usuario.nombre_empresa || null,
+        usuario.descripcion_corta || null,
+        usuario.foto_perfil || null,
+        usuario.estado_cuenta,
+        usuario.tipo_usuario_id,
+        usuario.email // Se utiliza el email para identificar al usuario
+      ]);
 
-    if (result.rowsAffected > 0) {
-      // Luego de actualizar el usuario, actualizamos la dirección si se proporciona
-      const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
-      if (usuarioId) {
-        // Asegúrate de que los campos comuna_id y direccion están definidos en el objeto usuario
-        return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
+      if (result.rowsAffected > 0) {
+        // Luego de actualizar el usuario, actualizamos la dirección si se proporciona
+        const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
+        if (usuarioId) {
+          // Asegúrate de que los campos comuna_id y direccion están definidos en el objeto usuario
+          return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
+        }
       }
+
+      return false; // Retorna false si no se pudo actualizar
+    } catch (error) {
+      console.error('Error al actualizar el usuario:', error);
+      return false;
     }
-
-    return false; // Retorna false si no se pudo actualizar
-  } catch (error) {
-    console.error('Error al actualizar el usuario:', error);
-    return false;
   }
-}
 
-async getProductosCompradosUsuario(email: string): Promise<any[]> {
-  const query = `
+  async getProductosCompradosUsuario(email: string): Promise<any[]> {
+    const query = `
     SELECT 
       p.id AS producto_id,
       p.nombre,
@@ -2473,44 +2501,44 @@ async getProductosCompradosUsuario(email: string): Promise<any[]> {
       c.usuario_id = (SELECT id FROM usuario WHERE email = ?);
   `;
 
-  const result = await this.database.executeSql(query, [email]);
+    const result = await this.database.executeSql(query, [email]);
 
-  let productos = [];
-  for (let i = 0; i < result.rows.length; i++) {
-    productos.push(result.rows.item(i));
+    let productos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productos.push(result.rows.item(i));
+    }
+    return productos;
   }
-  return productos;
-}
 
-async obtenerCategoriaNombre(categoriaId: any) {
-  const query = `SELECT nombre FROM categoria WHERE id = ?`;
-  try {
+  async obtenerCategoriaNombre(categoriaId: any) {
+    const query = `SELECT nombre FROM categoria WHERE id = ?`;
+    try {
       const resultado = await this.database.executeSql(query, [categoriaId]);
       if (resultado.rows.length > 0) {
-          return resultado.rows.item(0).nombre;
+        return resultado.rows.item(0).nombre;
       } else {
-          return null; // No se encontró la categoría
+        return null; // No se encontró la categoría
       }
-  } catch (error) {
+    } catch (error) {
       console.error('Error al obtener el nombre de la categoría:', error);
       throw error; // Propagar el error
+    }
   }
-}
 
-async obtenerSubcategoriaNombre(subcategoriaId: any) {
-  const query = `SELECT nombre FROM subcategoria WHERE id = ?`;
-  try {
+  async obtenerSubcategoriaNombre(subcategoriaId: any) {
+    const query = `SELECT nombre FROM subcategoria WHERE id = ?`;
+    try {
       const resultado = await this.database.executeSql(query, [subcategoriaId]);
       if (resultado.rows.length > 0) {
-          return resultado.rows.item(0).nombre;
+        return resultado.rows.item(0).nombre;
       } else {
-          return null; // No se encontró la subcategoría
+        return null; // No se encontró la subcategoría
       }
-  } catch (error) {
+    } catch (error) {
       console.error('Error al obtener el nombre de la subcategoría:', error);
       throw error; // Propagar el error
+    }
   }
-}
 
 
 }

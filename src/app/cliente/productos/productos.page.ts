@@ -45,7 +45,7 @@ export class ProductosPage implements OnInit {
 
   async cargarProductos() {
     try {
-      this.productos = await this.dbService.getAllProductos();
+      this.productos = await this.dbService.getProductosConProveedor();
       console.log('Productos cargados:', this.productos); // Log para verificar los productos
       this.filtrados = this.productos.slice(1); // Omitir el primer producto
     } catch (error) {
