@@ -11,12 +11,14 @@ import { CmbTipUsuario } from './cmb-tip-usuario';
 import { CmbProveedores } from './cmb-proveedores';
 import { CmbRegion } from './cmb-region';
 import { CmbComuna } from './cmb-comuna';
+import { OlvideContraService } from './olvide-contra.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataBaseService {
   public database!: SQLiteObject;
+  private correoExiste = new BehaviorSubject<boolean>(false);
 
   //agregado de la tabla amonestaciones
   tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
@@ -420,9 +422,11 @@ export class DataBaseService {
   private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
+    private olvideContraService: OlvideContraService,
     private sqlite: SQLite,
     private platform: Platform,
-    private alertController: AlertController
+    private alertController: AlertController,
+    
   ) {
     this.createBD();
   }
@@ -1534,40 +1538,7 @@ JOIN
     }
   }
 
-  //RECUPERAR-PASSWORD
-  // Recuperar contraseña por correo
-  async recuperarcon(correo: string): Promise<any> {
-    try {
-      const result = await this.database.executeSql(
-        'SELECT * FROM usuario WHERE email = ?',
-        [correo]
-      );
 
-      if (result.rows.length === 0) {
-        await this.presentAlert('Error', 'El email ingresado no existe.');
-      }
-
-      const user = result.rows.item(0);
-      return user; // Retornar el usuario si se encuentra
-    } catch (error) {
-      console.error('Error al recuperar contraseña:', error);
-      throw error;
-    }
-  }
-
-  // Actualizar la contraseña del usuario
-  async actualizarcon(correo: string, nuevaPassword: string): Promise<void> {
-    try {
-      await this.database.executeSql(
-        'UPDATE usuario SET contrasena = ? WHERE email = ?',
-        [nuevaPassword, correo]
-      );
-      await this.presentAlert('¡Éxito!', `Contraseña actualizada.`);
-    } catch (error) {
-      console.error('Error al actualizar la contraseña:', error);
-      throw error;
-    }
-  }
 
   //REGISTER
   async Regiones(): Promise<any[]> {
@@ -2540,5 +2511,96 @@ JOIN
     }
   }
 
+  //funsiones  javier pruebas 
+  // Función para generar un código de verificación de 6 dígitos
+  private generateVerificationCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Genera un número aleatorio de 6 dígitos
+  }
+
+  /* Función para verificar el correo
+  
+  verificarCorreo(correo: string): Promise<boolean> {
+    const query = 'SELECT COUNT(*) AS count FROM usuario WHERE correo = ?';
+    const verificationCode = this.generateVerificationCode(); // Generar un código de verificación aleatorio
+  
+    return this.database.executeSql(query, [correo])
+      .then(result => {
+        const existe = result.rows.item(0).count > 0;
+  
+        if (existe) {
+          // Enviar el código de verificación y guardarlo
+          this.sendVerificationEmail(correo, verificationCode);
+          this.saveVerificationCode(correo, verificationCode);
+        }
+  
+        return existe; // Retorna true si existe, false en caso contrario
+      })
+      .catch(error => {
+        console.error('Error en la consulta:', error);
+        return false; // En caso de error, devuelve false
+      });
+  }
+*/
+
+  //RECUPERAR-PASSWORD
+  // Recuperar contraseña por correo
+  async recuperarcon(correo: string): Promise<any> {
+    const verificationCode = this.generateVerificationCode(); // Generar un código de verificación aleatorio
+    
+    try {
+      const result = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ?',
+        [correo]
+      );
+
+      if (result.rows.length === 0) {
+        await this.presentAlert('Error', 'El email ingresado no existe.');
+      }
+
+      const user = result.rows.item(0);
+      this.sendVerificationEmail(correo, verificationCode);
+      this.saveVerificationCode(correo, verificationCode);
+      return user; // Retornar el usuario si se encuentra
+    } catch (error) {
+      console.error('Error al recuperar contraseña:', error);
+      throw error;
+    }
+  }
+
+  // Actualizar la contraseña del usuario
+  async actualizarcon(correo: string, nuevaPassword: string): Promise<void> {
+    try {
+      await this.database.executeSql(
+        'UPDATE usuario SET contrasena = ? WHERE email = ?',
+        [nuevaPassword, correo]
+      );
+      await this.presentAlert('¡Éxito!', `Contraseña actualizada.`);
+    } catch (error) {
+      console.error('Error al actualizar la contraseña:', error);
+      throw error;
+    }
+  }
+
+  // Función para enviar el código por correo
+  private sendVerificationEmail(correo: string, code: string) {
+    this.olvideContraService.enviarCorreo(correo, code).subscribe({
+      next: () => console.log('Código de verificación enviado al correo:', correo),
+      error: (err) => console.error('Error en el envío de correo:', err)
+    });
+  }
+
+  // Función para guardar el código en localStorage
+  private saveVerificationCode(correo: string, code: string) {
+    localStorage.setItem('verificationCode', code);
+    localStorage.setItem('verificationCorreo', correo);
+  }
+
+  // Función para cambiar la contraseña del usuario
+  resetPassword(correo: string, newPassword: string): Promise<void> {
+    const query = `UPDATE usuario SET password = ? WHERE correo = ?`;
+    return this.database.executeSql(query, [newPassword, correo])
+      .then(() => console.log('Contraseña actualizada para el correo:', correo))
+      .catch(error => console.error('Error al actualizar la contraseña:', error));
+  }
 
 }
