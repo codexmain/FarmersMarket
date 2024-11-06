@@ -7,7 +7,6 @@ import { Geolocation } from '@capacitor/geolocation';
 import { GeocodingService } from 'src/app/services/geocoding.service';
 import { LocationValidationService } from 'src/app/services/location-validation.service';
 
-
 interface RegionesComunas {
   [key: string]: string[];
 }
@@ -18,7 +17,6 @@ interface RegionesComunas {
   styleUrls: ['./register.page.scss'],
 })
 export class RegisterPage implements OnInit {
-  
   // Variables del formulario
   pNombre: string = '';
   sNombre: string = '';
@@ -33,6 +31,7 @@ export class RegisterPage implements OnInit {
   estado_cuenta: string = 'activa';
   tipo_usuario_id: number = 1;
   imagen: any;
+  errorMessage: string = '';
 
   selectedRegion: number | null = null;
   selectedComuna: number | null = null;
@@ -44,13 +43,11 @@ export class RegisterPage implements OnInit {
   empresaObligatoria: boolean = false;
   descEmpresaObligatoria: boolean = false;
   
-
   constructor(
     private modalController: ModalController,
     private menu: MenuController,
     private route: ActivatedRoute,
     private router: Router,
-    public alertController: AlertController,
     private dataBase: DataBaseService,
     private toastController: ToastController,
     private geocodingService: GeocodingService, 
@@ -88,16 +85,8 @@ export class RegisterPage implements OnInit {
     this.selectedComuna = null;
   }
 
-  async presentAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header: header,
-      message: message,
-      buttons: ['OK']
-    });
-    await alert.present();
-  }
-
   async registrarse() {
+    this.errorMessage = '';
     if (!this.validarFormulario()) return;
 
     const nuevoUsuario = {
@@ -120,10 +109,10 @@ export class RegisterPage implements OnInit {
     const registroExitoso = await this.dataBase.registrarUsuario(nuevoUsuario);
 
     if (registroExitoso) {
-      await this.presentAlert('Éxito', 'Usuario registrado exitosamente.');
+      this.errorMessage = 'Usuario registrado exitosamente.';
       this.router.navigate(['/login']);
     } else {
-      await this.presentAlert('Error', 'Hubo un problema al registrar el usuario.');
+      this.errorMessage = 'Hubo un problema al registrar el usuario.';
     }
   }
 
@@ -163,58 +152,58 @@ export class RegisterPage implements OnInit {
     if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
         (this.sNombre && !namePattern.test(this.sNombre)) ||
         (this.aMaterno && !namePattern.test(this.aMaterno))) {
-      this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
+      this.errorMessage = 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.';
       return false;
     }
 
     if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.');
+      this.errorMessage = 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.';
       return false;
     }
 
     if (this.descripcion_corta && !descEmpresaPattern.test(this.descripcion_corta)) {
-      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
+      this.errorMessage = 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.';
       return false;
     }
     
     if (!emailPattern.test(this.email) || this.emails.includes(this.email)) {
-      this.presentAlert('Error', 'El email es obligatorio, debe tener un formato válido y no estar registrado.');
+      this.errorMessage = 'El email es obligatorio, debe tener un formato válido y no estar registrado.';
       return false;
     }
     
     if (!this.selectedRegion) {
-      this.presentAlert('Error', 'La región es obligatoria.');
+      this.errorMessage = 'La región es obligatoria.';
       return false;
     }
     
     if (!this.selectedComuna) {
-      this.presentAlert('Error', 'La comuna es obligatoria.');
+      this.errorMessage = 'La comuna es obligatoria.';
       return false;
     }
     
     if (!direccionPattern.test(this.direccion)) {
-      this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
+      this.errorMessage = 'La dirección solo puede contener letras, números y espacios.';
       return false;
     }
 
     // Validar contraseña aquí
     if (this.password.length < 10 || this.password.length > 30) {
-      this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
+      this.errorMessage = 'La contraseña debe tener entre 10 y 30 caracteres.';
       return false;
     }
     
     if (!/[!¡@#$%^&*(),.¿?":{}|<>=;'°]/.test(this.password)) {
-      this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
+      this.errorMessage = 'La contraseña debe contener al menos un carácter especial.';
       return false;
     }
     
     if (/(\d)\1/.test(this.password) || /([a-zA-Z])\1/.test(this.password)) {
-      this.presentAlert('Error', 'La contraseña no debe tener caracteres o números consecutivos repetidos.');
+      this.errorMessage = 'La contraseña no debe tener caracteres o números consecutivos repetidos.';
       return false;
     }
     
     if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
-      this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+      this.errorMessage = 'La contraseña debe contener al menos dos letras mayúsculas.';
       return false;
     }
 
@@ -246,7 +235,6 @@ export class RegisterPage implements OnInit {
 		}
 	}
 
-  
   async useCurrentLocation() {
     try {
       const coordinates = await Geolocation.getCurrentPosition();
@@ -297,27 +285,20 @@ export class RegisterPage implements OnInit {
   }
   clearAMaterno(){
     this.aMaterno = '';
-
   }
   clearEmpresa(){
     this.empresa = '';
-
   }
   clearDescEmpresa(){
     this.descripcion_corta = '';
-
   }
   clearMail(){
     this.email = '';
-
   }
   clearClave(){
     this.password = '';
-
   }
   clearDirr(){
     this.direccion = '';
-
   }
-
 }

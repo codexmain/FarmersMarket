@@ -1609,8 +1609,8 @@ JOIN
 
       // Mostrar alerta de éxito
       this.presentAlert(
-        'Insertar',
-        'Usuario y dirección registrados con éxito'
+        'Cuenta Creada',
+        '¡Puedes ingresar con tu nueva cuenta ahora!'
       );
 
       // Actualizar la lista de usuarios y proveedores
