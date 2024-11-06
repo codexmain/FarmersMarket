@@ -19,4 +19,3 @@ import { ProventasPage } from './proventas.page';
   declarations: [ProventasPage]
 })
 export class ProventasPageModule {}
-

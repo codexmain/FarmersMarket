@@ -18,4 +18,3 @@ import { ProductosPage } from './productos.page';
   declarations: [ProductosPage]
 })
 export class ProductosPageModule {}
-
