@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="datos">
   <ion-card>
     <form (ngSubmit)="actualizarUsuario()">
       <ion-item style="align-items: center; flex-direction: column;">
@@ -103,6 +103,7 @@
             {{ region.nombre }}
           </ion-select-option>
         </ion-select>
+        <div *ngIf="!usuario.region_id" class="placeholder">{{ datos.region || 'N/A' }}</div>
       </ion-item>
       <div *ngIf="regionCtrl.invalid && (regionCtrl.dirty || regionCtrl.touched)" class="error-message">
         La región es obligatoria.
@@ -117,10 +118,12 @@
             {{ comuna.nombre }}
           </ion-select-option>
         </ion-select>
+        <div *ngIf="!usuario.comuna_id" class="placeholder">{{ datos.comuna || 'N/A' }}</div>
       </ion-item>
       <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
         La comuna es obligatoria.
-      </div>    
+      </div>  
+      
 
 
       <ion-item>

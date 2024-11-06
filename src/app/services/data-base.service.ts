@@ -1749,8 +1749,10 @@ JOIN
       const result = await this.database.executeSql(
         `SELECT u.*, 
                 tu.descripcion AS tipo_usuario,
-                c.nombre AS comuna, 
-                r.nombre AS region 
+                c.nombre AS comuna,
+                c.id AS comuna_id, 
+                r.nombre AS region ,
+                r.id AS region_id
          FROM usuario u
          JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id
          LEFT JOIN direccion d ON u.id = d.usuario_id
