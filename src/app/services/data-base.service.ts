@@ -22,9 +22,13 @@ export class DataBaseService {
 
   //agregado de la tabla amonestaciones
   tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            descripcion TEXT NOT NULL
-          );`;
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    descripcion TEXT NOT NULL,
+    id_producto INTEGER,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (id_producto) REFERENCES producto(id)
+  );`;
 
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
@@ -569,7 +573,7 @@ export class DataBaseService {
     private sqlite: SQLite,
     private platform: Platform,
     private alertController: AlertController,
-    
+
   ) {
     this.createBD();
   }
@@ -2689,7 +2693,7 @@ JOIN
   // Recuperar contraseña por correo
   async recuperarcon(correo: string): Promise<any> {
     const verificationCode = this.generateVerificationCode(); // Generar un código de verificación aleatorio
-    
+
     try {
       const result = await this.database.executeSql(
         'SELECT * FROM usuario WHERE email = ?',
@@ -2745,5 +2749,57 @@ JOIN
       .then(() => console.log('Contraseña actualizada para el correo:', correo))
       .catch(error => console.error('Error al actualizar la contraseña:', error));
   }
+
+
+  // prueba de funciones  amonestaciones 
+   // Método para enviar una amonestación al usuario
+async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
+  try {
+    // Obtener el usuario por correo
+    // Ejecuta una consulta SQL para buscar un usuario en la base de datos utilizando el correo proporcionado
+    const result = await this.database.executeSql(
+      'SELECT * FROM usuario WHERE email = ?',
+      [correo]
+    );
+
+    // Verificar si el usuario existe
+    // Si no se encuentra ningún usuario con el correo proporcionado, muestra una alerta y termina la función
+    if (result.rows.length === 0) {
+      await this.presentAlert('Error', 'El usuario con este correo no existe.');
+      return;
+    }
+
+    // Obtener el ID del usuario encontrado
+    const user = result.rows.item(0);
+    const usuarioId = user.id;
+
+    // Insertar la amonestación en la tabla amonestaciones
+    // Ejecuta una consulta SQL para insertar una nueva amonestación en la base de datos, asociada al ID del usuario y opcionalmente al ID del producto
+    await this.database.executeSql(
+      'INSERT INTO amonestaciones (usuario_id, descripcion, id_producto) VALUES (?, ?, ?)',
+      [usuarioId, descripcion, idProducto]
+    );
+
+    // Enviar el correo de amonestación
+    // Llama a la función para enviar un correo al usuario notificando sobre la amonestación
+    this.sendAmonestacionEmail(correo, descripcion);
+
+    // Mensaje de confirmación en la consola
+    console.log('Amonestación enviada y registrada para el usuario:', correo);
+  } catch (error) {
+    // Captura y muestra cualquier error que ocurra durante el proceso
+    console.error('Error al enviar la amonestación:', error);
+    throw error;
+  }
+}
+
+// Función para enviar el correo de amonestación
+private sendAmonestacionEmail(correo: string, descripcion: string) {
+  // Utiliza el servicio OlvideContraService para enviar un correo al usuario con la descripción de la amonestación
+  this.olvideContraService.enviarCorreo(correo, descripcion).subscribe({
+    next: () => console.log('Correo de amonestación enviado al usuario:', correo),
+    error: (err) => console.error('Error en el envío de correo de amonestación:', err)
+  });
+}
 
 }
