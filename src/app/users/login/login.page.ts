@@ -19,6 +19,7 @@ export class LoginPage implements OnInit {
   password: string = '';
   intentoLogin: number = 0;
   isCooldown: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private router: Router,
@@ -29,48 +30,46 @@ export class LoginPage implements OnInit {
     private nativeStorage: NativeStorage
   ) {}
 
-  ngOnInit(
-  ) {}
+  ngOnInit() {}
 
   async Logearse() {
+    this.errorMessage = '';
+
     // Validar campos vacíos
     if (!this.email || !this.password) {
-      await this.showAlert('Error', 'Por favor, completa todos los campos.');
+      this.errorMessage = 'Por favor, completa todos los campos.';
       return;
     }
-  
+
     // Verificar cooldown
     if (this.isCooldown) {
-      await this.showAlert(
-        'Error',
-        'Demasiados intentos fallidos. Por favor, espera 20 segundos.'
-      );
+      this.errorMessage = 'Demasiados intentos fallidos. Por favor, espera 20 segundos.';
       return;
     }
-  
+
     try {
       const usuario = await this.dataBase.login(this.email, this.password);
-  
+
       // Verificar si el usuario fue encontrado
       if (usuario) {
         if (usuario.estado_cuenta !== 'activa') {
-          await this.showAlert('Error', 'Tu cuenta no está activa.');
+          this.errorMessage = 'Tu cuenta no está activa.';
           return;
         }
-  
+
         // Validar que el email no esté vacío ni contenga solo espacios
         if (!this.email.trim()) {
-          await this.showAlert('Error', 'El email no puede estar vacío o solo contener espacios.');
+          this.errorMessage = 'El email no puede estar vacío o solo contener espacios.';
           return;
         }
-  
+
         // Actualizar email en NativeStorage
         await this.actualizarEmail();
-  
+
         const navigationExtras: NavigationExtras = {
-          state: { ...usuario }, 
+          state: { ...usuario },
         };
-  
+
         // Redirigir según el tipo de usuario
         switch (usuario.tipo_usuario_id) {
           case 1:
@@ -83,7 +82,7 @@ export class LoginPage implements OnInit {
             this.router.navigate(['/admin-page'], navigationExtras);
             break;
           default:
-            await this.showAlert('Error', 'Tipo de usuario no reconocido.');
+            this.errorMessage = 'Tipo de usuario no reconocido.';
         }
       } else {
         this.intentoLogin++;
@@ -94,20 +93,14 @@ export class LoginPage implements OnInit {
             this.isCooldown = false;
             this.intentoLogin = 0;
           }, 10000); // 10 segundos de cooldown
-          await this.showAlert(
-            'Error',
-            'Demasiados intentos fallidos. Por favor, espera 20 segundos.'
-          );
+          this.errorMessage = 'Demasiados intentos fallidos. Por favor, espera 20 segundos.';
         } else {
-          await this.showAlert(
-            'Error',
-            'Correo electrónico o contraseña incorrectos.'
-          );
+          this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
         }
       }
     } catch (error) {
       console.error('Error en el inicio de sesión:', JSON.stringify(error));
-      await this.showAlert('Error', 'Hubo un problema al iniciar sesión.');
+      this.errorMessage = 'Hubo un problema al iniciar sesión.';
     }
   }
 
@@ -117,22 +110,13 @@ export class LoginPage implements OnInit {
       await this.nativeStorage.remove('userEmail')
         .then(() => console.log('Email anterior eliminado de NativeStorage.'))
         .catch(error => console.error('Error al eliminar el email:', error));
-  
+
       // Guardar el nuevo email
       await this.nativeStorage.setItem('userEmail', this.email);
       console.log('Email actualizado en NativeStorage:', this.email);
     } catch (error) {
       console.error('Error al actualizar el email:', error);
     }
-  }
-
-  async showAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK'],
-    });
-    await alert.present();
   }
 
   async presentModal() {
