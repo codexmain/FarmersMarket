@@ -1,4 +1,4 @@
 export class CmbProdAmnstones {
     id!: number;
-    nombre!: string;
+    nombre_producto!: string;
 }

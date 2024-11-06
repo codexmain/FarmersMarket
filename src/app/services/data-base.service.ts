@@ -12,6 +12,7 @@ import { CmbProveedores } from './cmb-proveedores';
 import { CmbRegion } from './cmb-region';
 import { CmbComuna } from './cmb-comuna';
 import { OlvideContraService } from './olvide-contra.service';
+import { CmbProdAmnstones } from './cmb-prod-amnstones';
 
 @Injectable({
   providedIn: 'root',
@@ -2655,5 +2656,42 @@ private sendAmonestacionEmail(correo: string, descripcion: string) {
     error: (err) => console.error('Error en el envío de correo de amonestación:', err)
   });
 }
+
+
+
+//CONSTRUCCION COMBOBOX PARA MOSTRAR LOS PRODUCTOS DEL USUARIO EN LAS AMONESTACIONES
+
+listadoCmbProdAmnstones = new BehaviorSubject([]);
+
+fetchCmbProdAmnstones(): Observable<CmbProdAmnstones[]> {
+  return this.listadoCmbProdAmnstones.asObservable();
+}
+
+
+seleccionarPrdaAmonestar(idProveedor: number) {
+  return this.database
+    .executeSql(
+      'SELECT id, nombre FROM producto WHERE estado_producto = "activa" AND proveedor_id = ?',
+      [idProveedor]
+    )
+    .then((res) => {
+      //variable para almacenar el resultado de la consulta
+      let items: CmbProdAmnstones[] = [];
+      //valido si trae al menos un registro
+      if (res.rows.length > 0) {
+        //recorro mi resultado
+        for (var i = 0; i < res.rows.length; i++) {
+          //agrego los registros a mi lista
+          items.push({
+            id: res.rows.item(i).id,
+            nombre_producto: res.rows.item(i).nombre_producto,
+          });
+        }
+      }
+      //actualizar el observable de usuarios
+      this.listadoCmbProdAmnstones.next(items as any);
+    });
+}
+
 
 }
