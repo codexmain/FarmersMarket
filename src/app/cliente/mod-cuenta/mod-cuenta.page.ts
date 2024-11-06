@@ -31,9 +31,10 @@ export class ModCuentaPage implements OnInit {
     comuna_id: null, // ID de la comuna seleccionada
   };
   imagen: any;
+  datos: any;
 
-  selectedRegion: number | null = null;
-  selectedComuna: number | null = null;
+  selectedRegion!: number;
+  selectedComuna!: number;
   regiones: any[] = [];
   comunas: any[] = [];
   direcciones: any[] = []; // Lista de direcciones del usuario
@@ -72,26 +73,31 @@ export class ModCuentaPage implements OnInit {
 
   async cargarDatosUsuario() {
     try {
-      const email = await this.nativeStorage.getItem('userEmail');
-      const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
-      
-      if (usuarioData) {
-        this.usuario = usuarioData;
-        this.selectedRegion = usuarioData.region_id; // Asignar la región seleccionada
-        this.selectedComuna = usuarioData.comuna_id; // Asignar la comuna seleccionada
+        const email = await this.nativeStorage.getItem('userEmail');
+        const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
+        this.datos = await this.dataBase.getUsuarioByEmail(email);
+        
+        if (usuarioData) {
+            this.usuario = usuarioData;
+            this.selectedRegion = usuarioData.region_id; // Assign selected region
+            this.selectedComuna = usuarioData.comuna_id; // Assign selected comuna
 
-        // Llamar a cargarcomunas solo si selectedRegion no es null
-        if (this.selectedRegion !== null) {
-          await this.cargarcomunas(this.selectedRegion); // Cargar comunas de la región seleccionada
+            // Set region and comuna directly in usuario object
+            this.usuario.region_id = this.selectedRegion;
+            this.usuario.comuna_id = this.selectedComuna;
+
+            // Load comunas for the selected region if it's not null
+            if (this.selectedRegion !== null) {
+                await this.cargarcomunas(this.selectedRegion);
+            }
+        } else {
+            await this.presentAlert('Error', 'No se encontró el usuario.');
         }
-      } else {
-        await this.presentAlert('Error', 'No se encontró el usuario.');
-      }
     } catch (error) {
-      console.error('Error al cargar datos del usuario:', error);
-      await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
+        console.error('Error al cargar datos del usuario:', error);
+        await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
     }
-  }
+}
 
   async cargarRegiones() {
     try {
