@@ -370,54 +370,6 @@ export class DataBaseService {
 
   //declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
 
-  tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_categoria (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL UNIQUE
-);`;
-
-  tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_subcategoria (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL,
-  categoria_id INTEGER NOT NULL
-);`;
-
-  tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS respaldo_usuario (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL,
-  segundo_nombre TEXT,
-  apellido_paterno TEXT NOT NULL,
-  apellido_materno TEXT,
-  email TEXT UNIQUE NOT NULL,
-  contrasena TEXT NOT NULL,
-  nombre_empresa TEXT,
-  descripcion_corta TEXT, 
-  foto_perfil TEXT,
-  estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
-  fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
-  tipo_usuario_id INTEGER NOT NULL
-);`;
-
-  tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS respaldo_producto (
-  id INTEGER PRIMARY KEY NOT NULL,
-  proveedor_id INTEGER NOT NULL,
-  nombre TEXT NOT NULL,
-  descripcion TEXT,
-  precio INTEGER NOT NULL,
-  stock INTEGER NOT NULL,
-  organico INTEGER NOT NULL CHECK(organico IN (0, 1)),
-  foto_producto TEXT,
-  subcategoria_id INTEGER NOT NULL,
-  fecha_agregado TEXT DEFAULT(datetime('now'))
-);`;
-
-  tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
-  id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
-  usuario_id INTEGER NOT NULL,
-  comuna_id INTEGER NOT NULL,
-  direccion TEXT NOT NULL,
-  PRIMARY KEY (id, usuario_id)  -- Llave compuesta
-);`;
-
   //variable para el status de la Base de datos
   private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
@@ -485,13 +437,6 @@ export class DataBaseService {
       await this.database.executeSql(this.tblCarroCompra, []);
       await this.database.executeSql(this.tblDetalleCarroCompra, []);
 
-      //creacion de las tablas de respaldo
-      await this.database.executeSql(this.tblRespaldoCategoria, []);
-      await this.database.executeSql(this.tblRespaldoSubcategoria, []);
-      await this.database.executeSql(this.tblRespaldoUsuario, []);
-      await this.database.executeSql(this.tblRespaldoProducto, []);
-      await this.database.executeSql(this.tblRespaldoDirecciones, []);
-
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
       await this.seleccionarCategorias();
@@ -514,128 +459,11 @@ export class DataBaseService {
       await this.database.executeSql(this.registroProducto, []);
       await this.seleccionarProductos();
 
-      await this.eliminarDatosIniciales(); //y ahora como se modifican deben actualizarse todos los observables afectados
-      await this.seleccionarUsuarios();
-      await this.seleccionarCbmProveedores();
-      await this.seleccionarCategorias();
-      await this.seleccionarSubCategorias();
-      await this.seleccionarProductos();
-
       this.isDBReady.next(true);
     } catch (e) {
       this.presentAlert(
         'Creación de Tablas',
         'Error en crear las tablas: ' + JSON.stringify(e)
-      );
-    }
-  }
-
-  async eliminarDatosIniciales() {
-    try {
-      // Eliminar categorías iniciales
-      const categoriasIniciales = await this.database.executeSql(
-        'SELECT * FROM categoria',
-        []
-      );
-      for (let i = 0; i < categoriasIniciales.rows.length; i++) {
-        const categoria = categoriasIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_categoria WHERE id = ?',
-          [categoria.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM categoria WHERE id = ?', [
-            categoria.id,
-          ]);
-        }
-      }
-
-      // Eliminar subcategorías iniciales
-      const subcategoriasIniciales = await this.database.executeSql(
-        'SELECT * FROM subcategoria',
-        []
-      );
-      for (let i = 0; i < subcategoriasIniciales.rows.length; i++) {
-        const subcategoria = subcategoriasIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_subcategoria WHERE id = ?',
-          [subcategoria.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql(
-            'DELETE FROM subcategoria WHERE id = ?',
-            [subcategoria.id]
-          );
-        }
-      }
-
-      // Eliminar productos iniciales
-      const productosIniciales = await this.database.executeSql(
-        'SELECT * FROM producto',
-        []
-      );
-      for (let i = 0; i < productosIniciales.rows.length; i++) {
-        const producto = productosIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_producto WHERE id = ?',
-          [producto.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM producto WHERE id = ?', [
-            producto.id,
-          ]);
-        }
-      }
-
-      // Eliminar usuarios iniciales
-      const usuariosIniciales = await this.database.executeSql(
-        'SELECT * FROM usuario',
-        []
-      );
-      for (let i = 0; i < usuariosIniciales.rows.length; i++) {
-        const usuario = usuariosIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_usuario WHERE id = ?',
-          [usuario.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM usuario WHERE id = ?', [
-            usuario.id,
-          ]);
-        }
-      }
-      // Eliminar direcciones iniciales
-      const direccionesIniciales = await this.database.executeSql(
-        'SELECT * FROM direccion',
-        []
-      );
-      for (let i = 0; i < direccionesIniciales.rows.length; i++) {
-        const direccion = direccionesIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_direccion WHERE id = ? AND usuario_id = ?',
-          [direccion.id, direccion.usuario_id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql(
-            'DELETE FROM direccion WHERE id = ? AND usuario_id = ?',
-            [direccion.id, direccion.usuario_id]
-          );
-        }
-      }
-    } catch (e) {
-      this.presentAlert(
-        'Eliminar Datos Iniciales',
-        'Error: ' + JSON.stringify(e)
       );
     }
   }
@@ -1227,8 +1055,7 @@ JOIN
           );
         } else {
           // Actualizar registros en las tablas que dependen de usuario
-          this.database
-            .executeSql(
+          this.database.executeSql(
               'UPDATE producto SET proveedor_id = 1 WHERE proveedor_id = ?',
               [id]
             )
@@ -1243,28 +1070,7 @@ JOIN
                 'UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?',
                 [id]
               );
-            })
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_usuario(id, nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-                [
-                  id,
-                  nombre,
-                  segundo_nombre,
-                  apellido_paterno,
-                  apellido_materno,
-                  email,
-                  contrasena,
-                  nombre_empresa,
-                  descripcion_corta,
-                  foto_perfil,
-                  estado_cuenta,
-                  tipo_usuario_id,
-                ]
-              );
-            })
-            .then(() => {
+            }).then(() => {
               // Finalmente, eliminar el usuario
               return this.database.executeSql(
                 'DELETE FROM usuario WHERE id = ?',
@@ -1306,13 +1112,6 @@ JOIN
               [id]
             )
             .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_categoria (id, nombre) VALUES (?, ?)',
-                [id, nombre]
-              );
-            })
-            .then(() => {
               // Luego, eliminar la categoría
 
               return this.database.executeSql(
@@ -1353,14 +1152,6 @@ JOIN
               'UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?',
               [id]
             )
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_subcategoria (id, nombre, categoria_id) VALUES (?, ?, ?)',
-                [id, nombre, categoria_id]
-              );
-            })
-
             .then(() => {
               // Finalmente, eliminar la subcategoría
               return this.database.executeSql(
@@ -1411,23 +1202,6 @@ JOIN
               'UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?',
               [id]
             )
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                  id,
-                  proveedor_id,
-                  nombre_producto,
-                  descripcion_producto,
-                  precio,
-                  stock,
-                  organico,
-                  foto_producto,
-                  subcategoria_id,
-                ]
-              );
-            })
 
             .then(() => {
               // Finalmente, eliminar el producto
