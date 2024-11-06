@@ -60,12 +60,9 @@ export class DataBaseService {
             descripcion_corta TEXT, 
             foto_perfil TEXT,
             estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
-            amonestacion_id INTEGER,
-            detalle_amonestacion TEXT,
             fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
             tipo_usuario_id INTEGER NOT NULL,
-            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id),
-            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
+            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
           );`; //aca se le agrego el amonestada, para el tema de que modifque si es inapropiado un campo
 
   tblDireccion: string = `CREATE TABLE IF NOT EXISTS direccion(
@@ -105,11 +102,9 @@ export class DataBaseService {
             subcategoria_id INTEGER NOT NULL,
             fecha_agregado TEXT DEFAULT(datetime('now')),
             estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
-            amonestacion_id INTEGER,
-            detalle_amonestacion TEXT,
             FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
-            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id),
-            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
+            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
+            
           );`;
 
   tblCarroCompra: string = `CREATE TABLE IF NOT EXISTS carro_compra (
