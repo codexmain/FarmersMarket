@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Agregar Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label position="floating">Nombre del Producto</ion-label>
+      <ion-input [(ngModel)]="nombre"></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-input [(ngModel)]="descripcion"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Precio</ion-label>
+      <ion-input type="number" [(ngModel)]="precio"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Stock</ion-label>
+      <ion-input type="number" [(ngModel)]="stock"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">¿Orgánico?</ion-label>
+      <ion-checkbox [(ngModel)]="organico"></ion-checkbox>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Foto del Producto</ion-label>
+      <ion-input [(ngModel)]="foto_producto"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Categoría</ion-label>
+      <ion-select (ionChange)="obtenerSubcategorias($event.detail.value)" [(ngModel)]="categoria_id">
+        <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
+          {{ categoria.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Subcategoría</ion-label>
+      <ion-select [(ngModel)]="subcategoria_id">
+        <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id">
+          {{ subcategoria.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  
+  <ion-button expand="full" (click)="onAgregarProducto()">Agregar Producto</ion-button>
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Agregar Categoría</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-item>
+    <ion-label position="floating">Nombre de la Categoría</ion-label>
+    <ion-input [(ngModel)]="nombreCategoria"></ion-input>
+  </ion-item>
+  <ion-button expand="full" (click)="onAgregarCategoria()">Agregar Categoría</ion-button>
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Agregar Subcategoría</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-item>
+    <ion-label position="floating">Nombre de la Subcategoría</ion-label>
+    <ion-input [(ngModel)]="nombreSubcategoria"></ion-input>
+  </ion-item>
+  <ion-button expand="full" (click)="onAgregarSubcategoria()">Agregar Subcategoría</ion-button>
+</ion-content>
