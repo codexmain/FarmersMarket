@@ -19,8 +19,6 @@
       </ion-card-header>
 
       <ion-card-content>
-
-
         <form (ngSubmit)="registrarse()">
 
           <!-- Foto -->
@@ -38,8 +36,8 @@
 
           <!-- Nombre -->
           <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
+            <ion-input label="Nombre" type="text" [(ngModel)]="pNombre" labelPlacement="stacked"
+              placeholder="Ingresar Nombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearPNombre()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -50,8 +48,9 @@
 
           <!-- Apellido Paterno -->
           <ion-item>
-            <ion-label position="floating">Apellido Paterno</ion-label>
-            <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2" #aPaternoCtrl="ngModel"></ion-input>
+            <ion-input label="Apellido Paterno" type="text" [(ngModel)]="aPaterno" labelPlacement="stacked"
+              placeholder="Ingresar Apellido" name="aPaterno" required minlength="2"
+              #aPaternoCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearAPaterno()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -62,8 +61,8 @@
 
           <!-- Segundo Nombre -->
           <ion-item>
-            <ion-label position="floating">Segundo Nombre (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="sNombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
+            <ion-input label="Segundo Nombre (Opcional)" type="text" [(ngModel)]="sNombre" labelPlacement="stacked"
+              placeholder="Ingresar Nombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearSNombre()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -74,8 +73,8 @@
 
           <!-- Apellido Materno -->
           <ion-item>
-            <ion-label position="floating">Apellido Materno (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="aMaterno" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
+            <ion-input label="Apellido Materno (Opcional)" type="text" [(ngModel)]="aMaterno" labelPlacement="stacked"
+              placeholder="Ingresar Apellido" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearAMaterno()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -86,8 +85,9 @@
 
           <!-- Empresa -->
           <ion-item>
-            <ion-label position="floating">Empresa (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()" #empresaCtrl="ngModel"></ion-input>
+            <ion-input label="Empresa (Opcional)" type="text" [(ngModel)]="empresa" labelPlacement="stacked"
+              placeholder="Ingresar Empresa" name="empresa" (ionChange)="onFieldsChange()"
+              #empresaCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearEmpresa()" (ionChange)="onFieldsChange()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -96,26 +96,28 @@
             El nombre de la empresa debe entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
           </div>
 
-
           <!-- Descripción Corta -->
           <ion-item>
-            <ion-label position="floating">Descripción Corta (Opcional)</ion-label>
-            <ion-textarea [(ngModel)]="descripcion_corta" name="descripcion_corta" (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-textarea>
+            <ion-input label="Descripción Corta (Opcional)" type="text" [(ngModel)]="descripcion_corta"
+              labelPlacement="stacked" placeholder="Ingresar descripcion" name="descripcion_corta"
+              (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()" (ionChange)="onFieldsChange()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
           </ion-item>
-          <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
-            La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras, números y espacios.
+          <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)"
+            class="error-message">
+            La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras,
+            números y espacios.
           </div>
 
           <!-- Email -->
           <ion-item>
-            <ion-input label="Correo" type="email" [(ngModel)]="email" labelPlacement="stacked" name="email" placeholder="Ingresar Correo" required email #emailCtrl="ngModel"></ion-input>
+            <ion-input label="Correo" type="email" [(ngModel)]="email" labelPlacement="stacked" name="email"
+              placeholder="Ingresar Correo" required email #emailCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearMail()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
-
           </ion-item>
           <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
             El email es obligatorio y debe tener un formato válido.
@@ -131,17 +133,18 @@
             </ion-input>
           </ion-item>
           <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
-            Requisitos Contraseña: 
-              Entre 10 y 30 caracteres.
-              Minimo 1 caracter especial.
-              No tener caracteres o numeros consecutivos.
-              Tener 2 letras mayusculas.
+            Requisitos Contraseña:
+            Entre 10 y 30 caracteres.
+            Minimo 1 caracter especial.
+            No tener caracteres o numeros consecutivos.
+            Tener 2 letras mayusculas.
           </div>
 
           <!-- Región -->
           <ion-item>
             <ion-label>Región</ion-label>
-            <ion-select [(ngModel)]="selectedRegion" #regionCtrl="ngModel" (ionChange)="cargarcomunas($event)" name="region" required>
+            <ion-select [(ngModel)]="selectedRegion" #regionCtrl="ngModel" (ionChange)="cargarcomunas($event)"
+              name="region" required>
               <ion-select-option *ngFor="let region of regiones" [value]="region.id">
                 {{ region.nombre }}
               </ion-select-option>
@@ -154,7 +157,8 @@
           <!-- Comuna -->
           <ion-item>
             <ion-label>Comuna</ion-label>
-            <ion-select [(ngModel)]="selectedComuna" name="comuna" #comunaCtrl="ngModel" required [disabled]="!selectedRegion">
+            <ion-select [(ngModel)]="selectedComuna" name="comuna" #comunaCtrl="ngModel" required
+              [disabled]="!selectedRegion">
               <ion-select-option *ngFor="let comuna of comunas" [value]="comuna.id">
                 {{ comuna.nombre }}
               </ion-select-option>
@@ -162,12 +166,13 @@
           </ion-item>
           <div *ngIf="comunaCtrl.invalid && (comunaCtrl.dirty || comunaCtrl.touched)" class="error-message">
             La comuna es obligatoria.
-          </div>      
+          </div>
 
           <!-- Dirección -->
           <ion-item>
-            <ion-label position="floating">Dirección</ion-label>
-            <ion-input id="autoscroll-input" type="text" [(ngModel)]="direccion" name="direccion" required #dirCtrl="ngModel" placeholder="Escribe la ubicación o usa el Marcador (automatico)"></ion-input>
+            <ion-input id="autoscroll-input" label="Dirección" type="text" [(ngModel)]="direccion"
+              labelPlacement="stacked" placeholder="Escribe la ubicación o usa el Marcador (automatico)"
+              name="direccion" required (ionChange)="onFieldsChange()" #dirCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearDirr()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -177,6 +182,11 @@
           </ion-item>
           <div *ngIf="dirCtrl.invalid && (dirCtrl.dirty || dirCtrl.touched)" class="error-message">
             La dirección es obligatoria y debe tener un formato válido.
+          </div><br>
+
+          <!-- Mensaje de error general -->
+          <div class="ion-text-center" *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
           </div>
 
           <ion-button type="submit" fill="solid" expand="full">Registrarse</ion-button>
