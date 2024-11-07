@@ -157,7 +157,15 @@ const routes: Routes = [
   {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
+  },  {
+    path: 'hacer-amonestacion',
+    loadChildren: () => import('./administracion/hacer-amonestacion/hacer-amonestacion.module').then( m => m.HacerAmonestacionPageModule)
+  },
+  {
+    path: 'view-amonestaciones',
+    loadChildren: () => import('./administracion/view-amonestaciones/view-amonestaciones.module').then( m => m.ViewAmonestacionesPageModule)
   }
+
 
 
 
