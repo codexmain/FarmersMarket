@@ -13,6 +13,7 @@ import { CmbRegion } from './cmb-region';
 import { CmbComuna } from './cmb-comuna';
 import { OlvideContraService } from './olvide-contra.service';
 import { CmbProdAmnstones } from './cmb-prod-amnstones';
+import { Amonestaciones } from './amonestaciones';
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +22,7 @@ export class DataBaseService {
   public database!: SQLiteObject;
   private correoExiste = new BehaviorSubject<boolean>(false);
 
-  //agregado de la tabla amonestaciones
-  tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id INTEGER NOT NULL,
-    descripcion TEXT NOT NULL,
-    id_producto INTEGER,
-    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
-    FOREIGN KEY (id_producto) REFERENCES producto(id)
-  );`;
-
+  
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,7 +77,7 @@ export class DataBaseService {
 
   tblSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
+            nombre TEXT NOT NULL UNIQUE,
             categoria_id INTEGER NOT NULL,
             estado_subcategoria TEXT CHECK(estado_subcategoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL,
             FOREIGN KEY (categoria_id) REFERENCES categoria(id)
@@ -128,6 +120,17 @@ export class DataBaseService {
             FOREIGN KEY (producto_id) REFERENCES producto(id),
             PRIMARY KEY (id, carro_id)
           );`;
+
+  //agregado de la tabla amonestaciones
+  tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestacion (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    id_producto INTEGER,
+    descripcion TEXT NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (id_producto) REFERENCES producto(id)
+  );`;
+
 
   //variables para realizar la precarga inicial de datos
   registroCategoria: string = `INSERT OR IGNORE INTO categoria (id,nombre) VALUES
@@ -425,7 +428,7 @@ export class DataBaseService {
   async crearTablas() {
     try {
       //ejecuto la creación de Tablas
-      await this.database.executeSql(this.tblAmonestaciones, []);
+      
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
       await this.database.executeSql(this.tblTipoUsuario, []);
@@ -436,6 +439,7 @@ export class DataBaseService {
       await this.database.executeSql(this.tblProducto, []);
       await this.database.executeSql(this.tblCarroCompra, []);
       await this.database.executeSql(this.tblDetalleCarroCompra, []);
+      await this.database.executeSql(this.tblAmonestaciones, []);
 
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
@@ -2381,59 +2385,59 @@ JOIN
   }
 
 
-  // prueba de funciones  amonestaciones 
-   // Método para enviar una amonestación al usuario
-async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
-  try {
-    // Obtener el usuario por correo
-    // Ejecuta una consulta SQL para buscar un usuario en la base de datos utilizando el correo proporcionado
-    const result = await this.database.executeSql(
-      'SELECT * FROM usuario WHERE email = ?',
-      [correo]
-    );
 
-    // Verificar si el usuario existe
-    // Si no se encuentra ningún usuario con el correo proporcionado, muestra una alerta y termina la función
-    if (result.rows.length === 0) {
-      await this.presentAlert('Error', 'El usuario con este correo no existe.');
-      return;
+// prueba de funciones  amonestaciones 
+  // Método para enviar una amonestación al usuario
+  async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
+    try {
+      // Obtener el usuario por correo
+      // Ejecuta una consulta SQL para buscar un usuario en la base de datos utilizando el correo proporcionado
+      const result = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ?',
+        [correo]
+      );
+
+      // Verificar si el usuario existe
+      // Si no se encuentra ningún usuario con el correo proporcionado, muestra una alerta y termina la función
+      if (result.rows.length === 0) {
+        await this.presentAlert('Error', 'El usuario con este correo no existe.');
+        return;
+      }
+
+      // Obtener el ID del usuario encontrado
+      const user = result.rows.item(0);
+      const usuarioId = user.id;
+
+      // Insertar la amonestación en la tabla amonestaciones
+      // Ejecuta una consulta SQL para insertar una nueva amonestación en la base de datos, asociada al ID del usuario y opcionalmente al ID del producto
+      await this.database.executeSql(
+        'INSERT INTO amonestaciones (usuario_id, descripcion, id_producto) VALUES (?, ?, ?)',
+        [usuarioId, descripcion, idProducto]
+      );
+
+      // Enviar el correo de amonestación
+      // Llama a la función para enviar un correo al usuario notificando sobre la amonestación
+      this.sendAmonestacionEmail(correo, descripcion);
+
+      // Mensaje de confirmación en la consola
+      console.log('Amonestación enviada y registrada para el usuario:', correo);
+    } catch (error) {
+      // Captura y muestra cualquier error que ocurra durante el proceso
+      console.error('Error al enviar la amonestación:', error);
+      throw error;
     }
-
-    // Obtener el ID del usuario encontrado
-    const user = result.rows.item(0);
-    const usuarioId = user.id;
-
-    // Insertar la amonestación en la tabla amonestaciones
-    // Ejecuta una consulta SQL para insertar una nueva amonestación en la base de datos, asociada al ID del usuario y opcionalmente al ID del producto
-    await this.database.executeSql(
-      'INSERT INTO amonestaciones (usuario_id, descripcion, id_producto) VALUES (?, ?, ?)',
-      [usuarioId, descripcion, idProducto]
-    );
-
-    // Enviar el correo de amonestación
-    // Llama a la función para enviar un correo al usuario notificando sobre la amonestación
-    this.sendAmonestacionEmail(correo, descripcion);
-
-    // Mensaje de confirmación en la consola
-    console.log('Amonestación enviada y registrada para el usuario:', correo);
-  } catch (error) {
-    // Captura y muestra cualquier error que ocurra durante el proceso
-    console.error('Error al enviar la amonestación:', error);
-    throw error;
   }
-}
 
-// Función para enviar el correo de amonestación
-private sendAmonestacionEmail(correo: string, descripcion: string) {
-  // Utiliza el servicio OlvideContraService para enviar un correo al usuario con la descripción de la amonestación
-  this.olvideContraService.enviarCorreo(correo, descripcion).subscribe({
-    next: () => console.log('Correo de amonestación enviado al usuario:', correo),
-    error: (err) => console.error('Error en el envío de correo de amonestación:', err)
-  });
-}
+  // Función para enviar el correo de amonestación
+  private sendAmonestacionEmail(correo: string, descripcion: string) {
+    // Utiliza el servicio OlvideContraService para enviar un correo al usuario con la descripción de la amonestación
+    this.olvideContraService.enviarCorreo(correo, descripcion).subscribe({
+      next: () => console.log('Correo de amonestación enviado al usuario:', correo),
+      error: (err) => console.error('Error en el envío de correo de amonestación:', err)
+    });
+  }
 
-
-
+//========================================================================================
 //CONSTRUCCION COMBOBOX PARA MOSTRAR LOS PRODUCTOS DEL USUARIO EN LAS AMONESTACIONES
 
 listadoCmbProdAmnstones = new BehaviorSubject([]);
@@ -2443,7 +2447,7 @@ fetchCmbProdAmnstones(): Observable<CmbProdAmnstones[]> {
 }
 
 
-seleccionarPrdaAmonestar(idProveedor: number) {
+seleccionarCmbProdaAmonestar(idProveedor: number) {
   return this.database
     .executeSql(
       'SELECT id, nombre FROM producto WHERE estado_producto = "activa" AND proveedor_id = ?',
@@ -2466,7 +2470,126 @@ seleccionarPrdaAmonestar(idProveedor: number) {
       //actualizar el observable de usuarios
       this.listadoCmbProdAmnstones.next(items as any);
     });
+    //insertar la amonestacion
+    //listar amonestaciones, para visualizarlas
 }
+
+    //creacion de las funciones para el resto de cosas de la amonestación
+
+    listadoAmonestaciones = new BehaviorSubject([]);
+
+    fetchAmonestaciones(): Observable<Amonestaciones[]> {
+      return this.listadoAmonestaciones.asObservable();
+    }  
+
+    //insertar la amonestacion
+    insertarAmonestacion(
+      usuario_id: number,
+      id_producto: number,
+      descripcion: string,
+
+    ) {
+      return this.database
+        .executeSql(
+          'INSERT INTO amonestacion(usuario_id, id_producto, descripcion) VALUES (?,?,?)',
+          [
+            usuario_id,
+            id_producto,
+            descripcion
+          ]
+        )
+        .then((res) => {
+          this.presentAlert('Insertar', 'Producto Registrado');
+          this.seleccionarAmonestaciones();
+        })
+        .catch((e) => {
+          this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+        });
+    }
+
+    //listar amonestaciones, para visualizarlas
+
+    seleccionarAmonestaciones() {
+      return this.database
+        .executeSql(`SELECT 
+    a.id,
+    a.usuario_id,
+    (SELECT u.nombre || ' ' || COALESCE(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || COALESCE(u.apellido_materno, '') 
+     FROM usuario u WHERE u.id = a.usuario_id) AS nombre_usuario,
+    (SELECT COALESCE(u.nombre_empresa, 'Cuenta Cliente') 
+     FROM usuario u WHERE u.id = a.usuario_id) AS nombre_empresa,
+    CASE 
+        WHEN a.id_producto IS NULL THEN 'Amonestación sin Producto'
+        ELSE a.id_producto
+    END AS id_producto,
+    CASE 
+        WHEN a.id_producto IS NULL THEN 'Amonestación sin Producto'
+        ELSE (SELECT p.nombre FROM producto p WHERE p.id = a.id_producto)
+    END AS nombre_producto,
+    a.descripcion
+FROM 
+    amonestacion a;
+`, [])
+        .then((res) => {
+          //variable para almacenar el resultado de la consulta
+          let items: Amonestaciones[] = [];
+          //valido si trae al menos un registro
+          if (res.rows.length > 0) {
+            //recorro mi resultado
+            for (var i = 0; i < res.rows.length; i++) {
+              //agrego los registros a mi lista
+              items.push({
+                id: res.rows.item(i).id,
+                usuario_id: res.rows.item(i).usuario_id,
+                nombre_usuario: res.rows.item(i).nombre_usuario,
+                nombre_empresa: res.rows.item(i).nombre_empresa,
+                id_producto: res.rows.item(i).id_producto,
+                nombre_producto: res.rows.item(i).nombre_producto,
+                descripcion: res.rows.item(i).descripcion,
+
+              });
+            }
+          }
+          //actualizar el observable de usuarios
+          this.listadoAmonestaciones.next(items as any);
+        });
+    }
+
+
+
+    //corroborar si la amonestacíon se ejectuo: (esta vale pico, no se va a hacer por tiempo)
+
+
+    verificarCategoriaExistente(categoria: string): Promise<boolean> {
+      return this.database
+        .executeSql('SELECT COUNT(*) AS count FROM categoria WHERE nombre = ?', [
+          categoria,
+        ])
+        .then((res) => {
+          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+        });
+    }
+
+
+    verificarSubcategoriaExistente(subcategoria: string): Promise<boolean> {
+      return this.database
+        .executeSql('SELECT COUNT(*) AS count FROM subcategoria WHERE nombre = ?', [
+          subcategoria,
+        ])
+        .then((res) => {
+          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+        });
+    }
+
+    
+
+
+
+    
+
+
+
+
 
 
 }
