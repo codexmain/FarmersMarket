@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, ActionSheetController, AlertController} from '@ionic/angular';
-import { AddUsuariosPage } from '../add-usuarios/add-usuarios.page'
+import { ModalController, ActionSheetController, AlertController } from '@ionic/angular';
+import { AddUsuariosPage } from '../add-usuarios/add-usuarios.page';
 import { ViewUsuarioPage } from '../view-usuario/view-usuario.page';
 import { ModificarUsuarioPage } from '../modificar-usuario/modificar-usuario.page';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataBaseService } from 'src/app/services/data-base.service'
+import { DataBaseService } from 'src/app/services/data-base.service';
 import { Usuarios } from 'src/app/services/usuarios';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-
+import { HacerAmonestacionPage } from '../hacer-amonestacion/hacer-amonestacion.page';
 
 @Component({
   selector: 'app-usuarios',
@@ -15,13 +15,8 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
   styleUrls: ['./usuarios.page.scss'],
 })
 export class UsuariosPage implements OnInit {
-
-
-  constructor(private bd: DataBaseService, private modalController: ModalController, private route: ActivatedRoute, private router: Router,private actionSheetController: ActionSheetController, private nativeStorage: NativeStorage, public alertController: AlertController) {
-
-  }
-
   usuarioAct: any; // Para almacenar los datos del usuario actual
+  searchTerm: string = '';
 
   arregloUsuarios: any = [
     {
@@ -42,11 +37,8 @@ export class UsuariosPage implements OnInit {
       fecha_registro: '',
       tipo_usuario_id: '',
       descTipUser: ''
-
     }
-  ]
-
-  searchTerm: string = '';
+  ];
 
   filteredUsuarios: any = [
     {
@@ -67,23 +59,29 @@ export class UsuariosPage implements OnInit {
       fecha_registro: '',
       tipo_usuario_id: '',
       descTipUser: ''
-
     }
-  ]
+  ];
+
+  constructor(
+    private bd: DataBaseService,
+    private modalController: ModalController,
+    private route: ActivatedRoute,
+    private router: Router,
+    private actionSheetController: ActionSheetController,
+    private nativeStorage: NativeStorage,
+    public alertController: AlertController
+  ) { }
 
   ngOnInit() {
     this.cargarDatosUsuario(); // Cargar datos del usuario actual
-    this.bd.dbState().subscribe(data=>{
-      //validar si la bd esta lista
-      if(data){
-        //subscribir al observable de la listaNoticias
-        this.bd.fetchUsuarios().subscribe(res=>{
+    this.bd.dbState().subscribe(data => {
+      if (data) {
+        this.bd.fetchUsuarios().subscribe(res => {
           this.arregloUsuarios = res;
           this.filteredUsuarios = res;
-
-        })
+        });
       }
-    })
+    });
   }
 
   async cargarDatosUsuario() {
@@ -97,19 +95,15 @@ export class UsuariosPage implements OnInit {
     }
   }
 
-  // Método para filtrar las categorías
   searchUsuarios() {
     if (this.searchTerm.trim() === '') {
-      // Si el searchTerm está vacío, mostrar todas las categorías
       this.filteredUsuarios = this.arregloUsuarios;
     } else {
-      // Filtrar las categorías
-      this.filteredUsuarios = this.arregloUsuarios.filter((user: Usuarios) => 
+      this.filteredUsuarios = this.arregloUsuarios.filter((user: Usuarios) =>
         user.nombreCompleto.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
   }
-
 
   async presentActionSheet(x: any) {
     const actionSheet = await this.actionSheetController.create({
@@ -122,6 +116,10 @@ export class UsuariosPage implements OnInit {
         {
           text: 'Visualizar',
           handler: () => this.visualizar(x)
+        },
+        {
+          text: 'Amonestar',
+          handler: () => this.openAmonestacionModal(x)
         },
         {
           text: 'Eliminar',
@@ -137,75 +135,69 @@ export class UsuariosPage implements OnInit {
     await actionSheet.present();
   }
 
-
-  async presentModal() { //este present modal es para 
+  async presentModal() {
     const modal = await this.modalController.create({
       component: AddUsuariosPage,
     });
+    return await modal.present();
+  }
 
-    return await modal.present();}
-  
+  async openAmonestacionModal(x: any) {
+    const modal = await this.modalController.create({
+      component: HacerAmonestacionPage,
+      componentProps: { usuario: x } // Pasar datos del usuario seleccionado
+    });
+    return await modal.present();
+  }
 
   async modificar(x: any) {
     const modal = await this.modalController.create({
-      component: ModificarUsuarioPage, //crear la pagina de edicio
+      component: ModificarUsuarioPage,
       componentProps: { usuario: x }
-    });
-    modal.onDidDismiss().then(() => {
     });
     return await modal.present();
   }
 
   async visualizar(x: any) {
     const modal = await this.modalController.create({
-      component: ViewUsuarioPage, //crear la pagina de visualizacion
+      component: ViewUsuarioPage,
       componentProps: { usuario: x }
     });
     return await modal.present();
   }
 
   async eliminar(x: any) {
-    const usuarioAct = this.usuarioAct; // Referencia al usuario actual
-
+    const usuarioAct = this.usuarioAct;
     if (usuarioAct && x.id === usuarioAct.id) {
-        this.presentAlert('Error', 'No puedes eliminar tu propia cuenta.'); // Mensaje de error
-        return; // Cancelar la eliminación
+      this.presentAlert('Error', 'No puedes eliminar tu propia cuenta.');
+      return;
     }
-
-    // Llama a la función para eliminar el usuario
     await this.bd.eliminarUsuario(
-        x.id,
-        x.nombre,
-        x.segundo_nombre,
-        x.apellido_paterno,
-        x.apellido_materno,
-        x.email,
-        x.contrasena,
-        x.nombre_empresa,
-        x.descripcion_corta,
-        x.foto_perfil,
-        x.estado_cuenta,
-        x.tipo_usuario_id
+      x.id,
+      x.nombre,
+      x.segundo_nombre,
+      x.apellido_paterno,
+      x.apellido_materno,
+      x.email,
+      x.contrasena,
+      x.nombre_empresa,
+      x.descripcion_corta,
+      x.foto_perfil,
+      x.estado_cuenta,
+      x.tipo_usuario_id
     );
-}
+  }
 
-// Método para presentar una alerta
-async presentAlert(header: string, message: string) {
-  const alert = await this.alertController.create({
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
       header,
       message,
       buttons: ['OK']
-  });
-  await alert.present();
-}
+    });
+    await alert.present();
+  }
 
   agregar() {
-    this.presentModal(); // Mostrar modal para agregar usuario
+    this.presentModal();
   }
 }
-
-
-
-
-
-

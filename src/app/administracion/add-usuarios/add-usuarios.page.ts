@@ -47,35 +47,35 @@ export class AddUsuariosPage implements OnInit {
   empresa: string = '';
   descEmpresa: string = '';
 
-  estadoUsuario: string ='activa'; //estado del usuario por defecto
-  tipoUsuario: number = 1 ; //tipo de usuario por defecto
+  estadoUsuario: string = 'activa'; //estado del usuario por defecto
+  tipoUsuario: number = 1; //tipo de usuario por defecto
   region!: number;
   comuna: number | undefined;
   direccion: string = '';
   empresaObligatoria: boolean = false;
   descEmpresaObligatoria: boolean = false;
-  foto_perfil: string ='';
+  foto_perfil: string = '';
   imagen: any;
 
-  constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) { 
+  constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) {
 
   }
 
 
 
-  
+
   ngOnInit() {
-    this.bd.dbState().subscribe(data=>{
+    this.bd.dbState().subscribe(data => {
       //validar si la bd esta lista
-      if(data){
+      if (data) {
         //subscribir al observable de la listaNoticias
-        this.bd.fetchCmbRegiones().subscribe(res=>{
+        this.bd.fetchCmbRegiones().subscribe(res => {
           this.arrayCmbRegiones = res;
         })
 
-        this.bd.fetchCmbTipUsuario().subscribe(res=>{
+        this.bd.fetchCmbTipUsuario().subscribe(res => {
           this.arrayCmbTipoUsuario = res;
-        })     
+        })
       }
     })
   }
@@ -101,14 +101,14 @@ export class AddUsuariosPage implements OnInit {
   }
 
 
-  async takePicture() { 
+  async takePicture() {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Uri
     });
 
-    if (image && image.webPath) { 
+    if (image && image.webPath) {
       this.foto_perfil = image.webPath;
       this.imagen = image.webPath;
     }
@@ -116,7 +116,7 @@ export class AddUsuariosPage implements OnInit {
 
 
 
-  
+
   async presentToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
@@ -160,65 +160,65 @@ export class AddUsuariosPage implements OnInit {
 
   async agregarUsuario() {
 
-  // Validar pNombre
+    // Validar pNombre
 
-  if (!this.pNombre || this.pNombre.length < 2) {
-    this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
-    return;
-  }
+    if (!this.pNombre || this.pNombre.length < 2) {
+      this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
+      return;
+    }
 
-  // Validar aPaterno
-  if (!this.aPaterno || this.aPaterno.length < 2) {
-    this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
-    return;
-  }
-  
-  // Validar empresa y descEmpresa si se han marcado como obligatorios
-  if ((this.empresaObligatoria && !this.empresa) || (this.descEmpresaObligatoria && !this.descEmpresa)) {
-    this.presentAlert('Error', 'Los campos "Empresa" y "Descripción Empresa" son obligatorios.');
-    return;
-  }
+    // Validar aPaterno
+    if (!this.aPaterno || this.aPaterno.length < 2) {
+      this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
+      return;
+    }
 
-  //validacion tipo usuario
-  if (!this.tipoUsuario) {
-    this.presentAlert('Error', 'El tipo de usuario es obligatorio.');
-    return;
-  }
+    // Validar empresa y descEmpresa si se han marcado como obligatorios
+    if ((this.empresaObligatoria && !this.empresa) || (this.descEmpresaObligatoria && !this.descEmpresa)) {
+      this.presentAlert('Error', 'Los campos "Empresa" y "Descripción Empresa" son obligatorios.');
+      return;
+    }
 
-  //validacion tipo usuario
-  if (!this.estadoUsuario) {
-    this.presentAlert('Error', 'El Estado del usuario es obligatorio.');
-    return;
-  }
+    //validacion tipo usuario
+    if (!this.tipoUsuario) {
+      this.presentAlert('Error', 'El tipo de usuario es obligatorio.');
+      return;
+    }
+
+    //validacion tipo usuario
+    if (!this.estadoUsuario) {
+      this.presentAlert('Error', 'El Estado del usuario es obligatorio.');
+      return;
+    }
 
 
-  // Validar email
-  if (!this.email) {
-    this.presentAlert('Error', 'El email es obligatorio.');
-    return;
-  }
+    // Validar email
+    if (!this.email) {
+      this.presentAlert('Error', 'El email es obligatorio.');
+      return;
+    }
 
-  // Validar región
-  if (!this.region) {
-    this.presentAlert('Error', 'La región es obligatoria.');
-    return;
-  }
+    // Validar región
+    if (!this.region) {
+      this.presentAlert('Error', 'La región es obligatoria.');
+      return;
+    }
 
     // Validar comuna
-  if (!this.comuna) {
-    this.presentAlert('Error', 'La comuna es obligatoria.');
-    return;
-  }
+    if (!this.comuna) {
+      this.presentAlert('Error', 'La comuna es obligatoria.');
+      return;
+    }
 
     // Validar pNombre, sNombre, aPaterno, aMaterno
     const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
     if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
-        (this.sNombre && !namePattern.test(this.sNombre)) ||
-        (this.aMaterno && !namePattern.test(this.aMaterno))) {
+      (this.sNombre && !namePattern.test(this.sNombre)) ||
+      (this.aMaterno && !namePattern.test(this.aMaterno))) {
       this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
       return;
     }
- 
+
 
 
     // Validar empresa
@@ -256,31 +256,31 @@ export class AddUsuariosPage implements OnInit {
       return;
     }
 
-      // Validar contraseña
-  if (this.password.length < 10 || this.password.length > 30) {
-    this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
-    return;
-  }
+    // Validar contraseña
+    if (this.password.length < 10 || this.password.length > 30) {
+      this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
+      return;
+    }
 
-  if (!/[!¡@#$%^&*(),.¿?":{}|<>=;'°]/.test(this.password)) {
-    this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
-    return;
-  }
+    if (!/[!¡@#$%^&*(),.¿?":{}|<>=;'°]/.test(this.password)) {
+      this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
+      return;
+    }
 
-  if (/(\d)\1/.test(this.password) || /([a-zA-Z])\1/.test(this.password)) {
-    this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
-    return;
-  }
+    if (/(\d)\1/.test(this.password) || /([a-zA-Z])\1/.test(this.password)) {
+      this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
+      return;
+    }
 
-  if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
-    this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-    return; 
-  }
+    if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
+      this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+      return;
+    }
 
     // Si todas las validaciones pasan
     await this.bd.insertarUsuario(
-      this.pNombre, this.sNombre, this.aPaterno, this.aMaterno, this.email, 
-      this.password, this.empresa, this.descEmpresa, this.foto_perfil, this.estadoUsuario, 
+      this.pNombre, this.sNombre, this.aPaterno, this.aMaterno, this.email,
+      this.password, this.empresa, this.descEmpresa, this.foto_perfil, this.estadoUsuario,
       this.tipoUsuario, this.comuna, this.direccion
     );
     this.presentAlert('Éxito', 'Se ha agregado el cliente exitosamente.');
@@ -294,7 +294,7 @@ export class AddUsuariosPage implements OnInit {
       const coordinates = await Geolocation.getCurrentPosition();
       const lat = coordinates.coords.latitude;
       const lng = coordinates.coords.longitude;
-  
+
       if (this.comuna && this.locationValidationService.isWithinBoundary(this.comuna, lat, lng)) {
         this.geocodingService.reverseGeocode(lat, lng)
           .subscribe({
@@ -327,42 +327,42 @@ export class AddUsuariosPage implements OnInit {
     }
   }
 
-  clearPNombre(){
+  clearPNombre() {
     this.pNombre = '';
   }
-  clearSNombre(){
+  clearSNombre() {
     this.sNombre = '';
   }
 
-  clearAPaterno(){
+  clearAPaterno() {
     this.aPaterno = '';
   }
-  clearAMaterno(){
+  clearAMaterno() {
     this.aMaterno = '';
 
   }
-  clearEmpresa(){
+  clearEmpresa() {
     this.empresa = '';
 
   }
-  clearDescEmpresa(){
+  clearDescEmpresa() {
     this.descEmpresa = '';
 
   }
-  clearMail(){
+  clearMail() {
     this.email = '';
 
   }
-  clearClave(){
+  clearClave() {
     this.password = '';
 
   }
-  clearDirr(){
+  clearDirr() {
     this.direccion = '';
 
   }
-  
 
 
- 
+
+
 }
