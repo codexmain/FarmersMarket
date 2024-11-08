@@ -52,7 +52,7 @@ export class DataBaseService {
             nombre_empresa TEXT,
             descripcion_corta TEXT, 
             foto_perfil TEXT,
-            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
+            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL, 
             fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
             tipo_usuario_id INTEGER NOT NULL,
             FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
@@ -94,7 +94,7 @@ export class DataBaseService {
             foto_producto TEXT,
             subcategoria_id INTEGER NOT NULL,
             fecha_agregado TEXT DEFAULT(datetime('now')),
-            estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
+            estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL, 
             FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
             FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
             

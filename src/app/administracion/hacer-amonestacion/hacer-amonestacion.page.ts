@@ -79,7 +79,7 @@ export class HacerAmonestacionPage implements OnInit {
       this.amonestacionesssService.enviarAmonestacion(this.email, this.descripcion, this.id_producto)
         .then(() => {
           console.log('Amonestación enviada');
-          this.dismiss(); // Cierra el modal con éxito
+          this.modalController.dismiss({ success: true });// Cierra el modal con éxito
         })
 
 
@@ -116,5 +116,13 @@ export class HacerAmonestacionPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  clearDescripcion(){
+    this.descripcion = '';
+  }
+
+  clearProducto(){
+    this.id_producto = null;
   }
 }
