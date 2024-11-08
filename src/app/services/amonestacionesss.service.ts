@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class AmonestacionService {
+export class AmonestacionesssService {
   private apiUrl = 'https://api.emailjs.com/api/v1.0/email/send'; // URL de la API de envío de correos
   private publicKey = 'APICHULA'; // Public Key de EmailJS
   private servicesKey = 'APICHULA'; // Service ID de EmailJS
