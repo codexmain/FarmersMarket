@@ -1752,7 +1752,8 @@ JOIN
                 c.nombre AS comuna,
                 c.id AS comuna_id, 
                 r.nombre AS region ,
-                r.id AS region_id
+                r.id AS region_id,
+                d.direccion AS direccion
          FROM usuario u
          JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id
          LEFT JOIN direccion d ON u.id = d.usuario_id

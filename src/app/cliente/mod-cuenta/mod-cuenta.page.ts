@@ -73,32 +73,39 @@ export class ModCuentaPage implements OnInit {
 
   async cargarDatosUsuario() {
     try {
-        const email = await this.nativeStorage.getItem('userEmail');
-        const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
-        this.datos = await this.dataBase.getUsuarioByEmail(email);
+      const email = await this.nativeStorage.getItem('userEmail');
+      const usuarioData = await this.dataBase.getUsuarioByEmail(email);
+      this.datos = await this.dataBase.getUsuarioByEmail(email);
+      
+      if (usuarioData) {
+        this.usuario = usuarioData;
         
-        if (usuarioData) {
-            this.usuario = usuarioData;
-            this.selectedRegion = usuarioData.region_id; // Assign selected region
-            this.selectedComuna = usuarioData.comuna_id; // Assign selected comuna
-
-            // Set region and comuna directly in usuario object
-            this.usuario.region_id = this.selectedRegion;
-            this.usuario.comuna_id = this.selectedComuna;
-
-            // Load comunas for the selected region if it's not null
-            if (this.selectedRegion !== null) {
-                await this.cargarcomunas(this.selectedRegion);
-            }
-        } else {
-            await this.presentAlert('Error', 'No se encontró el usuario.');
+        // Cargar las regiones y asignar el valor correspondiente a region_id
+        await this.cargarRegiones();
+        
+        // Buscar la región correspondiente y asignarla al usuario
+        const regionEncontrada = this.regiones.find(region => region.nombre === this.datos.region);
+        if (regionEncontrada) {
+          this.usuario.region_id = regionEncontrada.id;
+          this.selectedRegion = this.usuario.region_id;
+          await this.cargarcomunas(this.selectedRegion);
+          
+          // Buscar la comuna correspondiente y asignarla al usuario
+          const comunaEncontrada = this.comunas.find(comuna => comuna.nombre === this.datos.comuna);
+          if (comunaEncontrada) {
+            this.usuario.comuna_id = comunaEncontrada.id;
+            this.selectedComuna = this.usuario.comuna_id;
+          }
         }
+      } else {
+        await this.presentAlert('Error', 'No se encontró el usuario.');
+      }
     } catch (error) {
-        console.error('Error al cargar datos del usuario:', error);
-        await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
+      console.error('Error al cargar datos del usuario:', error);
+      await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
     }
-}
-
+  }
+  
   async cargarRegiones() {
     try {
       this.regiones = await this.dataBase.Regiones();
@@ -106,7 +113,7 @@ export class ModCuentaPage implements OnInit {
       console.error('Error al cargar regiones:', error);
     }
   }
-
+  
   async cargarcomunas(regionId: number) {
     if (regionId) {
       try {
