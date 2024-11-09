@@ -19,7 +19,8 @@ export class CategoriasPage implements OnInit {
   arrayCategorias: any = [
     {
       id: '',
-      nombre: ''
+      nombre: '',
+      estado_categoria: ''
 
     }
   ]
@@ -29,7 +30,8 @@ export class CategoriasPage implements OnInit {
   filteredCategorias: any = [
     {
       id: '',
-      nombre: ''
+      nombre: '',
+      estado_categoria: ''
 
     }
   ]

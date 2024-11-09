@@ -36,6 +36,17 @@
     <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
       La Categoría es obligatoria.
     </div>      
+
+    <ion-item>
+      <ion-label>Estado SubCategoría:</ion-label>
+      <ion-select [(ngModel)]="estado_subcategoria" name="estado_subcategoria" required #estadoCtrl="ngModel">
+        <ion-select-option value="activa">SubCategoría Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">SubCategoría Deshabilitada</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoCtrl.invalid && (estadoCtrl.dirty || estadoCtrl.touched)" class="error-message">
+      El estado de la SubCategoría es obligatorio.
+    </div>
   </form>
 </ion-card>
 </ion-content>

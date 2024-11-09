@@ -13,6 +13,7 @@ export class ViewSubcategoriaPage implements OnInit {
 
   nombre: string = '';
   categoria_id!: number;  
+  estado_subcategoria: string= '';
 
   arrayCmbCategorias: any = [
     {
@@ -28,6 +29,7 @@ export class ViewSubcategoriaPage implements OnInit {
   ngOnInit(){
     this.nombre = this.subcategoria.nombre;
     this.categoria_id = this.subcategoria.categoria_id;
+    this.estado_subcategoria = this.subcategoria.estado_subcategoria
 
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista

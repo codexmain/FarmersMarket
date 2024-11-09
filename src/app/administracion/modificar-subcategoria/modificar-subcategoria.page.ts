@@ -12,6 +12,8 @@ export class ModificarSubcategoriaPage implements OnInit {
 
   nombre: string = '';
   categoria_id!: number;  
+  estado_subcategoria: string= '';
+
 
   arrayCmbCategorias: any = [
     {
@@ -26,6 +28,8 @@ export class ModificarSubcategoriaPage implements OnInit {
   ngOnInit() {
     this.nombre = this.subcategoria.nombre;
     this.categoria_id = this.subcategoria.categoria_id;
+    this.estado_subcategoria = this.subcategoria.estado_subcategoria
+
 
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
@@ -53,6 +57,11 @@ export class ModificarSubcategoriaPage implements OnInit {
     if (!this.categoria_id) {
        this.presentAlert('Error', 'La Categoría es obligatoria.');
        return false;}
+
+    if (!this.estado_subcategoria) {
+      this.presentAlert('Error', 'El Estado de la SubCategoría es obligatorio.');
+      return false;
+    }
 
        return true;
 }
@@ -87,6 +96,8 @@ async modificarSubcategoria() {
   clearNombre() {
     this.nombre = '';
   }
+
+
 
   }
 

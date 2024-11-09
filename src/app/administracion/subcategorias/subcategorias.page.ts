@@ -23,7 +23,8 @@ export class SubcategoriasPage implements OnInit {
       id: '',
       nombre: '',
       categoria_id: '',
-      nombreCategoria: ''
+      nombreCategoria: '',
+      estado_subcategoria: ''
 
     }
   ]
@@ -35,7 +36,8 @@ export class SubcategoriasPage implements OnInit {
       id: '',
       nombre: '',
       categoria_id: '',
-      nombreCategoria: ''
+      nombreCategoria: '',
+      estado_subcategoria: ''
 
     }
   ]

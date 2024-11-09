@@ -46,6 +46,10 @@ export class ModificarItemPage implements OnInit {
   foto_perfil: string='';
   imagen: any;
 
+  estado_producto: string = '';
+
+
+
 
   constructor(private toastController: ToastController, private modalController: ModalController, private navParams: NavParams, private bd: DataBaseService, public alertController: AlertController) {
     this.producto = this.navParams.get('producto');
@@ -81,6 +85,7 @@ export class ModificarItemPage implements OnInit {
     this.categoria_id = this.producto.categoria_id;
     this.subcategoria_id = this.producto.subcategoria_id;
     this.foto_perfil = this.producto.foto_perfil;
+    this.estado_producto = this.producto.estado_producto;
   }
 
   onCategoriaChange(event: any) {
@@ -147,9 +152,11 @@ export class ModificarItemPage implements OnInit {
     if (this.descripcion_producto && 
       (this.descripcion_producto.length < 10 || this.descripcion_producto.length > 255)) {
        this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
-       return false;
-   }  
+       return false;}
 
+    if (!this.estado_producto) {
+        this.presentAlert('Error', 'El Estado del Producto es obligatorio.');
+        return false;}
 
     if (!this.precio) {
       this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');
@@ -185,7 +192,6 @@ export class ModificarItemPage implements OnInit {
       return false;}
 
       return true;
-
   }
 
 

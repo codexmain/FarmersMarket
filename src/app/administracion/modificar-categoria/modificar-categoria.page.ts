@@ -13,6 +13,8 @@ export class ModificarCategoriaPage implements OnInit {
 
   //inputs del formulario
   nombre: string = '';
+  estado_categoria: string= '';
+
 
   constructor(private bd: DataBaseService, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
     this.categoria = this.navParams.get('categoria');
@@ -20,7 +22,9 @@ export class ModificarCategoriaPage implements OnInit {
 
 
   ngOnInit() {
-    this.nombre = this.categoria.nombre
+    this.nombre = this.categoria.nombre;
+    this.estado_categoria = this.categoria.estado_categoria;
+
   }
 
   async validateFields(){
@@ -35,6 +39,11 @@ export class ModificarCategoriaPage implements OnInit {
     if (this.nombre && !categoryPattern.test(this.nombre)) {
       this.presentAlert('Error', 'El nombre de la categoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;}
+
+    if (!this.estado_categoria) {
+      this.presentAlert('Error', 'El Estado de la categoría es obligatorio.');
+      return false;
+    }
       return true
     }
 

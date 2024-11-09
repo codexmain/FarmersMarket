@@ -46,10 +46,9 @@ export class HacerAmonestacionPage implements OnInit {
   }
 
   ngOnInit() {
-    this.cargarProductos();
-
-
+    
     this.usuario_id = this.usuario.id; //TRAER EL ID DEL USUARIO PAARA HACER LA AMONESTACION
+    this.cargarProductos();
     this.email = this.usuario.email;
   }
 
@@ -90,17 +89,15 @@ export class HacerAmonestacionPage implements OnInit {
     // Validación de la descripción del producto
 
     if (!this.descripcion) {
-      this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
+      this.presentAlert('Error', 'La descripcion de la amonestación es un campo obligatorio.');
       return;}  
 
     if  
       (this.descripcion.length < 10 || this.descripcion.length > 255) {
-       this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
+       this.presentAlert('Error', 'La Descripción de la amonestacion debe tener entre 10 y 255 caracteres.');
        return;}
 
    return true
-
-
 
   }
 

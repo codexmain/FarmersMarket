@@ -23,5 +23,14 @@
       </ion-select>
     </ion-item>
 
+    <ion-item>
+      <ion-label>Estado SubCategoría:</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="estado_subcategoria" name="estado_subcategoria">
+        <ion-select-option value="activa">SubCategoría Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">SubCategoría Deshabilitada</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+
 </ion-card>
 </ion-content>
