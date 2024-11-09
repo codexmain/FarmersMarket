@@ -1870,6 +1870,23 @@ JOIN
 
 
   //COMPRAS
+
+  async getProductosCompradosPorCarroId(carroId: number): Promise<any[]> {
+    const query = `
+      SELECT d.*, p.nombre, p.precio, p.foto_producto 
+      FROM detalle_carro_compra d
+      JOIN producto p ON d.producto_id = p.id
+      WHERE d.carro_id = ?
+    `;
+  
+    const result = await this.database.executeSql(query, [carroId]);
+    const productos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productos.push(result.rows.item(i));
+    }
+    return productos;
+  }
+  
   async getUsuarioPorEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
