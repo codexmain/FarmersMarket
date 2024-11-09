@@ -69,19 +69,24 @@ export class HacerAmonestacionPage implements OnInit {
 
   async hacerAmonestacion() {
     const isValid = await this.validateFields();
-
+  
     if (!isValid) {
       return; // Si hay errores, salimos
     }
-
-      this.bd.insertarAmonestacion(this.usuario_id,this.id_producto as number, this.descripcion)
-      this.amonestacionesssService.enviarAmonestacion(this.email, this.descripcion, this.id_producto)
-        .then(() => {
-          console.log('Amonestación enviada');
-          this.modalController.dismiss({ success: true });// Cierra el modal con éxito
-        })
-
-
+  
+    // Insertar amonestación en la base de datos
+    await this.bd.insertarAmonestacion(this.usuario_id, this.id_producto as number, this.descripcion);
+  
+    // Usamos subscribe() en lugar de then()
+    this.amonestacionesssService.enviarAmonestacion(this.email, this.descripcion, this.id_producto).subscribe({
+      next: () => {
+        console.log('Amonestación enviada');
+        this.modalController.dismiss({ success: true }); // Cierra el modal con éxito
+      },
+      error: (error) => {
+        console.error('Error al enviar la amonestación:', error);
+      }
+    });
   }
 
 

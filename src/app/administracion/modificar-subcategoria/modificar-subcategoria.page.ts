@@ -74,7 +74,7 @@ async modificarSubcategoria() {
   }
     // Procede a actualizar el usuario en la base de datos
 
-    await this.bd.modificarSubCategoria(this.subcategoria.id, this.nombre,this.categoria_id);
+    await this.bd.modificarSubCategoria(this.subcategoria.id, this.nombre,this.categoria_id, this.estado_subcategoria);
 
     this.modalController.dismiss({ success: true });}
 

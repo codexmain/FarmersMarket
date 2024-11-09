@@ -55,7 +55,7 @@ export class ModificarCategoriaPage implements OnInit {
     }
       // Procede a actualizar el usuario en la base de datos
   
-      await this.bd.modificarCategoria(this.categoria.id, this.nombre);
+      await this.bd.modificarCategoria(this.categoria.id, this.estado_categoria, this.nombre);
   
       this.modalController.dismiss({ success: true });}  
   
