@@ -2207,25 +2207,6 @@ JOIN
     });
   }
 
-  async obtenerProducto(productoId: number): Promise<any> {
-    const query = `SELECT * FROM producto WHERE id = ?`;
-
-    return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [productoId])
-        .then((data) => {
-          if (data.rows.length > 0) {
-            resolve(data.rows.item(0)); // Devuelve el primer producto encontrado
-          } else {
-            reject('Producto no encontrado');
-          }
-        })
-        .catch((error) => {
-          console.error('Error al obtener el producto', error);
-          reject(error);
-        });
-    });
-  }
-
 
   //VIEW-PROVENTAS
   // Obtener producto por ID
@@ -2242,10 +2223,12 @@ JOIN
                 p.foto_producto,
                 p.fecha_agregado,
                 p.estado_producto,
+                p.subcategoria_id,
                 p.detalle_amonestacion AS producto_detalle_amonestacion,
                 
                 -- Obtener el nombre completo del proveedor
                 u.nombre || ' ' || IFNULL(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || IFNULL(u.apellido_materno, '') AS proveedor_nombre,
+                u.nombre_empresa AS proveedor_empresa,
 
                 -- Obtener la descripción de la amonestación si existe
                 a.descripcion AS amonestacion_descripcion,
@@ -2286,8 +2269,10 @@ JOIN
                 estado_producto: item.estado_producto,
                 detalle_amonestacion: item.producto_detalle_amonestacion,
                 proveedor_nombre: item.proveedor_nombre,
+                proveedor_empresa: item.proveedor_empresa,
                 amonestacion_descripcion: item.amonestacion_descripcion,
                 subcategoria_nombre: item.subcategoria_nombre,
+                subcategoria_id: item.subcategoria_id,
                 categoria_nombre: item.categoria_nombre
             };
         } else {
