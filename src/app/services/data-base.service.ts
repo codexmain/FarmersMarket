@@ -2461,7 +2461,7 @@ seleccionarCmbProdaAmonestar(idProveedor: number) {
           //agrego los registros a mi lista
           items.push({
             id: res.rows.item(i).id,
-            nombre_producto: res.rows.item(i).nombre_producto,
+            nombre: res.rows.item(i).nombre,
           });
         }
       }
