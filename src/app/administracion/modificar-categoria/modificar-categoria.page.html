@@ -26,6 +26,17 @@
     <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
       El nombre de la Categoría es obligatorio y debe tener al menos 5 caracteres y un maximo de 50.
     </div>
+
+    <ion-item>
+      <ion-label>Estado Categoría:</ion-label>
+      <ion-select [(ngModel)]="estado_categoria" name="estado_categoria" required #estadoCtrl="ngModel">
+        <ion-select-option value="activa">Categoría Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">Categoría Deshabilitada</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoCtrl.invalid && (estadoCtrl.dirty || estadoCtrl.touched)" class="error-message">
+      El estado de la categoria es obligatorio.
+    </div>
   </form>
 </ion-card>
 </ion-content>

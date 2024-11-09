@@ -11,6 +11,8 @@ import { ModalController, NavParams } from '@ionic/angular';
 export class ViewCategoriaPage implements OnInit {
   isDisabled = true;
   categoria: any;
+  estado_categoria: string= '';
+
 
   //inputs del formulario
   nombre: string = '';
@@ -21,7 +23,8 @@ export class ViewCategoriaPage implements OnInit {
   }
 
   ngOnInit() {
-    this.nombre = this.categoria.nombre
+    this.nombre = this.categoria.nombre;
+    this.estado_categoria = this.categoria.estado_categoria;
   }
 
   dismiss() {

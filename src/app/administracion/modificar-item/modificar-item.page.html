@@ -137,6 +137,22 @@
     </div>
 
     <ion-item>
+      <ion-label>Estado Producto:</ion-label>
+      <ion-select [(ngModel)]="estado_producto" name="estado_producto" required #estadoCtrl="ngModel">
+        <ion-select-option value="activa">Producto Activo</ion-select-option>
+        <ion-select-option value="deshabilitada">Producto Deshabilitado</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoCtrl.invalid && (estadoCtrl.dirty || estadoCtrl.touched)" class="error-message">
+      El estado del producto es obligatorio.
+    </div>
+
+
+
+
+
+
+    <ion-item>
       <ion-label position="floating">Precio Producto (CLP)</ion-label>
       <ion-input [disabled]="isDisabled" type="number" [(ngModel)]="precio" name="precio"></ion-input>
     </ion-item>
