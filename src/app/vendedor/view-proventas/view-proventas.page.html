@@ -162,6 +162,11 @@
         <ion-input [(ngModel)]="producto.proveedor_nombre" name="producto.proveedor_nombre" disabled></ion-input>
       </ion-item>
 
+      <ion-item>
+        <ion-label position="stacked">Empresa</ion-label>
+        <ion-input [(ngModel)]="producto.proveedor_empresa" name="producto.proveedor_empresa" disabled></ion-input>
+      </ion-item>
+
       <ion-item *ngIf="producto.amonestacion_descripcion">
         <ion-label position="stacked">Amonestación del Producto</ion-label>
         <ion-input [(ngModel)]="producto.amonestacion_descripcion" name="producto.amonestacion_descripcion"
