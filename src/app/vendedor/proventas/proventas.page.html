@@ -120,8 +120,8 @@
           <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
           <p><strong>Stock:</strong> {{ producto.stock }}</p>
         </ion-card-content>
-        <ion-card-content>
-          <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <ion-card-content slot="end">
+          <div style="display: flex; flex-direction: column; align-items: flex-end;" >
             <ion-button size="small" color="primary" (click)="verDetalle(producto.id)">
               <ion-icon name="eye">Ver</ion-icon>
             </ion-button>
