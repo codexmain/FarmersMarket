@@ -205,7 +205,7 @@ export class ModificarItemPage implements OnInit {
       // Procede a actualizar el usuario en la base de datos
       const subcategoriaId = this.subcategoria_id as number
       await this.bd.modificarProducto(this.producto.id, this.proveedor_id,this.nombre_producto,
-                                    this.descripcion_producto, this.precio, this.stock, this.organico, this.foto_perfil, subcategoriaId);
+                                    this.descripcion_producto, this.precio, this.stock, this.organico, this.foto_perfil, subcategoriaId, this.estado_producto);
   
       this.modalController.dismiss({ success: true });}
 

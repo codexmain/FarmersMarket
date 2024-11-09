@@ -856,9 +856,9 @@ JOIN
       });
   }
 
-  modificarCategoria(id: number, nombre: string) {
+  modificarCategoria(id: number, estado_categoria:string ,nombre: string) {
     return this.database
-      .executeSql('UPDATE categoria SET nombre = ? WHERE id = ?', [nombre, id])
+      .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
       .then((res) => {
         this.presentAlert('Modificar', 'Categoría Modificada');
         this.seleccionarCategorias(); //actualizar en su seccion en sí
@@ -869,11 +869,11 @@ JOIN
       });
   }
 
-  modificarSubCategoria(id: number, nombre: string, categoria_id: number) {
+  modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
     return this.database
       .executeSql(
-        'UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',
-        [nombre, categoria_id, id]
+        'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
+        [nombre, categoria_id, estado_subcategoria, id]
       )
       .then((res) => {
         this.presentAlert('Modificar', 'SubCategoría Modificada');
@@ -897,11 +897,12 @@ JOIN
     stock: number,
     organico: number,
     foto_producto: string,
-    subcategoria_id: number
+    subcategoria_id: number,
+    estado_producto: string
   ) {
     return this.database
       .executeSql(
-        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',
+        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ?  WHERE id = ?',
         [
           proveedor_id,
           nombre,
@@ -911,7 +912,8 @@ JOIN
           organico,
           foto_producto,
           subcategoria_id,
-          id,
+          estado_producto,
+          id
         ]
       )
       .then((res) => {
@@ -1162,13 +1164,6 @@ JOIN
               'UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?',
               [id]
             )
-            .then(() => {
-              // Finalmente, eliminar la subcategoría
-              return this.database.executeSql(
-                'DELETE FROM subcategoria WHERE id = ?',
-                [id]
-              );
-            })
             .then(() => {
               this.presentAlert('Eliminar', 'Subcategoría eliminada con éxito');
               this.seleccionarSubCategorias(); // Actualizar la lista de subcategorías
@@ -2502,7 +2497,7 @@ seleccionarCmbProdaAmonestar(idProveedor: number) {
           ]
         )
         .then((res) => {
-          this.presentAlert('Insertar', 'Producto Registrado');
+          this.presentAlert('Insertar', 'Amonestación Registrada');
           this.seleccionarAmonestaciones();
         })
         .catch((e) => {

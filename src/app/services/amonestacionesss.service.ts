@@ -10,19 +10,42 @@ import { OlvideContraService } from './olvide-contra.service'; // Servicio de en
 })
 export class AmonestacionesssService {
   private apiUrl = 'https://api.emailjs.com/api/v1.0/email/send'; // URL de la API de envío de correos
-  private publicKey = 'APICHULA'; // Public Key de EmailJS
-  private servicesKey = 'APICHULA'; // Service ID de EmailJS
-  private templateId = 'APICHULA'; // ID de la plantilla de correo en EmailJS
+  private publicKey = 'pMgYuxH-AjMbTJdXF'; // API key de SendGrid
+  private services_key = 'service_88b994g';
+  private template_id = 'template_sh3syat'; // Reemplaza con el ID de tu plantilla de correo
 
   listadoCmbProdAmnstones = new BehaviorSubject([]);
   listadoAmonestaciones = new BehaviorSubject([]);
 
-  constructor(
-    private http: HttpClient,
-    private databaseService: DataBaseService, // Inyecta el servicio de base de datos
-    private olvideContraService: OlvideContraService // Inyecta el servicio para el envío de correo
-  ) { }
+  constructor(private http: HttpClient) { }
 
+  enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const body = {
+      service_id: this.services_key,
+      template_id: this.template_id,
+      user_id: this.publicKey,
+      template_params: {
+        email: correo,
+        mensaje: `Alerta, tienes un poblema con tu cuenta:
+        ID Producto: ${idProducto}
+        Detalles: ${descripcion}`
+      }
+    };
+
+    return this.http.post(this.apiUrl, body, { headers, responseType: 'text' }).pipe(
+      catchError((error) => {
+        console.error('Error al enviar el correo:', error);
+        return throwError('Error en el envío del correo: ' + (error.error || error.message || 'Error desconocido'));
+      })
+    );
+  }
+
+
+  /*
   // Método para enviar una amonestación al usuario
   async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
     try {
@@ -36,16 +59,12 @@ export class AmonestacionesssService {
   }
 
   private sendAmonestacionEmail(correo: string, descripcion: string) {
-    this.olvideContraService.enviarCorreo(correo, descripcion).subscribe({
+    this.databaseService.envia(correo, descripcion).subscribe({
       next: () => console.log('Correo de amonestación enviado al usuario:', correo),
       error: (err) => console.error('Error en el envío de correo de amonestación:', err)
     });
   }
 
-  // Construcción del combobox para mostrar los productos del usuario en las amonestaciones
-  fetchCmbProdAmnstones(): Observable<any[]> {
-    return this.listadoCmbProdAmnstones.asObservable();
-  }
 
   seleccionarCmbProdaAmonestar(idProveedor: number) {
     return this.databaseService.seleccionarCmbProdaAmonestar(idProveedor) // Llama a la función en el servicio de base de datos
@@ -59,12 +78,6 @@ export class AmonestacionesssService {
     return this.listadoAmonestaciones.asObservable();
   }
 
-  // Método para insertar una amonestación
-  insertarAmonestacion(usuario_id: number, id_producto: number, descripcion: string) {
-    this.databaseService.insertarAmonestacion(usuario_id, id_producto, descripcion) // Llama a la función en el servicio de base de datos
-      .then(() => this.seleccionarAmonestaciones())
-      .catch(error => console.error('Error al insertar amonestación:', error));
-  }
 
   // Método para seleccionar todas las amonestaciones
   seleccionarAmonestaciones() {
@@ -73,4 +86,5 @@ export class AmonestacionesssService {
         this.listadoAmonestaciones.next(items as any);
       });
   }
+      */
 }
