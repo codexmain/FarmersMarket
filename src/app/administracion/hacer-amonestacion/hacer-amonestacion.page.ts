@@ -20,7 +20,7 @@ export class HacerAmonestacionPage implements OnInit {
   arrayCmbProductos: any = [
     {
       id: '',
-      nombre_producto: '',
+      nombre: '',
     }
   ]
 
@@ -39,14 +39,13 @@ export class HacerAmonestacionPage implements OnInit {
     private bd: DataBaseService,
     public alertController: AlertController
 
-  ) 
-  { 
+  ) {
     this.usuario = this.navParams.get('usuario'); //obtener todos los datos del usuario en especifico
 
   }
 
   ngOnInit() {
-    
+
     this.usuario_id = this.usuario.id; //TRAER EL ID DEL USUARIO PAARA HACER LA AMONESTACION
     this.cargarProductos();
     this.email = this.usuario.email;
@@ -69,14 +68,14 @@ export class HacerAmonestacionPage implements OnInit {
 
   async hacerAmonestacion() {
     const isValid = await this.validateFields();
-  
+
     if (!isValid) {
       return; // Si hay errores, salimos
     }
-  
+
     // Insertar amonestación en la base de datos
     await this.bd.insertarAmonestacion(this.usuario_id, this.id_producto as number, this.descripcion);
-  
+
     // Usamos subscribe() en lugar de then()
     this.amonestacionesssService.enviarAmonestacion(this.email, this.descripcion, this.id_producto).subscribe({
       next: () => {
@@ -90,19 +89,21 @@ export class HacerAmonestacionPage implements OnInit {
   }
 
 
-  async validateFields(){
+  async validateFields() {
     // Validación de la descripción del producto
 
     if (!this.descripcion) {
       this.presentAlert('Error', 'La descripcion de la amonestación es un campo obligatorio.');
-      return;}  
+      return;
+    }
 
-    if  
+    if
       (this.descripcion.length < 10 || this.descripcion.length > 255) {
-       this.presentAlert('Error', 'La Descripción de la amonestacion debe tener entre 10 y 255 caracteres.');
-       return;}
+      this.presentAlert('Error', 'La Descripción de la amonestacion debe tener entre 10 y 255 caracteres.');
+      return;
+    }
 
-   return true
+    return true
 
   }
 
@@ -120,11 +121,11 @@ export class HacerAmonestacionPage implements OnInit {
     await alert.present();
   }
 
-  clearDescripcion(){
+  clearDescripcion() {
     this.descripcion = '';
   }
 
-  clearProducto(){
+  clearProducto() {
     this.id_producto = null;
   }
 }
