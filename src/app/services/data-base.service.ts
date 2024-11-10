@@ -1582,11 +1582,19 @@ JOIN
     );
   }
 
-  async confirmarCompra(carroId: number) {
-    await this.database.executeSql(
-      'UPDATE carro_compra SET estado = "pagado" WHERE id = ?',
-      [carroId]
-    );
+  async confirmarCompra(carroId: number, total: number): Promise<boolean> {
+    try {
+      const query = `
+        UPDATE carro_compra 
+        SET estado = 'pagado', total = ? 
+        WHERE id = ?
+      `;
+      await this.database.executeSql(query, [total, carroId]);
+      return true; // Indica que la operación fue exitosa
+    } catch (error) {
+      console.error('Error al confirmar la compra:', error);
+      return false; // Indica que hubo un error
+    }
   }
 
   async getUsuarioEmail(email: string): Promise<any> {
@@ -1652,7 +1660,7 @@ JOIN
 
   async getProductosCompradosPorCarroId(carroId: number): Promise<any[]> {
     const query = `
-      SELECT d.*, p.nombre, p.precio, p.foto_producto 
+      SELECT d.*, p.*
       FROM detalle_carro_compra d
       JOIN producto p ON d.producto_id = p.id
       WHERE d.carro_id = ?
@@ -1694,7 +1702,7 @@ JOIN
 
     const usuarioId = usuario.id; // Obtener el id del usuario
     const query = `
-    SELECT d.*, p.nombre, p.precio 
+    SELECT d.*, p.*, u.*, c.*
     FROM detalle_carro_compra d
     JOIN carro_compra c ON d.carro_id = c.id
     JOIN producto p ON d.producto_id = p.id
@@ -1716,7 +1724,7 @@ JOIN
     const usuarioId = usuario.id; // Obtener el id del usuario
     const query = `
     SELECT * FROM carro_compra
-    WHERE usuario_id = ? 
+    WHERE usuario_id = ? AND estado = 'pagado'
   `;
 
     const result = await this.database.executeSql(query, [usuarioId]);
