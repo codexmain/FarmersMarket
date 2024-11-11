@@ -52,6 +52,7 @@ export class ProDetallePage implements OnInit {
 
     // Agregar producto al carro
     await this.dbService.agregarProductoAlCarro(carroId, this.producto.id, this.cantidad, this.subtotal);
+    await this.dbService.reducirStock(this.producto.id, this.cantidad);
     
     // Mostrar alerta
     this.alertOpen = true;
