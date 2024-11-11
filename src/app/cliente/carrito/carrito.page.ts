@@ -67,10 +67,27 @@ export class CarritoPage implements OnInit {
   }
 
   async eliminarProducto(productoIdentificador: string) {
-    await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
-    this.detalles = this.detalles.filter(detalle => detalle.producto_identificador !== productoIdentificador);
-    this.calcularTotal();
-    this.presentAlert('Producto eliminado', 'El producto ha sido eliminado del carrito.');
+    // Obtener el detalle del producto antes de eliminarlo
+    const detalle = this.detalles.find(d => d.producto_identificador === productoIdentificador);
+    
+    if (detalle) {
+      // Eliminar el producto del carrito en la base de datos
+      await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
+  
+      // Reponer el stock del producto eliminado
+      await this.dbService.reponerStock(detalle.producto_id, detalle.cantidad);
+  
+      // Actualizar la lista de detalles en la vista
+      this.detalles = this.detalles.filter(d => d.producto_identificador !== productoIdentificador);
+  
+      // Recalcular el total de la compra
+      this.calcularTotal();
+  
+      // Mostrar una alerta de confirmación
+      this.presentAlert('Producto eliminado', 'El producto ha sido eliminado del carrito y el stock ha sido actualizado.');
+    } else {
+      console.error('Detalle del producto no encontrado');
+    }
   }
 
   async confirmarCompra() {

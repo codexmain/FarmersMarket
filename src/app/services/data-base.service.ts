@@ -1717,27 +1717,32 @@ JOIN
 
 
   //obtener productos con el nombre del proveedor y empresa asociada
-  public async getProductosConProveedor(): Promise<any[]> {
+  public async getProductosConProveedorPorRegion(usuarioClienteId: number): Promise<any[]> {
     try {
       const query = `
-      SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
-             p.organico, p.foto_producto, s.nombre AS subcategoria, 
-             u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
-      FROM producto p
-      JOIN usuario u ON p.proveedor_id = u.id
-      JOIN subcategoria s ON p.subcategoria_id = s.id;
-    `;
-
-      const result = await this.database.executeSql(query, []);
+        SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
+               p.organico, p.foto_producto, s.nombre AS subcategoria, 
+               u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
+        FROM producto p
+        JOIN usuario u ON p.proveedor_id = u.id
+        JOIN subcategoria s ON p.subcategoria_id = s.id
+        JOIN direccion d_proveedor ON u.id = d_proveedor.usuario_id
+        JOIN direccion d_cliente ON d_cliente.usuario_id = ?
+        JOIN comuna c_proveedor ON d_proveedor.comuna_id = c_proveedor.id
+        JOIN comuna c_cliente ON d_cliente.comuna_id = c_cliente.id
+        WHERE c_proveedor.region_id = c_cliente.region_id;
+      `;
+  
+      const result = await this.database.executeSql(query, [usuarioClienteId]);
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-
-      console.log('Productos con proveedor obtenidos:', productos);
+  
+      console.log('Productos con proveedor en la misma región obtenidos:', productos);
       return productos;
     } catch (error) {
-      console.error('Error al obtener productos con proveedor:', error);
+      console.error('Error al obtener productos con proveedor en la misma región:', error);
       return [];
     }
   }
@@ -1876,6 +1881,12 @@ JOIN
     );
   }
 
+  async reponerStock(productoId: number, cantidad: number) {
+    await this.database.executeSql(
+      'UPDATE producto SET stock = stock + ? WHERE id = ?',
+      [cantidad, productoId]
+    );
+  }
 
   //COMPRAS
 
