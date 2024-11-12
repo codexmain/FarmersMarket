@@ -100,7 +100,6 @@ export class CarritoPage implements OnInit {
 
     if (confirm) {
       await this.dbService.confirmarCompra(this.carro.id, this.totalCompra);
-      await Promise.all(this.detalles.map(detalle => this.reducirStock(detalle.producto_id, detalle.cantidad)));
       this.presentAlert('Compra confirmada', 'Su compra ha sido confirmada.');
       this.detalles = []; // Limpiar el carrito
       this.totalCompra = 0; // Reiniciar el total
