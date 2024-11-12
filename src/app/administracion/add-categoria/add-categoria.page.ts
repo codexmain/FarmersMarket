@@ -47,6 +47,13 @@ export class AddCategoriaPage implements OnInit {
     this.presentAlert('Error', 'El nombre de la categoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
     return;}
 
+  // Validar si el correo ya existe
+  const catExistente = await this.bd.verificarCategoriaExistente(this.nombre);
+  if (catExistente) {
+    this.presentAlert('Error', 'Esta SubCategoría ya existe.');
+    return;
+  }
+
     await this.bd.insertarCategoria(this.nombre);
     this.presentAlert('Éxito', 'Se ha agregado la Categoría exitosamente.');
     console.log('Formulario válido, proceder con el registro.');
