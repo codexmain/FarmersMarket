@@ -53,6 +53,16 @@ export class ModificarSubcategoriaPage implements OnInit {
       this.presentAlert('Error', 'El nombre de la Subcategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;
     }
+
+    // Validar la existencia del correo solo si no es el mismo que el actual
+    if (this.nombre !== this.subcategoria.nombre) {
+      const subCatExistente = await this.bd.verificarSubcategoriaExistente(this.nombre);
+      if (subCatExistente) {
+        this.presentAlert('Error', 'Esta Categoría ya existe.');
+        return false;
+      }
+    }
+
     // Validar región
     if (!this.categoria_id) {
        this.presentAlert('Error', 'La Categoría es obligatoria.');

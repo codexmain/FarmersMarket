@@ -40,6 +40,15 @@ export class ModificarCategoriaPage implements OnInit {
       this.presentAlert('Error', 'El nombre de la categoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;}
 
+    // Validar la existencia del correo solo si no es el mismo que el actual
+    if (this.nombre !== this.categoria.nombre) {
+      const catExistente = await this.bd.verificarCategoriaExistente(this.nombre);
+      if (catExistente) {
+        this.presentAlert('Error', 'Esta Categoría ya existe.');
+        return false;
+      }
+    }
+
     if (!this.estado_categoria) {
       this.presentAlert('Error', 'El Estado de la categoría es obligatorio.');
       return false;
