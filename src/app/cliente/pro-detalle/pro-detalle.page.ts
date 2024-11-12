@@ -45,6 +45,20 @@ export class ProDetallePage implements OnInit {
     this.subtotal = this.producto.precio * this.cantidad; // Calcular subtotal
   }
 
+  incrementarCantidad() {
+    if (this.cantidad < this.producto.stock) {
+      this.cantidad++;
+      this.actualizarSubtotal();
+    }
+  }
+
+  decrementarCantidad() {
+    if (this.cantidad > 1) {
+      this.cantidad--;
+      this.actualizarSubtotal();
+    }
+  }
+
   async agregarAlCarrito() {
     // Obtener o crear carro de compra
     const carro = await this.dbService.getCarroCompra(this.usuarioId);
