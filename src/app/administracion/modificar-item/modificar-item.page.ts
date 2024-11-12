@@ -223,13 +223,7 @@ export class ModificarItemPage implements OnInit {
     this.modalController.dismiss();
   }
 
-  clearProductName(){
-    this.nombre_producto = '';
-  }
 
-  clearProductDesc(){
-    this.descripcion_producto = '';
-  }
 
   async presentToast(message: string) {
     const toast = await this.toastController.create({
