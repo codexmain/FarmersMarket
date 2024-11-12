@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content>
-    <ion-grid>
+    <ion-card [style.background-color]="'#e0ac08'">
         <ion-list *ngIf="getFechasCarros().length > 0">
             <!-- Iteramos sobre las fechas de los carros -->
             <ion-item-group *ngFor="let fecha of getFechasCarros()">
@@ -137,5 +137,5 @@
                 No tienes compras registradas.
             </ion-card>
         </ion-text>
-    </ion-grid>
+    </ion-card>
 </ion-content>
