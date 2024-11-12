@@ -25,6 +25,17 @@ export class CarritoPage implements OnInit {
     await this.cargarCarrito();
   }
 
+  async vaciarCarrito() {
+    if (this.detalles.length > 0) {
+      // Iterar sobre una copia de `detalles` para evitar modificar la lista durante la eliminación
+      for (const detalle of [...this.detalles]) {
+        await this.eliminarProducto(detalle.producto_identificador);
+      }
+    } else {
+      this.presentAlert('Carrito vacío', 'No hay productos en el carrito para eliminar.');
+    }
+  }
+
   async obtenerUsuarioId() {
     const email = await this.nativeStorage.getItem('userEmail');
     const usuario = await this.dbService.getUsuarioEmail(email);
@@ -83,8 +94,6 @@ export class CarritoPage implements OnInit {
       // Recalcular el total de la compra
       this.calcularTotal();
   
-      // Mostrar una alerta de confirmación
-      this.presentAlert('Producto eliminado', 'El producto ha sido eliminado del carrito y el stock ha sido actualizado.');
     } else {
       console.error('Detalle del producto no encontrado');
     }

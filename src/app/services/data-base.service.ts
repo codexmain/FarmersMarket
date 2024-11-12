@@ -1484,13 +1484,13 @@ JOIN
         JOIN comuna c_cliente ON d_cliente.comuna_id = c_cliente.id
         WHERE c_proveedor.region_id = c_cliente.region_id;
       `;
-  
+
       const result = await this.database.executeSql(query, [usuarioClienteId]);
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-  
+
       console.log('Productos con proveedor en la misma región obtenidos:', productos);
       return productos;
     } catch (error) {
@@ -1614,11 +1614,33 @@ JOIN
 
   // Agregar producto al carro y generar un identificador único
   async agregarProductoAlCarro(carroId: number, productoId: number, cantidad: number, subtotal: number) {
-    const productoIdentificador = this.generarIdentificadorUnico(); // Generar identificador único
-    await this.database.executeSql(
-      'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal, producto_identificador) VALUES (?, ?, ?, ?, ?)',
-      [carroId, productoId, cantidad, subtotal, productoIdentificador]
+    // Verificar si ya existe un registro con el mismo carroId y productoId
+    const result = await this.database.executeSql(
+      'SELECT cantidad, subtotal, producto_identificador FROM detalle_carro_compra WHERE carro_id = ? AND producto_id = ?',
+      [carroId, productoId]
     );
+
+    if (result.rows.length > 0) {
+      // Si existe el producto en el carrito con el mismo carroId, actualizar cantidad y subtotal
+      const existingCantidad = result.rows.item(0).cantidad;
+      const existingSubtotal = result.rows.item(0).subtotal;
+      const productoIdentificador = result.rows.item(0).producto_identificador;
+
+      const nuevaCantidad = existingCantidad + cantidad;
+      const nuevoSubtotal = existingSubtotal + subtotal;
+
+      await this.database.executeSql(
+        'UPDATE detalle_carro_compra SET cantidad = ?, subtotal = ? WHERE carro_id = ? AND producto_id = ? AND producto_identificador = ?',
+        [nuevaCantidad, nuevoSubtotal, carroId, productoId, productoIdentificador]
+      );
+    } else {
+      // Si no existe, insertar un nuevo registro con un identificador único
+      const productoIdentificador = this.generarIdentificadorUnico(); // Generar identificador único
+      await this.database.executeSql(
+        'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal, producto_identificador) VALUES (?, ?, ?, ?, ?)',
+        [carroId, productoId, cantidad, subtotal, productoIdentificador]
+      );
+    }
   }
 
   // Generar un identificador único para cada producto
@@ -1649,7 +1671,7 @@ JOIN
       JOIN producto p ON d.producto_id = p.id
       WHERE d.carro_id = ?
     `;
-  
+
     const result = await this.database.executeSql(query, [carroId]);
     const productos = [];
     for (let i = 0; i < result.rows.length; i++) {
@@ -1657,7 +1679,7 @@ JOIN
     }
     return productos;
   }
-  
+
   async getUsuarioPorEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
@@ -2000,7 +2022,7 @@ JOIN
   // Obtener producto por ID
   async getProductoselect(productoId: number) {
     try {
-        const query = `
+      const query = `
             SELECT 
                 p.id,
                 p.nombre AS producto_nombre,
@@ -2041,37 +2063,37 @@ JOIN
                 p.id = ?;
         `;
 
-        const result = await this.database.executeSql(query, [productoId]);
+      const result = await this.database.executeSql(query, [productoId]);
 
-        if (result.rows.length > 0) {
-            const item = result.rows.item(0);
-            return {
-                id: item.id,
-                nombre: item.producto_nombre,
-                descripcion: item.producto_descripcion,
-                precio: item.precio,
-                stock: item.stock,
-                organico: item.organico,
-                foto_producto: item.foto_producto,
-                fecha_agregado: item.fecha_agregado,
-                estado_producto: item.estado_producto,
-                detalle_amonestacion: item.producto_detalle_amonestacion,
-                proveedor_nombre: item.proveedor_nombre,
-                proveedor_empresa: item.proveedor_empresa,
-                amonestacion_descripcion: item.amonestacion_descripcion,
-                subcategoria_nombre: item.subcategoria_nombre,
-                subcategoria_id: item.subcategoria_id,
-                categoria_nombre: item.categoria_nombre
-            };
-        } else {
-            return null; // No product found
-        }
+      if (result.rows.length > 0) {
+        const item = result.rows.item(0);
+        return {
+          id: item.id,
+          nombre: item.producto_nombre,
+          descripcion: item.producto_descripcion,
+          precio: item.precio,
+          stock: item.stock,
+          organico: item.organico,
+          foto_producto: item.foto_producto,
+          fecha_agregado: item.fecha_agregado,
+          estado_producto: item.estado_producto,
+          detalle_amonestacion: item.producto_detalle_amonestacion,
+          proveedor_nombre: item.proveedor_nombre,
+          proveedor_empresa: item.proveedor_empresa,
+          amonestacion_descripcion: item.amonestacion_descripcion,
+          subcategoria_nombre: item.subcategoria_nombre,
+          subcategoria_id: item.subcategoria_id,
+          categoria_nombre: item.categoria_nombre
+        };
+      } else {
+        return null; // No product found
+      }
     } catch (error) {
-        console.error('Error al obtener los datos del producto:', error);
-        throw error; // Propagate the error for further handling
+      console.error('Error al obtener los datos del producto:', error);
+      throw error; // Propagate the error for further handling
     }
-}
-  
+  }
+
 
   //REGVENTAS
 
