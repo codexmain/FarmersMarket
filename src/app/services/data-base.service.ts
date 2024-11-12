@@ -1068,27 +1068,9 @@ JOIN
         } else {
           // Actualizar registros en las tablas que dependen de usuario
           this.database.executeSql(
-              'UPDATE producto SET proveedor_id = 1 WHERE proveedor_id = ?',
+              'UPDATE usuario SET estado_cuenta = "deshabilitada" WHERE id = ?',
               [id]
             )
-            .then(() => {
-              return this.database.executeSql(
-                'UPDATE direccion SET usuario_id = 1 WHERE usuario_id = ?',
-                [id]
-              );
-            })
-            .then(() => {
-              return this.database.executeSql(
-                'UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?',
-                [id]
-              );
-            }).then(() => {
-              // Finalmente, eliminar el usuario
-              return this.database.executeSql(
-                'DELETE FROM usuario WHERE id = ?',
-                [id]
-              );
-            })
             .then(() => {
               this.presentAlert('Eliminar', 'Usuario eliminado con éxito');
               this.seleccionarUsuarios(); // Actualizar la lista de usuarios
@@ -1127,7 +1109,7 @@ JOIN
               // Luego, eliminar la categoría
 
               return this.database.executeSql(
-                'DELETE FROM categoria WHERE id = ?',
+                'UPDATE categoria SET estado_categoria = "deshabilitada" WHERE id = ?',
                 [id]
               );
             })
@@ -1161,7 +1143,7 @@ JOIN
           // Actualizar registros en la tabla de productos
           this.database
             .executeSql(
-              'UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?',
+              'UPDATE subcategoria SET estado_subcategoria = "deshabilitada" WHERE id = ?',
               [id]
             )
             .then(() => {
@@ -1204,18 +1186,9 @@ JOIN
           // Actualizar registros en la tabla de detalle_carro_compra
           this.database
             .executeSql(
-              'UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?',
+              'UPDATE producto SET estado_producto = "deshabilitada" WHERE id = ?',
               [id]
             )
-
-            .then(() => {
-              // Finalmente, eliminar el producto
-              return this.database.executeSql(
-                'DELETE FROM producto WHERE id = ?',
-                [id]
-              );
-            })
-
             .then(() => {
               this.presentAlert('Eliminar', 'Producto eliminado con éxito');
               this.seleccionarProductos(); // Actualizar la lista de productos
