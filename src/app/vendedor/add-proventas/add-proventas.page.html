@@ -14,18 +14,18 @@
         <ion-button (click)="takePicture()">Tomar Foto</ion-button><br>
 
         <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
-          <ion-avatar style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
-            <img *ngIf="foto_producto" 
-                 [src]="foto_producto" 
-                 alt="avatar" 
-                 style="width: 100%; height: 100%; object-fit: cover;"/>
+          <ion-avatar
+            style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+            <img *ngIf="foto_producto" [src]="foto_producto" alt="avatar"
+              style="width: 100%; height: 100%; object-fit: cover;" />
           </ion-avatar>
         </div>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Nombre del Producto</ion-label>
-        <ion-input [(ngModel)]="nombre" name="nombre" required placeholder="Ingresar Nombre del Producto" #productCtrl="ngModel"></ion-input>
+        <ion-input [(ngModel)]="nombre" name="nombre" required placeholder="Ingresar Nombre del Producto"
+          #productCtrl="ngModel"></ion-input>
         <ion-button fill="outline" slot="end" (click)="clearProductName()">
           <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
         </ion-button>
@@ -36,7 +36,8 @@
 
       <ion-item>
         <ion-label position="stacked">Descripción</ion-label>
-        <ion-input [(ngModel)]="descripcion" name="descripcion" placeholder="Ingresar Descripción" #descProductCtrl="ngModel"></ion-input>
+        <ion-input [(ngModel)]="descripcion" name="descripcion" placeholder="Ingresar Descripción"
+          #descProductCtrl="ngModel"></ion-input>
         <ion-button fill="outline" slot="end" (click)="clearProductDesc()">
           <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
         </ion-button>
@@ -47,19 +48,22 @@
 
       <ion-item>
         <ion-label position="stacked">Precio</ion-label>
-        <ion-input [(ngModel)]="precio" name="precio" type="number" required placeholder="Ingresar Precio" #productPriceCtrl="ngModel"></ion-input>
+        <ion-input [(ngModel)]="precio" name="precio" type="number" required placeholder="Ingresar Precio"
+          #productPriceCtrl="ngModel"></ion-input>
       </ion-item>
-      <div *ngIf="productPriceCtrl.invalid && (productPriceCtrl.dirty || productPriceCtrl.touched)" class="error-message">
+      <div *ngIf="productPriceCtrl.invalid && (productPriceCtrl.dirty || productPriceCtrl.touched)"
+        class="error-message">
         El Precio del producto es obligatorio y deben ser numeros enteros positivos de hasta 7 cifras.
       </div>
 
       <ion-item>
         <ion-label position="stacked">Stock</ion-label>
-        <ion-input [(ngModel)]="stock" name="stock" type="number" required placeholder="Ingresar Stock" #stockCtrl="ngModel"></ion-input>
+        <ion-input [(ngModel)]="stock" name="stock" type="number" required placeholder="Ingresar Stock"
+          #stockCtrl="ngModel"></ion-input>
       </ion-item>
       <div *ngIf="stockCtrl.invalid && (stockCtrl.dirty || stockCtrl.touched)" class="error-message">
         Las Existencias del Producto es obligatorio y debe ser un número entero de hasta 5 cifras o cero.
-      </div> 
+      </div>
 
       <ion-item>
         <ion-label>¿Producto Orgánico?:</ion-label>
@@ -75,23 +79,26 @@
 
       <ion-item>
         <ion-label>Categoría</ion-label>
-        <ion-select [(ngModel)]="categoriaId" (ionChange)="onCategoriaChange($event.detail.value)" required #categoryCtrl="ngModel">
-          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
+        <ion-select [(ngModel)]="categoriaId" (ionChange)="onCategoriaChange($event.detail.value)" required
+          #categoryCtrl="ngModel">
+          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre
+            }}</ion-select-option>
         </ion-select>
       </ion-item>
       <div *ngIf="categoryCtrl.invalid && (categoryCtrl.dirty || categoryCtrl.touched)" class="error-message">
         La Categoría es obligatoria.
-      </div>   
+      </div>
 
       <ion-item>
         <ion-label>Subcategoría</ion-label>
         <ion-select [(ngModel)]="subcategoriaId" name="subcategoriaId" required #subCategoryCtrl="ngModel">
-          <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id" >{{ subcategoria.nombre }}</ion-select-option>
+          <ion-select-option *ngFor="let subcategoria of subcategorias" [value]="subcategoria.id">{{ subcategoria.nombre
+            }}</ion-select-option>
         </ion-select>
       </ion-item>
       <div *ngIf="subCategoryCtrl.invalid && (subCategoryCtrl.dirty || subCategoryCtrl.touched)" class="error-message">
         La SubCategoría es obligatoria.
-      </div> 
+      </div>
 
       <ion-button style="margin: 20px 20px;" expand="full" type="submit">Agregar Producto</ion-button>
     </form>

@@ -25,6 +25,17 @@ export class CarritoPage implements OnInit {
     await this.cargarCarrito();
   }
 
+  async vaciarCarrito() {
+    if (this.detalles.length > 0) {
+      // Iterar sobre una copia de `detalles` para evitar modificar la lista durante la eliminación
+      for (const detalle of [...this.detalles]) {
+        await this.eliminarProducto(detalle.producto_identificador);
+      }
+    } else {
+      this.presentAlert('Carrito vacío', 'No hay productos en el carrito para eliminar.');
+    }
+  }
+
   async obtenerUsuarioId() {
     const email = await this.nativeStorage.getItem('userEmail');
     const usuario = await this.dbService.getUsuarioEmail(email);
@@ -67,10 +78,25 @@ export class CarritoPage implements OnInit {
   }
 
   async eliminarProducto(productoIdentificador: string) {
-    await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
-    this.detalles = this.detalles.filter(detalle => detalle.producto_identificador !== productoIdentificador);
-    this.calcularTotal();
-    this.presentAlert('Producto eliminado', 'El producto ha sido eliminado del carrito.');
+    // Obtener el detalle del producto antes de eliminarlo
+    const detalle = this.detalles.find(d => d.producto_identificador === productoIdentificador);
+    
+    if (detalle) {
+      // Eliminar el producto del carrito en la base de datos
+      await this.dbService.eliminarProductoDelCarro(productoIdentificador, this.carro.id);
+  
+      // Reponer el stock del producto eliminado
+      await this.dbService.reponerStock(detalle.producto_id, detalle.cantidad);
+  
+      // Actualizar la lista de detalles en la vista
+      this.detalles = this.detalles.filter(d => d.producto_identificador !== productoIdentificador);
+  
+      // Recalcular el total de la compra
+      this.calcularTotal();
+  
+    } else {
+      console.error('Detalle del producto no encontrado');
+    }
   }
 
   async confirmarCompra() {
@@ -82,8 +108,7 @@ export class CarritoPage implements OnInit {
     const confirm = await this.presentConfirmationAlert();
 
     if (confirm) {
-      await this.dbService.confirmarCompra(this.carro.id);
-      await Promise.all(this.detalles.map(detalle => this.reducirStock(detalle.producto_id, detalle.cantidad)));
+      await this.dbService.confirmarCompra(this.carro.id, this.totalCompra);
       this.presentAlert('Compra confirmada', 'Su compra ha sido confirmada.');
       this.detalles = []; // Limpiar el carrito
       this.totalCompra = 0; // Reiniciar el total
