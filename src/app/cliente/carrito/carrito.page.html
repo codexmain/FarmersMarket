@@ -4,6 +4,9 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Carrito</ion-title>
+    <ion-button slot="end" fill="outline" color="danger" (click)="vaciarCarrito()">
+      Vaciar carro
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
@@ -112,9 +115,9 @@
           <p>{{ detalle.descripcion }}</p>
         </ion-card-header>
         <ion-card-content>
-          <p><strong>Precio:</strong> {{ detalle.precio | currency }}</p>
+          <p><strong>Precio:</strong> ${{ detalle.precio }}</p>
           <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
-          <p><strong>Subtotal:</strong> {{ detalle.subtotal | currency }}</p>
+          <p><strong>Subtotal:</strong> ${{ detalle.subtotal }}</p>
           <ion-button color="danger" (click)="eliminarProducto(detalle.producto_identificador)">
             Eliminar
           </ion-button>
@@ -130,7 +133,7 @@
   <ion-card>
     <ion-item>
       <ion-label>Total:</ion-label>
-      <ion-label> {{ totalCompra | currency }}</ion-label>
+      <ion-label> ${{ totalCompra }}</ion-label>
     </ion-item>
   </ion-card>
 

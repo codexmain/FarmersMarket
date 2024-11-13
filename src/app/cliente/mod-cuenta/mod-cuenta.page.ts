@@ -31,13 +31,15 @@ export class ModCuentaPage implements OnInit {
     comuna_id: null, // ID de la comuna seleccionada
   };
   imagen: any;
+  datos: any;
 
-  selectedRegion: number | null = null;
-  selectedComuna: number | null = null;
+  selectedRegion!: number;
+  selectedComuna!: number;
   regiones: any[] = [];
   comunas: any[] = [];
   direcciones: any[] = []; // Lista de direcciones del usuario
-  direccionSeleccionada: number | null = null; // 
+  direccionSeleccionada: number | null = null;
+  errorMessage: string = '';
 
   constructor(
     private dataBase: DataBaseService,
@@ -46,50 +48,63 @@ export class ModCuentaPage implements OnInit {
     private router: Router,
     private navCtrl: NavController,
     private toastController: ToastController,
-    private geocodingService: GeocodingService, 
+    private geocodingService: GeocodingService,
     private locationValidationService: LocationValidationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.cargarDatosUsuario();
     this.cargarRegiones();  // Cargar regiones al inicializar
     this.cargarDirecciones();
-    
+
   }
+
 
   async guardarDireccionPreferida() {
     try {
       const id = this.direccionSeleccionada ?? 0; // Valor por defecto si es null
       await this.dataBase.establecerDireccionPreferida(id, this.usuario.id);
-      await this.presentAlert('Éxito', 'Dirección preferida actualizada.');
+      this.errorMessage = 'Éxito: Dirección preferida actualizada.';
     } catch (error) {
       console.error('Error al guardar la dirección preferida:', error);
-      await this.presentAlert('Error', 'No se pudo guardar la dirección preferida.');
+      this.errorMessage = 'Error: No se pudo guardar la dirección preferida.';
     }
   }
 
- 
+
 
   async cargarDatosUsuario() {
     try {
       const email = await this.nativeStorage.getItem('userEmail');
-      const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
-      
+      const usuarioData = await this.dataBase.getUsuarioByEmail(email);
+      this.datos = await this.dataBase.getUsuarioByEmail(email);
+
       if (usuarioData) {
         this.usuario = usuarioData;
-        this.selectedRegion = usuarioData.region_id; // Asignar la región seleccionada
-        this.selectedComuna = usuarioData.comuna_id; // Asignar la comuna seleccionada
 
-        // Llamar a cargarcomunas solo si selectedRegion no es null
-        if (this.selectedRegion !== null) {
-          await this.cargarcomunas(this.selectedRegion); // Cargar comunas de la región seleccionada
+        // Cargar las regiones y asignar el valor correspondiente a region_id
+        await this.cargarRegiones();
+
+        // Buscar la región correspondiente y asignarla al usuario
+        const regionEncontrada = this.regiones.find(region => region.nombre === this.datos.region);
+        if (regionEncontrada) {
+          this.usuario.region_id = regionEncontrada.id;
+          this.selectedRegion = this.usuario.region_id;
+          await this.cargarcomunas(this.selectedRegion);
+
+          // Buscar la comuna correspondiente y asignarla al usuario
+          const comunaEncontrada = this.comunas.find(comuna => comuna.nombre === this.datos.comuna);
+          if (comunaEncontrada) {
+            this.usuario.comuna_id = comunaEncontrada.id;
+            this.selectedComuna = this.usuario.comuna_id;
+          }
         }
       } else {
-        await this.presentAlert('Error', 'No se encontró el usuario.');
+        this.errorMessage = 'Error: No se encontró el usuario.';
       }
     } catch (error) {
       console.error('Error al cargar datos del usuario:', error);
-      await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
+      this.errorMessage = 'Error: Error al cargar los datos del usuario.';
     }
   }
 
@@ -118,82 +133,71 @@ export class ModCuentaPage implements OnInit {
       try {
         const actualizado = await this.dataBase.actualizarUsuarioPorEmail(this.usuario);
         if (actualizado) {
-          await this.presentAlert('Éxito', 'Usuario actualizado exitosamente.');
+          this.errorMessage = 'Éxito: Usuario actualizado exitosamente.';
           this.irHaciaAtras();
         } else {
-          await this.presentAlert('Error', 'Hubo un problema al actualizar el usuario.');
+          this.errorMessage = 'Error: Hubo un problema al actualizar el usuario.';
         }
       } catch (error) {
         console.error('Error al actualizar el usuario:', error);
-        await this.presentAlert('Error', 'Error al actualizar el usuario. Inténtalo más tarde.');
+        this.errorMessage = 'Error: Error al actualizar el usuario. Inténtalo más tarde.';
       }
     }
   }
 
 
   async validarCampos(): Promise<boolean> {
-    // Validar nombres
-    if (!this.usuario.nombre || this.usuario.nombre.length < 2) {
-      await this.presentAlert('Error', 'El primer nombre es obligatorio y debe tener al menos 2 caracteres.');
-      return false;
-    }
-
-    if (!this.usuario.apellido_paterno || this.usuario.apellido_paterno.length < 2) {
-      await this.presentAlert('Error', 'El apellido paterno es obligatorio y debe tener al menos 2 caracteres.');
-      return false;
-    }
-
-    // Validar pNombre, sNombre, aPaterno, aMaterno
     const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
+    if (!this.usuario.nombre || this.usuario.nombre.length < 2) {
+      this.errorMessage = 'Error: El primer nombre es obligatorio y debe tener al menos 2 caracteres.';
+      return false;
+    }
+    if (!this.usuario.apellido_paterno || this.usuario.apellido_paterno.length < 2) {
+      this.errorMessage = 'Error: El apellido paterno es obligatorio y debe tener al menos 2 caracteres.';
+      return false;
+    }
     if (!namePattern.test(this.usuario.nombre) || !namePattern.test(this.usuario.apellido_paterno) ||
-        (this.usuario.segundo_nombre && !namePattern.test(this.usuario.segundo_nombre)) ||
-        (this.usuario.apellido_materno && !namePattern.test(this.usuario.apellido_materno))) {
-      await this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 carecteres y no contener números.');
+      (this.usuario.segundo_nombre && !namePattern.test(this.usuario.segundo_nombre)) ||
+      (this.usuario.apellido_materno && !namePattern.test(this.usuario.apellido_materno))) {
+      this.errorMessage = 'Error: Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.';
       return false;
     }
 
-   
-    
+    // Validar "Empresa" solo si contiene un valor
     const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
-    if (!empresaPattern.test(this.usuario.nombre_empresa)) {
-      await this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres, y solo puede contener letras, números y espacios.');
+    if (this.usuario.nombre_empresa && !empresaPattern.test(this.usuario.nombre_empresa)) {
+      this.errorMessage = 'Error: El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.';
       return false;
     }
-    
 
-    
-
+    // Validar "Descripción Corta" solo si contiene un valor
     const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
-    if (!descEmpresaPattern.test(this.usuario.descripcion_corta)) {
-      await this.presentAlert('Error', 'La descripción de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
+    if (this.usuario.descripcion_corta && !descEmpresaPattern.test(this.usuario.descripcion_corta)) {
+      this.errorMessage = 'Error: La descripción de la empresa debe tener entre 10 y 90 caracteres y solo puede contener letras, números y espacios.';
       return false;
     }
 
-    // Validar región
-  if (!this.usuario.region_id) {
-    this.presentAlert('Error', 'La región es obligatoria.');
-    return false;
-  }
+    if (!this.usuario.region_id) {
+      this.errorMessage = 'Error: La región es obligatoria.';
+      return false;
+    }
+    if (!this.usuario.comuna_id) {
+      this.errorMessage = 'Error: La comuna es obligatoria.';
+      return false;
+    }
+    const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
+    if (!direccionPattern.test(this.usuario.direccion)) {
+      this.errorMessage = 'Error: La dirección solo puede contener letras, números y espacios.';
+      return false;
+    }
 
-    // Validar comuna
-  if (!this.usuario.comuna_id) {
-    this.presentAlert('Error', 'La comuna es obligatoria.');
-    return false;
-  }
-
-//Validar dirección
-  const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
-  if (!direccionPattern.test(this.usuario.direccion)) {
-    this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
-    return false;
-  }
-
-    return true; // Todos los campos son válidos
+    return true;
   }
 
   irHaciaAtras() {
-    this.navCtrl.pop(); // Regresa a la página anterior
+    this.navCtrl.pop();
   }
+
 
 
 
@@ -255,31 +259,31 @@ export class ModCuentaPage implements OnInit {
     }
   }
 
-  clearPNombre(){
+  clearPNombre() {
     this.usuario.nombre = '';
   }
-  clearSNombre(){
+  clearSNombre() {
     this.usuario.segundo_nombre = '';
   }
 
-  clearAPaterno(){
+  clearAPaterno() {
     this.usuario.apellido_paterno = '';
   }
-  clearAMaterno(){
+  clearAMaterno() {
     this.usuario.apellido_materno = '';
 
   }
 
-  clearEmpresa(){
+  clearEmpresa() {
     this.usuario.nombre_empresa = '';
 
   }
-  clearDescEmpresa(){
+  clearDescEmpresa() {
     this.usuario.descripcion_corta = '';
 
   }
 
-  clearDirr(){
+  clearDirr() {
     this.usuario.direccion = '';
 
   }
@@ -292,7 +296,7 @@ export class ModCuentaPage implements OnInit {
       const coordinates = await Geolocation.getCurrentPosition();
       const lat = coordinates.coords.latitude;
       const lng = coordinates.coords.longitude;
-  
+
       if (this.usuario.comuna_id && this.locationValidationService.isWithinBoundary(this.usuario.comuna_id, lat, lng)) {
         this.geocodingService.reverseGeocode(lat, lng)
           .subscribe({

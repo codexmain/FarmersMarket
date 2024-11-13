@@ -95,15 +95,21 @@
       <p><strong>Precio:</strong> ${{ producto.precio }}</p>
       <p><strong>Stock:</strong> {{ producto.stock }}</p>
     </ion-card-content>
+
     <ion-item>
       <ion-label class="ion-text-left"><strong>Escoger Cantidad: </strong></ion-label>
-      <ion-input class="ion-text-right" type="number" [(ngModel)]="cantidad" min="1" [max]="producto.stock"
-        (ionInput)="actualizarSubtotal()">
-      </ion-input>
+      <ion-button fill="solid" size="small" style="width: 20px; height: 20px;" color="warning" (click)="decrementarCantidad()" [disabled]="cantidad <= 1">-</ion-button>
+      
+      <ion-input class="ion-text-center" type="number" [(ngModel)]="cantidad" min="1" [max]="producto.stock" readonly
+
+        (ionInput)="actualizarSubtotal()"></ion-input>
+      
+      <ion-button fill="solid" size="small" style="width: 20px; height: 20px;" color="warning" (click)="incrementarCantidad()" [disabled]="cantidad >= producto.stock">+</ion-button>
     </ion-item>
+
     <ion-item>
       <ion-label><strong>Subtotal: </strong></ion-label>
-      <ion-text> {{ subtotal | currency }}</ion-text>
+      <ion-text> ${{ subtotal }}</ion-text>
     </ion-item>
 
     <ion-button expand="full" color="primary" (click)="agregarAlCarrito()"
