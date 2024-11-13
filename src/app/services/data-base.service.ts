@@ -2115,82 +2115,75 @@ modificarProducto(
         });
     });
   }
+  
 
-  //VIEW-PROVENTAS
-  // Obtener producto por ID
-  async getProductoselect(productoId: number) {
-    try {
-      const query = `
-            SELECT 
-                p.id,
-                p.nombre AS producto_nombre,
-                p.descripcion AS producto_descripcion,
-                p.precio,
-                p.stock,
-                p.organico,
-                p.foto_producto,
-                p.fecha_agregado,
-                p.estado_producto,
-                p.subcategoria_id,
-                p.detalle_amonestacion AS producto_detalle_amonestacion,
-                
-                -- Obtener el nombre completo del proveedor
-                u.nombre || ' ' || IFNULL(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || IFNULL(u.apellido_materno, '') AS proveedor_nombre,
-                u.nombre_empresa AS proveedor_empresa,
+//VIEW-PROVENTAS
+// Obtener producto por ID
+async getProductoselect(productoId: number) {
+  try {
+    const query = `
+          SELECT 
+              p.id,
+              p.nombre AS producto_nombre,
+              p.descripcion AS producto_descripcion,
+              p.precio,
+              p.stock,
+              p.organico,
+              p.foto_producto,
+              p.fecha_agregado,
+              p.estado_producto,
+              p.subcategoria_id,
+              
+              -- Obtener el nombre completo del proveedor
+              u.nombre || ' ' || IFNULL(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || IFNULL(u.apellido_materno, '') AS proveedor_nombre,
+              u.nombre_empresa AS proveedor_empresa,
 
-                -- Obtener la descripción de la amonestación si existe
-                a.descripcion AS amonestacion_descripcion,
+              -- Obtener el nombre de la subcategoría
+              s.nombre AS subcategoria_nombre,
 
-                -- Obtener el nombre de la subcategoría
-                s.nombre AS subcategoria_nombre,
+              -- Obtener el nombre de la categoría
+              c.nombre AS categoria_nombre
 
-                -- Obtener el nombre de la categoría
-                c.nombre AS categoria_nombre
+          FROM 
+              producto p
+          LEFT JOIN 
+              usuario u ON u.id = p.proveedor_id
+          LEFT JOIN 
+              subcategoria s ON s.id = p.subcategoria_id
+          LEFT JOIN 
+              categoria c ON c.id = s.categoria_id
+          WHERE 
+              p.id = ?;
+      `;
 
-            FROM 
-                producto p
-            LEFT JOIN 
-                usuario u ON u.id = p.proveedor_id
-            LEFT JOIN 
-                amonestaciones a ON a.id = p.amonestacion_id
-            LEFT JOIN 
-                subcategoria s ON s.id = p.subcategoria_id
-            LEFT JOIN 
-                categoria c ON c.id = s.categoria_id
-            WHERE 
-                p.id = ?;
-        `;
+    const result = await this.database.executeSql(query, [productoId]);
 
-      const result = await this.database.executeSql(query, [productoId]);
-
-      if (result.rows.length > 0) {
-        const item = result.rows.item(0);
-        return {
-          id: item.id,
-          nombre: item.producto_nombre,
-          descripcion: item.producto_descripcion,
-          precio: item.precio,
-          stock: item.stock,
-          organico: item.organico,
-          foto_producto: item.foto_producto,
-          fecha_agregado: item.fecha_agregado,
-          estado_producto: item.estado_producto,
-          detalle_amonestacion: item.producto_detalle_amonestacion,
-          proveedor_nombre: item.proveedor_nombre,
-          proveedor_empresa: item.proveedor_empresa,
-          amonestacion_descripcion: item.amonestacion_descripcion,
-          subcategoria_nombre: item.subcategoria_nombre,
-          subcategoria_id: item.subcategoria_id,
-          categoria_nombre: item.categoria_nombre,
-        };
-      } else {
-        return null; // No product found
-      }
-    } catch (error) {
-      console.error('Error al obtener los datos del producto:', error);
-      throw error; // Propagate the error for further handling
+    if (result.rows.length > 0) {
+      const item = result.rows.item(0);
+      return {
+        id: item.id,
+        nombre: item.producto_nombre,
+        descripcion: item.producto_descripcion,
+        precio: item.precio,
+        stock: item.stock,
+        organico: item.organico,
+        foto_producto: item.foto_producto,
+        fecha_agregado: item.fecha_agregado,
+        estado_producto: item.estado_producto,
+        proveedor_nombre: item.proveedor_nombre,
+        proveedor_empresa: item.proveedor_empresa,
+        subcategoria_nombre: item.subcategoria_nombre,
+        subcategoria_id: item.subcategoria_id,
+        categoria_nombre: item.categoria_nombre,
+      };
+    } else {
+      return null; // No product found
     }
+  } catch (error) {
+    console.error('Error al obtener los datos del producto:', error);
+    throw error; // Propagate the error for further handling
   }
+}
 
   //REGVENTAS
 
