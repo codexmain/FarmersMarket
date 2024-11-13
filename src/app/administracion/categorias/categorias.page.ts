@@ -117,7 +117,7 @@ export class CategoriasPage implements OnInit {
     }
 
     eliminar(x: any) {
-      this.bd.eliminarCategoria(x.id, x.nombre)
+      this.bd.eliminarCategoria(x.id)
     }
 
     agregar() {

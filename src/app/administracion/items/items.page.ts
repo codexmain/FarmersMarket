@@ -142,7 +142,7 @@ export class ItemsPage implements OnInit {
   }
 
   eliminar(x: any) {
-    this.bd.eliminarProducto(x.id, x.proveedor_id, x.nombre_producto, x.descripcion_producto, x.precio, x.stock, x.organico, x.foto_producto, x.subcategoria_id)
+    this.bd.eliminarProducto(x.id)
   }
   
   agregar() {
