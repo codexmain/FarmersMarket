@@ -25,7 +25,7 @@
         <ion-label>Producto (opcional) </ion-label>
         <ion-select [disabled]="isDisabledIdProd" name="id_producto" [(ngModel)]="id_producto" #productoCtrl="ngModel">
           <ion-select-option *ngFor="let producto of arrayCmbProductos" [value]="producto.id">
-            {{ producto.nombre }}
+            ID: {{producto.id}} / Nombre: {{producto.nombre}}
           </ion-select-option>
         </ion-select>
         <ion-button fill="outline" slot="end" (click)="clearProducto()">

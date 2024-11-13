@@ -58,7 +58,7 @@ export class ModificarSubcategoriaPage implements OnInit {
     if (this.nombre !== this.subcategoria.nombre) {
       const subCatExistente = await this.bd.verificarSubcategoriaExistente(this.nombre);
       if (subCatExistente) {
-        this.presentAlert('Error', 'Esta Categoría ya existe.');
+        this.presentAlert('Error', 'Esta SubCategoría ya existe.');
         return false;
       }
     }

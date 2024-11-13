@@ -50,7 +50,7 @@ export class AddCategoriaPage implements OnInit {
   // Validar si el correo ya existe
   const catExistente = await this.bd.verificarCategoriaExistente(this.nombre);
   if (catExistente) {
-    this.presentAlert('Error', 'Esta SubCategoría ya existe.');
+    this.presentAlert('Error', 'Esta Categoría ya existe.');
     return;
   }
 

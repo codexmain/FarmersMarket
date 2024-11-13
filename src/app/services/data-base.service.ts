@@ -460,6 +460,7 @@ export class DataBaseService {
 
       await this.database.executeSql(this.registroProducto, []);
       await this.seleccionarProductos();
+      await this.seleccionarAmonestaciones();
 
       this.isDBReady.next(true);
     } catch (e) {
