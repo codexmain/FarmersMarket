@@ -753,6 +753,9 @@ JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id WHERE u.id > 1`,
             items.push({
               id: res.rows.item(i).id,
               nombre: res.rows.item(i).nombre,
+              estado_categoria: res.rows.item(i).estado_categoria,
+
+
             });
           }
         }
@@ -764,7 +767,7 @@ JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id WHERE u.id > 1`,
   seleccionarSubCategorias() {
     return this.database
       .executeSql(
-        `SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria
+        `SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria, sbct.estado_subcategoria 
 FROM subcategoria sbct
 JOIN categoria ct  ON sbct.categoria_id = ct.id`,
         []
@@ -782,6 +785,7 @@ JOIN categoria ct  ON sbct.categoria_id = ct.id`,
               nombre: res.rows.item(i).nombre,
               categoria_id: res.rows.item(i).categoria_id,
               nombreCategoria: res.rows.item(i).nombreCategoria,
+              estado_subcategoria: res.rows.item(i).estado_subcategoria,
             });
           }
         }
@@ -808,6 +812,7 @@ JOIN categoria ct  ON sbct.categoria_id = ct.id`,
     p.foto_producto,
     p.subcategoria_id,
     p.fecha_agregado,
+    p.estado_producto,
     s.nombre AS nombre_subcategoria,
     s.categoria_id AS categoria_id, -- ID de la categoría desde la subcategoría
     u.nombre_empresa AS nombre_proveedor,
@@ -842,6 +847,7 @@ JOIN
               foto_producto: res.rows.item(i).foto_producto,
               subcategoria_id: res.rows.item(i).subcategoria_id,
               fecha_agregado: res.rows.item(i).fecha_agregado,
+              estado_producto: res.rows.item(i).estado_producto,
               nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
               categoria_id: res.rows.item(i).categoria_id,
               nombre_proveedor: res.rows.item(i).nombre_proveedor,
