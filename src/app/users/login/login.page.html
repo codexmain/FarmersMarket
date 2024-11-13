@@ -22,17 +22,32 @@
 
       <ion-card-content>
         <form (ngSubmit)="Logearse()">
+          <!-- Email -->
           <ion-item>
             <ion-icon slot="start" name="person" aria-hidden="true"></ion-icon>
             <ion-input label="Cuenta" type="email" [(ngModel)]="email" labelPlacement="stacked"
-              placeholder="Ingresar Cuenta" name="email" required></ion-input>
+              placeholder="Ingresar Cuenta" name="email" required #emailCtrl="ngModel"></ion-input>
           </ion-item>
+          <div class="ion-text-center" *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
+            El email es obligatorio y debe tener un formato válido.
+          </div>
+
+          <!-- Contraseña -->
           <ion-item>
             <ion-icon slot="start" name="lock-closed" aria-hidden="true"></ion-icon>
             <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
-              placeholder="Ingresar Contraseña" name="password" required>
+              placeholder="Ingresar Contraseña" name="password" required #passwordCtrl="ngModel">
               <ion-input-password-toggle slot="end"></ion-input-password-toggle></ion-input>
           </ion-item>
+          <div class="ion-text-center" *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
+            La contraseña es obligatoria.
+          </div><br>
+
+          <!-- Mensaje de error general -->
+          <div  class="ion-text-center" *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+
           <ion-button type="submit" fill="solid" expand="full">
             Entrar
           </ion-button>
