@@ -347,7 +347,6 @@ export class DataBaseService {
             (1,2,44,'Av. Independencia 4599',0),
             (1,4,26,'Mena 665.',0);`;
 
-
   registroProducto: string = `INSERT OR IGNORE INTO producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id, fecha_agregado) VALUES
   (1, 1, 'Producto Desconocido', 'Descripción genérica para productos desconocidos.', 0, 0, 0, NULL, 1, '2024-10-04 20:20:28'),
   (2, 2, 'Manzana Roja', 'Manzana fresca y crujiente (500g).', 1000, 50, 1, NULL, 2, '2024-10-04 20:20:28'),
@@ -380,8 +379,7 @@ export class DataBaseService {
     private olvideContraService: OlvideContraService,
     private sqlite: SQLite,
     private platform: Platform,
-    private alertController: AlertController,
-
+    private alertController: AlertController
   ) {
     this.createBD();
   }
@@ -458,7 +456,7 @@ export class DataBaseService {
       await this.seleccionarUsuarios();
       await this.seleccionarCbmProveedores();
 
-      await this.database.executeSql(this.registroDireccion, [])
+      await this.database.executeSql(this.registroDireccion, []);
 
       await this.database.executeSql(this.registroProducto, []);
       await this.seleccionarProductos();
@@ -747,7 +745,6 @@ JOIN
   }
 
   //se debe agregar el combobox de categoría, ya que el otro como queda con otro parametro más no sirve, hay que conectarlo con el ts respectivo despues
-
 
   seleccionarCmbTipUsuario() {
     return this.database
@@ -1348,8 +1345,6 @@ modificarProducto(
     }
   }
 
-
-
   //REGISTER
   async Regiones(): Promise<any[]> {
     try {
@@ -1419,8 +1414,8 @@ modificarProducto(
 
       // Mostrar alerta de éxito
       this.presentAlert(
-        'Insertar',
-        'Usuario y dirección registrados con éxito'
+        'Cuenta Creada',
+        '¡Puedes ingresar con tu nueva cuenta ahora!'
       );
 
       // Actualizar la lista de usuarios y proveedores
@@ -1457,8 +1452,6 @@ modificarProducto(
     }
   }
 
-
-
   async getProductosPorProveedor(proveedorId: number): Promise<any[]> {
     const query = `
       SELECT * FROM producto WHERE proveedor_id = ?;
@@ -1470,7 +1463,6 @@ modificarProducto(
     }
     return productos;
   }
-
 
   //PRODUCTOS
   // Función para obtener todos los productos disponibles
@@ -1500,8 +1492,6 @@ modificarProducto(
     return productos;
   }
 
-
-
   public async getProductos(): Promise<any[]> {
     try {
       const result = await this.database.executeSql(
@@ -1525,29 +1515,41 @@ modificarProducto(
     }
   }
 
-
   //obtener productos con el nombre del proveedor y empresa asociada
-  public async getProductosConProveedor(): Promise<any[]> {
+  public async getProductosConProveedorPorRegion(
+    usuarioClienteId: number
+  ): Promise<any[]> {
     try {
       const query = `
-      SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
-             p.organico, p.foto_producto, s.nombre AS subcategoria, 
-             u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
-      FROM producto p
-      JOIN usuario u ON p.proveedor_id = u.id
-      JOIN subcategoria s ON p.subcategoria_id = s.id;
-    `;
+        SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
+               p.organico, p.foto_producto, s.nombre AS subcategoria, 
+               u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
+        FROM producto p
+        JOIN usuario u ON p.proveedor_id = u.id
+        JOIN subcategoria s ON p.subcategoria_id = s.id
+        JOIN direccion d_proveedor ON u.id = d_proveedor.usuario_id
+        JOIN direccion d_cliente ON d_cliente.usuario_id = ?
+        JOIN comuna c_proveedor ON d_proveedor.comuna_id = c_proveedor.id
+        JOIN comuna c_cliente ON d_cliente.comuna_id = c_cliente.id
+        WHERE c_proveedor.region_id = c_cliente.region_id;
+      `;
 
-      const result = await this.database.executeSql(query, []);
+      const result = await this.database.executeSql(query, [usuarioClienteId]);
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
 
-      console.log('Productos con proveedor obtenidos:', productos);
+      console.log(
+        'Productos con proveedor en la misma región obtenidos:',
+        productos
+      );
       return productos;
     } catch (error) {
-      console.error('Error al obtener productos con proveedor:', error);
+      console.error(
+        'Error al obtener productos con proveedor en la misma región:',
+        error
+      );
       return [];
     }
   }
@@ -1559,8 +1561,11 @@ modificarProducto(
       const result = await this.database.executeSql(
         `SELECT u.*, 
                 tu.descripcion AS tipo_usuario,
-                c.nombre AS comuna, 
-                r.nombre AS region 
+                c.nombre AS comuna,
+                c.id AS comuna_id, 
+                r.nombre AS region ,
+                r.id AS region_id,
+                d.direccion AS direccion
          FROM usuario u
          JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id
          LEFT JOIN direccion d ON u.id = d.usuario_id
@@ -1603,24 +1608,36 @@ modificarProducto(
   }
 
   // Eliminar producto usando el identificador único
-  async eliminarProductoDelCarro(productoIdentificador: string, carroId: number) {
+  async eliminarProductoDelCarro(
+    productoIdentificador: string,
+    carroId: number
+  ) {
     await this.database.executeSql(
       'DELETE FROM detalle_carro_compra WHERE producto_identificador = ? AND carro_id = ?',
       [productoIdentificador, carroId]
     );
   }
 
-  async confirmarCompra(carroId: number) {
-    await this.database.executeSql(
-      'UPDATE carro_compra SET estado = "pagado" WHERE id = ?',
-      [carroId]
-    );
+  async confirmarCompra(carroId: number, total: number): Promise<boolean> {
+    try {
+      const query = `
+        UPDATE carro_compra 
+        SET estado = 'pagado', total = ? 
+        WHERE id = ?
+      `;
+      await this.database.executeSql(query, [total, carroId]);
+      return true; // Indica que la operación fue exitosa
+    } catch (error) {
+      console.error('Error al confirmar la compra:', error);
+      return false; // Indica que hubo un error
+    }
   }
 
   async getUsuarioEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [email])
+      this.database
+        .executeSql(query, [email])
         .then((res) => {
           if (res.rows.length > 0) {
             resolve({
@@ -1655,12 +1672,45 @@ modificarProducto(
   }
 
   // Agregar producto al carro y generar un identificador único
-  async agregarProductoAlCarro(carroId: number, productoId: number, cantidad: number, subtotal: number) {
-    const productoIdentificador = this.generarIdentificadorUnico(); // Generar identificador único
-    await this.database.executeSql(
-      'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal, producto_identificador) VALUES (?, ?, ?, ?, ?)',
-      [carroId, productoId, cantidad, subtotal, productoIdentificador]
+  async agregarProductoAlCarro(
+    carroId: number,
+    productoId: number,
+    cantidad: number,
+    subtotal: number
+  ) {
+    // Verificar si ya existe un registro con el mismo carroId y productoId
+    const result = await this.database.executeSql(
+      'SELECT cantidad, subtotal, producto_identificador FROM detalle_carro_compra WHERE carro_id = ? AND producto_id = ?',
+      [carroId, productoId]
     );
+
+    if (result.rows.length > 0) {
+      // Si existe el producto en el carrito con el mismo carroId, actualizar cantidad y subtotal
+      const existingCantidad = result.rows.item(0).cantidad;
+      const existingSubtotal = result.rows.item(0).subtotal;
+      const productoIdentificador = result.rows.item(0).producto_identificador;
+
+      const nuevaCantidad = existingCantidad + cantidad;
+      const nuevoSubtotal = existingSubtotal + subtotal;
+
+      await this.database.executeSql(
+        'UPDATE detalle_carro_compra SET cantidad = ?, subtotal = ? WHERE carro_id = ? AND producto_id = ? AND producto_identificador = ?',
+        [
+          nuevaCantidad,
+          nuevoSubtotal,
+          carroId,
+          productoId,
+          productoIdentificador,
+        ]
+      );
+    } else {
+      // Si no existe, insertar un nuevo registro con un identificador único
+      const productoIdentificador = this.generarIdentificadorUnico(); // Generar identificador único
+      await this.database.executeSql(
+        'INSERT INTO detalle_carro_compra (carro_id, producto_id, cantidad, subtotal, producto_identificador) VALUES (?, ?, ?, ?, ?)',
+        [carroId, productoId, cantidad, subtotal, productoIdentificador]
+      );
+    }
   }
 
   // Generar un identificador único para cada producto
@@ -1675,12 +1725,36 @@ modificarProducto(
     );
   }
 
+  async reponerStock(productoId: number, cantidad: number) {
+    await this.database.executeSql(
+      'UPDATE producto SET stock = stock + ? WHERE id = ?',
+      [cantidad, productoId]
+    );
+  }
 
   //COMPRAS
+
+  async getProductosCompradosPorCarroId(carroId: number): Promise<any[]> {
+    const query = `
+      SELECT d.*, p.*
+      FROM detalle_carro_compra d
+      JOIN producto p ON d.producto_id = p.id
+      WHERE d.carro_id = ?
+    `;
+
+    const result = await this.database.executeSql(query, [carroId]);
+    const productos = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      productos.push(result.rows.item(i));
+    }
+    return productos;
+  }
+
   async getUsuarioPorEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [email])
+      this.database
+        .executeSql(query, [email])
         .then((res) => {
           if (res.rows.length > 0) {
             resolve(res.rows.item(0));
@@ -1695,9 +1769,6 @@ modificarProducto(
     });
   }
 
-
-
-
   async getProductosCompradosPorUsuario(email: string): Promise<any[]> {
     // Obtener el usuario
     const usuario = await this.getUsuarioPorEmail(email);
@@ -1705,7 +1776,7 @@ modificarProducto(
 
     const usuarioId = usuario.id; // Obtener el id del usuario
     const query = `
-    SELECT d.*, p.nombre, p.precio 
+    SELECT d.*, p.*, u.*, c.*
     FROM detalle_carro_compra d
     JOIN carro_compra c ON d.carro_id = c.id
     JOIN producto p ON d.producto_id = p.id
@@ -1727,7 +1798,7 @@ modificarProducto(
     const usuarioId = usuario.id; // Obtener el id del usuario
     const query = `
     SELECT * FROM carro_compra
-    WHERE usuario_id = ? 
+    WHERE usuario_id = ? AND estado = 'pagado'
   `;
 
     const result = await this.database.executeSql(query, [usuarioId]);
@@ -1737,8 +1808,6 @@ modificarProducto(
     }
     return carros;
   }
-
-
 
   // MOD-USUARIO
   async actualizarUsuarioPorEmail(usuario: any): Promise<boolean> {
@@ -1768,14 +1837,18 @@ modificarProducto(
         usuario.foto_perfil || null,
         usuario.estado_cuenta,
         usuario.tipo_usuario_id,
-        usuario.email // Se utiliza el email para identificar al usuario
+        usuario.email, // Se utiliza el email para identificar al usuario
       ]);
 
       if (result.rowsAffected > 0) {
         // Luego de actualizar el usuario, actualizamos la dirección si se proporciona
         const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
         if (usuarioId) {
-          return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
+          return await this.actualizarDireccion(
+            usuarioId,
+            usuario.comuna_id,
+            usuario.direccion
+          );
         }
       }
 
@@ -1786,7 +1859,11 @@ modificarProducto(
     }
   }
 
-  async actualizarDireccion(usuarioId: number, comunaId: number, direccion: string): Promise<boolean> {
+  async actualizarDireccion(
+    usuarioId: number,
+    comunaId: number,
+    direccion: string
+  ): Promise<boolean> {
     try {
       const sql = `
       INSERT OR REPLACE INTO direccion (id, usuario_id, comuna_id, direccion)
@@ -1801,7 +1878,7 @@ modificarProducto(
         usuarioId, // Usamos el usuario_id para encontrar la fila
         usuarioId,
         comunaId,
-        direccion
+        direccion,
       ]);
 
       return result.rowsAffected > 0; // Retorna true si la actualización fue exitosa
@@ -1826,8 +1903,6 @@ modificarProducto(
     }
   }
 
-
-
   async obtenerUsuarioPorEmail(email: string): Promise<any> {
     try {
       const sql = 'SELECT * FROM usuario WHERE email = ?';
@@ -1843,13 +1918,12 @@ modificarProducto(
     }
   }
 
-
-
   //USUARIO
   async getUsuarioBYEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM usuario WHERE email = ?';
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [email])
+      this.database
+        .executeSql(query, [email])
         .then((res) => {
           if (res.rows.length > 0) {
             resolve(res.rows.item(0));
@@ -1863,7 +1937,6 @@ modificarProducto(
         });
     });
   }
-
 
   async getProductosVendidosPorVendedor(emailVendedor: string): Promise<any[]> {
     // Obtener el usuario (vendedor)
@@ -1895,7 +1968,7 @@ modificarProducto(
       await this.database.executeSql('DELETE FROM producto WHERE id = ?', [id]);
     } catch (error) {
       console.error('Error al eliminar el producto:', error);
-      throw error;  // Lanza el error para manejarlo más adelante
+      throw error; // Lanza el error para manejarlo más adelante
     }
   }
 
@@ -1927,15 +2000,14 @@ modificarProducto(
     }
   }
 
-
-
   //ADD-PROVENTAS
 
   async obtenerCategorias(): Promise<any[]> {
     const query = `SELECT * FROM categoria`;
 
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [])
+      this.database
+        .executeSql(query, [])
         .then((data) => {
           let categorias: any[] = [];
           for (let i = 0; i < data.rows.length; i++) {
@@ -1954,7 +2026,8 @@ modificarProducto(
     const query = `SELECT * FROM subcategoria WHERE categoria_id = ?`;
 
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [categoriaId])
+      this.database
+        .executeSql(query, [categoriaId])
         .then((data) => {
           let subcategorias: any[] = [];
           for (let i = 0; i < data.rows.length; i++) {
@@ -1969,14 +2042,33 @@ modificarProducto(
     });
   }
 
-  async agregarProducto(proveedorId: number, nombre: string, descripcion: string, precio: number, stock: number, organico: number, subcategoriaId: number, foto_producto: string): Promise<void> {
+  async agregarProducto(
+    proveedorId: number,
+    nombre: string,
+    descripcion: string,
+    precio: number,
+    stock: number,
+    organico: number,
+    subcategoriaId: number,
+    foto_producto: string
+  ): Promise<void> {
     const query = `
     INSERT INTO producto (proveedor_id, nombre, descripcion, precio, stock, organico, subcategoria_id, foto_producto)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [proveedorId, nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto])
+      this.database
+        .executeSql(query, [
+          proveedorId,
+          nombre,
+          descripcion,
+          precio,
+          stock,
+          organico,
+          subcategoriaId,
+          foto_producto,
+        ])
         .then(() => resolve())
         .catch((error) => {
           console.error('Error al agregar producto', error);
@@ -1984,7 +2076,6 @@ modificarProducto(
         });
     });
   }
-
 
   //MOD-PROVENTAS
 
@@ -2005,7 +2096,17 @@ modificarProducto(
     `;
 
     return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto, productoId])
+      this.database
+        .executeSql(query, [
+          nombre,
+          descripcion,
+          precio,
+          stock,
+          organico,
+          subcategoriaId,
+          foto_producto,
+          productoId,
+        ])
         .then(() => resolve())
         .catch((error) => {
           console.error('Error al modificar producto', error);
@@ -2014,50 +2115,85 @@ modificarProducto(
     });
   }
 
-  async obtenerProducto(productoId: number): Promise<any> {
-    const query = `SELECT * FROM producto WHERE id = ?`;
-
-    return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [productoId])
-        .then((data) => {
-          if (data.rows.length > 0) {
-            resolve(data.rows.item(0)); // Devuelve el primer producto encontrado
-          } else {
-            reject('Producto no encontrado');
-          }
-        })
-        .catch((error) => {
-          console.error('Error al obtener el producto', error);
-          reject(error);
-        });
-    });
-  }
-
-
   //VIEW-PROVENTAS
   // Obtener producto por ID
-  async obtProducto(productoId: number): Promise<any> {
-    const query = `SELECT * FROM producto WHERE id = ?`;
+  async getProductoselect(productoId: number) {
+    try {
+      const query = `
+            SELECT 
+                p.id,
+                p.nombre AS producto_nombre,
+                p.descripcion AS producto_descripcion,
+                p.precio,
+                p.stock,
+                p.organico,
+                p.foto_producto,
+                p.fecha_agregado,
+                p.estado_producto,
+                p.subcategoria_id,
+                p.detalle_amonestacion AS producto_detalle_amonestacion,
+                
+                -- Obtener el nombre completo del proveedor
+                u.nombre || ' ' || IFNULL(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || IFNULL(u.apellido_materno, '') AS proveedor_nombre,
+                u.nombre_empresa AS proveedor_empresa,
 
-    return new Promise((resolve, reject) => {
-      this.database.executeSql(query, [productoId])
-        .then((data) => {
-          if (data.rows.length > 0) {
-            resolve(data.rows.item(0));
-          } else {
-            resolve(null); // No se encontró el producto
-          }
-        })
-        .catch((error) => {
-          console.error('Error al obtener el producto', error);
-          reject(error);
-        });
-    });
+                -- Obtener la descripción de la amonestación si existe
+                a.descripcion AS amonestacion_descripcion,
+
+                -- Obtener el nombre de la subcategoría
+                s.nombre AS subcategoria_nombre,
+
+                -- Obtener el nombre de la categoría
+                c.nombre AS categoria_nombre
+
+            FROM 
+                producto p
+            LEFT JOIN 
+                usuario u ON u.id = p.proveedor_id
+            LEFT JOIN 
+                amonestaciones a ON a.id = p.amonestacion_id
+            LEFT JOIN 
+                subcategoria s ON s.id = p.subcategoria_id
+            LEFT JOIN 
+                categoria c ON c.id = s.categoria_id
+            WHERE 
+                p.id = ?;
+        `;
+
+      const result = await this.database.executeSql(query, [productoId]);
+
+      if (result.rows.length > 0) {
+        const item = result.rows.item(0);
+        return {
+          id: item.id,
+          nombre: item.producto_nombre,
+          descripcion: item.producto_descripcion,
+          precio: item.precio,
+          stock: item.stock,
+          organico: item.organico,
+          foto_producto: item.foto_producto,
+          fecha_agregado: item.fecha_agregado,
+          estado_producto: item.estado_producto,
+          detalle_amonestacion: item.producto_detalle_amonestacion,
+          proveedor_nombre: item.proveedor_nombre,
+          proveedor_empresa: item.proveedor_empresa,
+          amonestacion_descripcion: item.amonestacion_descripcion,
+          subcategoria_nombre: item.subcategoria_nombre,
+          subcategoria_id: item.subcategoria_id,
+          categoria_nombre: item.categoria_nombre,
+        };
+      } else {
+        return null; // No product found
+      }
+    } catch (error) {
+      console.error('Error al obtener los datos del producto:', error);
+      throw error; // Propagate the error for further handling
+    }
   }
 
   //REGVENTAS
 
-  // Obtener productos vendidos por el proveedor (vendedor)
+  // Obtener productos vendidos por el proveedor (vendedor) incluyendo datos del comprador
   async getProductosVendidosVendedor(emailVendedor: string): Promise<any[]> {
     try {
       // Obtener el id del proveedor utilizando el email
@@ -2073,34 +2209,30 @@ modificarProducto(
 
       const proveedorId = usuario.rows.item(0).id;
 
-      // Obtener detalles de la venta usando el proveedor_id
-      const query = `
-      SELECT 
-        p.id AS producto_id,
-        p.nombre,
-        p.descripcion,
-        p.foto_producto,
-        p.precio,
-        dc.cantidad, 
-        dc.subtotal, 
-        cc.fecha_creacion, 
-        cc.estado, 
-        cc.total,
-        (SELECT email FROM usuario WHERE id = cc.usuario_id) AS compradorEmail
-      FROM 
-        detalle_carro_compra dc
-      JOIN 
-        producto p ON dc.producto_id = p.id
-      JOIN 
-        carro_compra cc ON dc.carro_id = cc.id
-      WHERE 
-        p.proveedor_id = ?;
+      // Obtener detalles de la venta usando el proveedor_id e incluir los datos del comprador
+      const query = `SELECT 
+      p.*,
+      dc.*, 
+      cc.*,
+      cu.nombre AS comprador_nombre,
+      cu.email AS comprador_email 
+    FROM 
+      detalle_carro_compra dc
+    JOIN 
+      producto p ON dc.producto_id = p.id
+    JOIN 
+      carro_compra cc ON dc.carro_id = cc.id
+    JOIN 
+      usuario cu ON cc.usuario_id = cu.id 
+    WHERE 
+      p.proveedor_id = ?;
     `;
 
       const result = await this.database.executeSql(query, [proveedorId]);
       const productosVendidos = [];
       for (let i = 0; i < result.rows.length; i++) {
-        productosVendidos.push(result.rows.item(i));
+        const productoVendido = result.rows.item(i);
+        productosVendidos.push(productoVendido);
       }
 
       return productosVendidos;
@@ -2109,7 +2241,6 @@ modificarProducto(
       throw error;
     }
   }
-
 
   //MOD-CUENTA
   // Obtener todas las direcciones de un usuario por su ID
@@ -2127,7 +2258,11 @@ modificarProducto(
       return [];
     }
   }
-  async agregarDireccion(usuario_id: number, comuna_id: number, direccion: string) {
+  async agregarDireccion(
+    usuario_id: number,
+    comuna_id: number,
+    direccion: string
+  ) {
     // Obtenemos el siguiente ID, puedes ajustar esto si tienes otro método para manejar IDs
     const queryID = `SELECT MAX(id) as maxId FROM direccion WHERE usuario_id = ?;`;
     try {
@@ -2136,7 +2271,12 @@ modificarProducto(
       const nuevoId = maxId + 1; // Incrementar para nuevo ID
 
       const query = `INSERT INTO direccion (id, usuario_id, comuna_id, direccion, preferida) VALUES (?, ?, ?, ?, 0);`;
-      await this.database.executeSql(query, [nuevoId, usuario_id, comuna_id, direccion]);
+      await this.database.executeSql(query, [
+        nuevoId,
+        usuario_id,
+        comuna_id,
+        direccion,
+      ]);
     } catch (error) {
       console.error('Error al agregar dirección:', error);
     }
@@ -2155,14 +2295,19 @@ modificarProducto(
   async establecerDireccionPreferida(id: number, usuario_id: number) {
     try {
       // Resetear preferidas a 0
-      await this.database.executeSql(`UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`, [usuario_id]);
+      await this.database.executeSql(
+        `UPDATE direccion SET preferida = 0 WHERE usuario_id = ?;`,
+        [usuario_id]
+      );
       // Establecer la nueva dirección como preferida
-      await this.database.executeSql(`UPDATE direccion SET preferida = 1 WHERE id = ? AND usuario_id = ?;`, [id, usuario_id]);
+      await this.database.executeSql(
+        `UPDATE direccion SET preferida = 1 WHERE id = ? AND usuario_id = ?;`,
+        [id, usuario_id]
+      );
     } catch (error) {
       console.error('Error al establecer la dirección preferida:', error);
     }
   }
-
 
   // Obtener el nombre de la región en base al email del usuario
   async obtenerRegionPorEmail(email: string): Promise<string | null> {
@@ -2205,7 +2350,8 @@ modificarProducto(
   }
 
   async agregarDirec(usuarioId: number, comunaId: number, direccion: string) {
-    const query = 'INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?)';
+    const query =
+      'INSERT INTO direccion (usuario_id, comuna_id, direccion) VALUES (?, ?, ?)';
     try {
       await this.database.executeSql(query, [usuarioId, comunaId, direccion]);
     } catch (error) {
@@ -2240,7 +2386,7 @@ modificarProducto(
         usuario.foto_perfil || null,
         usuario.estado_cuenta,
         usuario.tipo_usuario_id,
-        usuario.email // Se utiliza el email para identificar al usuario
+        usuario.email, // Se utiliza el email para identificar al usuario
       ]);
 
       if (result.rowsAffected > 0) {
@@ -2248,7 +2394,11 @@ modificarProducto(
         const usuarioId = await this.obtenerUsuarioIdPorEmail(usuario.email); // Obtener el id del usuario
         if (usuarioId) {
           // Asegúrate de que los campos comuna_id y direccion están definidos en el objeto usuario
-          return await this.actualizarDireccion(usuarioId, usuario.comuna_id, usuario.direccion);
+          return await this.actualizarDireccion(
+            usuarioId,
+            usuario.comuna_id,
+            usuario.direccion
+          );
         }
       }
 
@@ -2321,7 +2471,7 @@ modificarProducto(
     }
   }
 
-  //funsiones  javier pruebas 
+  //funsiones  javier pruebas
   // Función para generar un código de verificación de 6 dígitos
   private generateVerificationCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString(); // Genera un número aleatorio de 6 dígitos
@@ -2394,8 +2544,9 @@ modificarProducto(
   // Función para enviar el código por correo
   private sendVerificationEmail(correo: string, code: string) {
     this.olvideContraService.enviarCorreo(correo, code).subscribe({
-      next: () => console.log('Código de verificación enviado al correo:', correo),
-      error: (err) => console.error('Error en el envío de correo:', err)
+      next: () =>
+        console.log('Código de verificación enviado al correo:', correo),
+      error: (err) => console.error('Error en el envío de correo:', err),
     });
   }
 
@@ -2408,9 +2559,12 @@ modificarProducto(
   // Función para cambiar la contraseña del usuario
   resetPassword(correo: string, newPassword: string): Promise<void> {
     const query = `UPDATE usuario SET password = ? WHERE correo = ?`;
-    return this.database.executeSql(query, [newPassword, correo])
+    return this.database
+      .executeSql(query, [newPassword, correo])
       .then(() => console.log('Contraseña actualizada para el correo:', correo))
-      .catch(error => console.error('Error al actualizar la contraseña:', error));
+      .catch((error) =>
+        console.error('Error al actualizar la contraseña:', error)
+      );
   }
 
 
@@ -2609,15 +2763,6 @@ FROM
           return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
         });
     }
-
-    
-
-
-
-    
-
-
-
 
 
 
