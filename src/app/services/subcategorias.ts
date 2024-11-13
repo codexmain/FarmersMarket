@@ -3,4 +3,5 @@ export class Subcategorias {
     nombre!: string;
     categoria_id!: number;
     nombreCategoria?: string;
+    estado_subcategoria!: string;
 }

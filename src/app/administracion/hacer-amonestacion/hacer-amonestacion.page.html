@@ -1,0 +1,55 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button type="submit" form="makeWarnForm" fill="clear" expand="full">
+        Hacer Amonestación
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header class="custom-card-header">Formulario Amonestaciónes</ion-card-header>
+    <form id="makeWarnForm" (ngSubmit)="hacerAmonestacion()">
+      <ion-item>
+        <ion-label position="floating">Correo</ion-label>
+        <ion-input [disabled]="isDisabledCorreo" type="email" name="email" [(ngModel)]="email" required
+          email></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Producto (opcional) </ion-label>
+        <ion-select [disabled]="isDisabledIdProd" name="id_producto" [(ngModel)]="id_producto" #productoCtrl="ngModel">
+          <ion-select-option *ngFor="let producto of arrayCmbProductos" [value]="producto.id">
+            {{ producto.nombre }}
+          </ion-select-option>
+        </ion-select>
+        <ion-button fill="outline" slot="end" (click)="clearProducto()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <div *ngIf="productoCtrl.invalid && (productoCtrl.dirty || productoCtrl.touched)" class="error-message">
+        En caso de que necesites amonestar un producto del usuario, puedes hacerlo con este campo.
+      </div>
+
+
+      <ion-item>
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-input name="descripcion" [(ngModel)]="descripcion" required #descCtrl="ngModel"></ion-input>
+        <ion-button fill="outline" slot="end" (click)="clearDescripcion()">
+          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <div *ngIf="descCtrl.invalid && (descCtrl.dirty || descCtrl.touched)" class="error-message">
+        La descripcion de la amonestación es obligatoria
+      </div>
+
+
+
+    </form>
+  </ion-card>
+</ion-content>

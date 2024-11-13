@@ -19,7 +19,8 @@ export class CategoriasPage implements OnInit {
   arrayCategorias: any = [
     {
       id: '',
-      nombre: ''
+      nombre: '',
+      estado_categoria: ''
 
     }
   ]
@@ -29,7 +30,8 @@ export class CategoriasPage implements OnInit {
   filteredCategorias: any = [
     {
       id: '',
-      nombre: ''
+      nombre: '',
+      estado_categoria: ''
 
     }
   ]
@@ -115,7 +117,7 @@ export class CategoriasPage implements OnInit {
     }
 
     eliminar(x: any) {
-      this.bd.eliminarCategoria(x.id, x.nombre)
+      this.bd.eliminarCategoria(x.id)
     }
 
     agregar() {

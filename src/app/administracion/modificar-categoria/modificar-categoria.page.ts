@@ -13,6 +13,8 @@ export class ModificarCategoriaPage implements OnInit {
 
   //inputs del formulario
   nombre: string = '';
+  estado_categoria: string= '';
+
 
   constructor(private bd: DataBaseService, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams) { 
     this.categoria = this.navParams.get('categoria');
@@ -20,7 +22,9 @@ export class ModificarCategoriaPage implements OnInit {
 
 
   ngOnInit() {
-    this.nombre = this.categoria.nombre
+    this.nombre = this.categoria.nombre;
+    this.estado_categoria = this.categoria.estado_categoria;
+
   }
 
   async validateFields(){
@@ -35,6 +39,20 @@ export class ModificarCategoriaPage implements OnInit {
     if (this.nombre && !categoryPattern.test(this.nombre)) {
       this.presentAlert('Error', 'El nombre de la categoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;}
+
+    // Validar la existencia del correo solo si no es el mismo que el actual
+    if (this.nombre !== this.categoria.nombre) {
+      const catExistente = await this.bd.verificarCategoriaExistente(this.nombre);
+      if (catExistente) {
+        this.presentAlert('Error', 'Esta Categoría ya existe.');
+        return false;
+      }
+    }
+
+    if (!this.estado_categoria) {
+      this.presentAlert('Error', 'El Estado de la categoría es obligatorio.');
+      return false;
+    }
       return true
     }
 
@@ -46,7 +64,7 @@ export class ModificarCategoriaPage implements OnInit {
     }
       // Procede a actualizar el usuario en la base de datos
   
-      await this.bd.modificarCategoria(this.categoria.id, this.nombre);
+      await this.bd.modificarCategoria(this.categoria.id, this.estado_categoria, this.nombre);
   
       this.modalController.dismiss({ success: true });}  
   

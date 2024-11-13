@@ -12,6 +12,8 @@ export class ModificarSubcategoriaPage implements OnInit {
 
   nombre: string = '';
   categoria_id!: number;  
+  estado_subcategoria: string= '';
+
 
   arrayCmbCategorias: any = [
     {
@@ -26,6 +28,8 @@ export class ModificarSubcategoriaPage implements OnInit {
   ngOnInit() {
     this.nombre = this.subcategoria.nombre;
     this.categoria_id = this.subcategoria.categoria_id;
+    this.estado_subcategoria = this.subcategoria.estado_subcategoria
+
 
     this.bd.dbState().subscribe(data=>{
       //validar si la bd esta lista
@@ -49,10 +53,25 @@ export class ModificarSubcategoriaPage implements OnInit {
       this.presentAlert('Error', 'El nombre de la Subcategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
       return false;
     }
+
+    // Validar la existencia del correo solo si no es el mismo que el actual
+    if (this.nombre !== this.subcategoria.nombre) {
+      const subCatExistente = await this.bd.verificarSubcategoriaExistente(this.nombre);
+      if (subCatExistente) {
+        this.presentAlert('Error', 'Esta Categoría ya existe.');
+        return false;
+      }
+    }
+
     // Validar región
     if (!this.categoria_id) {
        this.presentAlert('Error', 'La Categoría es obligatoria.');
        return false;}
+
+    if (!this.estado_subcategoria) {
+      this.presentAlert('Error', 'El Estado de la SubCategoría es obligatorio.');
+      return false;
+    }
 
        return true;
 }
@@ -65,7 +84,7 @@ async modificarSubcategoria() {
   }
     // Procede a actualizar el usuario en la base de datos
 
-    await this.bd.modificarSubCategoria(this.subcategoria.id, this.nombre,this.categoria_id);
+    await this.bd.modificarSubCategoria(this.subcategoria.id, this.nombre,this.categoria_id, this.estado_subcategoria);
 
     this.modalController.dismiss({ success: true });}
 
@@ -87,6 +106,8 @@ async modificarSubcategoria() {
   clearNombre() {
     this.nombre = '';
   }
+
+
 
   }
 

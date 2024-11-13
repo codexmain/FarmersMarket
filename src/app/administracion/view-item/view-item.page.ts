@@ -19,6 +19,7 @@ export class ViewItemPage implements OnInit {
   categoria_id!: number;
   subcategoria_id: number | undefined;
   photo: string = ''; // Ruta de la foto
+  estado_producto: string = '';
 
   arrayCmbProvedores: any = [
     {
@@ -55,6 +56,7 @@ export class ViewItemPage implements OnInit {
     this.categoria_id = this.producto.categoria_id;
     this.subcategoria_id = this.producto.subcategoria_id;
     this.photo = this.producto.photo;
+    this.estado_producto = this.producto.estado_producto;
 
 
     this.bd.dbState().subscribe(data=>{

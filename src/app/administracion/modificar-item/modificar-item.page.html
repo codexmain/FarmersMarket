@@ -18,7 +18,7 @@
 
     <ion-item>
       <ion-label>Seleccionar Vendedor:</ion-label>
-      <ion-select [(ngModel)]="proveedor_id" name="proveedor_id"  #sellerCtrl="ngModel" required>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="proveedor_id" name="proveedor_id"  #sellerCtrl="ngModel" required>
         <ion-select-option *ngFor="let vendedor of arrayCmbProvedores" [value]="vendedor.id">{{ vendedor.nombre_empresa }}</ion-select-option> <!--esto hay que conectarlo a la base de datos  --> 
       </ion-select>
     </ion-item>
@@ -27,7 +27,7 @@
     </div> 
     
     <ion-item style="align-items: center; flex-direction: column;">
-      <ion-button (click)="takePicture()">Cambiar Foto</ion-button><br>
+      <ion-button [disabled]="isDisabled" (click)="takePicture()">Cambiar Foto</ion-button><br>
 
       <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
         <ion-avatar style="background-color: #F5F5DC; width: 200px; height: 200px; border-radius: 50%; overflow: hidden;">
@@ -116,10 +116,7 @@
 
     <ion-item>
       <ion-label position="floating">Nombre Producto</ion-label>
-      <ion-input type="text" [(ngModel)]="nombre_producto" name="nombre_producto" required minlength="3" required #productCtrl="ngModel"></ion-input>
-      <ion-button fill="outline" slot="end" (click)="clearProductName()">
-        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-      </ion-button>
+      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="nombre_producto" name="nombre_producto" required minlength="3" required #productCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="productCtrl.invalid && (productCtrl.dirty || productCtrl.touched)" class="error-message">
       El nombre del Producto es obligatorio y debe tener al menos 3 caracteres y un maximo de 40.
@@ -127,14 +124,27 @@
 
     <ion-item>
       <ion-label position="floating">Descripción Producto</ion-label>
-      <ion-input type="text" [(ngModel)]="descripcion_producto" name="descripcion_producto" required minlength="10" required #descProductCtrl="ngModel"></ion-input>
-      <ion-button fill="outline" slot="end" (click)="clearProductDesc()">
-        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-      </ion-button>
+      <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="descripcion_producto" name="descripcion_producto" required minlength="10" required #descProductCtrl="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="descProductCtrl.invalid && (descProductCtrl.dirty || descProductCtrl.touched)" class="error-message">
       La descripción del Producto es opcional, debe tener al menos 10 caracteres y un maximo de 255.
     </div>
+
+    <ion-item>
+      <ion-label>Estado Producto:</ion-label>
+      <ion-select [(ngModel)]="estado_producto" name="estado_producto" required #estadoCtrl="ngModel">
+        <ion-select-option value="activa">Producto Activo</ion-select-option>
+        <ion-select-option value="deshabilitada">Producto Deshabilitado</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="estadoCtrl.invalid && (estadoCtrl.dirty || estadoCtrl.touched)" class="error-message">
+      El estado del producto es obligatorio.
+    </div>
+
+
+
+
+
 
     <ion-item>
       <ion-label position="floating">Precio Producto (CLP)</ion-label>
@@ -150,7 +160,7 @@
 
     <ion-item>
       <ion-label>¿Producto Orgánico?:</ion-label>
-      <ion-select [(ngModel)]="organico" name="organico" required #orgCtrl="ngModel" >
+      <ion-select [disabled]="isDisabled" [(ngModel)]="organico" name="organico" required #orgCtrl="ngModel" >
         <ion-select-option value=0>No es Orgánico</ion-select-option>
         <ion-select-option value=1>Es Orgánico</ion-select-option>
       </ion-select>
@@ -162,7 +172,7 @@
 
     <ion-item>
       <ion-label>Seleccionar Categoría:</ion-label>
-      <ion-select [(ngModel)]="categoria_id" name="categoria_id" #categoryCtrl="ngModel" required (ionChange)="onCategoriaChange($event)">
+      <ion-select [disabled]="isDisabled" [(ngModel)]="categoria_id" name="categoria_id" #categoryCtrl="ngModel" required (ionChange)="onCategoriaChange($event)">
         <ion-select-option *ngFor="let categoria of arrayCmbCategorias" [value]="categoria.id">{{ categoria.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>
@@ -172,7 +182,7 @@
 
     <ion-item>
       <ion-label>Seleccionar SubCategoría:</ion-label>
-      <ion-select [(ngModel)]="subcategoria_id" name="subcategoria_id" #subCategoryCtrl="ngModel" required [disabled]="!categoria_id">
+      <ion-select [disabled]="isDisabled" [(ngModel)]="subcategoria_id" name="subcategoria_id" #subCategoryCtrl="ngModel" required>
         <ion-select-option *ngFor="let subcategoria of arrayCmbSubcategorias" [value]="subcategoria.id">{{ subcategoria.nombre }}</ion-select-option>
       </ion-select>
     </ion-item>

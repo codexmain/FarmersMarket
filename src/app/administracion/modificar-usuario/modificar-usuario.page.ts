@@ -13,6 +13,7 @@ export class ModificarUsuarioPage implements OnInit {
   //esto para traer la data de la parte principal
 
   isDisabled = true;
+  isDisabledEstado = true
   usuario: any;
   usuarioActual: any; // Para almacenar el usuario actual del native storage
 
@@ -71,16 +72,13 @@ export class ModificarUsuarioPage implements OnInit {
 
     
 
-    // Actualiza la obligatoriedad de los campos al cargar
-    this.onFieldsChange();
-
 
 
     // Desactiva el campo estado_cuenta si el usuario está modificando su propia cuenta
     if (this.usuarioActual && this.usuario.id === this.usuarioActual.id) {
-      this.isDisabled = true; // Desactivar el campo
+      this.isDisabledEstado = true; // Desactivar el campo
     } else {
-      this.isDisabled = false; // Activar el campo
+      this.isDisabledEstado = false; // Activar el campo
     }
   }
 
@@ -92,25 +90,6 @@ export class ModificarUsuarioPage implements OnInit {
       }
     } catch (error) {
       console.error('Error al cargar los datos del usuario actual:', error);
-    }
-  }
-
-  onFieldsChange() {
-    // Lógica para determinar si los campos son obligatorios
-    if (this.nombre_empresa.length > 0 || this.descripcion_corta.length > 0) {
-      this.empresaObligatoria = true;
-      this.descEmpresaObligatoria = true;
-      this.presentToast('Los campos "Empresa" y "Descripción Empresa" son ahora obligatorios y la cuenta será Proveedor/Vendedor.');
-    } else {
-      this.empresaObligatoria = false;
-      this.descEmpresaObligatoria = false;
-    }
-
-    // Actualizar el tipo de usuario según los campos
-    if (this.empresaObligatoria && this.descEmpresaObligatoria) {
-      this.tipo_usuario_id = 2; // Proveedor/Vendedor
-    } else {
-      this.tipo_usuario_id = 1; // Usuario regular
     }
   }
 
@@ -237,33 +216,6 @@ export class ModificarUsuarioPage implements OnInit {
         this.modalController.dismiss();
       }
 
-      clearPNombre(){
-        this.nombre = '';
-      }
-      clearSNombre(){
-        this.segundo_nombre = '';
-      }
-    
-      clearAPaterno(){
-        this.apellido_paterno = '';
-      }
-      clearAMaterno(){
-        this.apellido_materno = '';
-    
-      }
-      clearEmpresa(){
-        this.nombre_empresa = '';
-    
-      }
-      clearDescEmpresa(){
-        this.descripcion_corta = '';
-    
-      }
-      clearMail(){
-        this.email = '';
-      }
-
-        
       
     }
     

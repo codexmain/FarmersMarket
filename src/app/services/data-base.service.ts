@@ -12,6 +12,8 @@ import { CmbProveedores } from './cmb-proveedores';
 import { CmbRegion } from './cmb-region';
 import { CmbComuna } from './cmb-comuna';
 import { OlvideContraService } from './olvide-contra.service';
+import { CmbProdAmnstones } from './cmb-prod-amnstones';
+import { Amonestaciones } from './amonestaciones';
 
 @Injectable({
   providedIn: 'root',
@@ -20,12 +22,7 @@ export class DataBaseService {
   public database!: SQLiteObject;
   private correoExiste = new BehaviorSubject<boolean>(false);
 
-  //agregado de la tabla amonestaciones
-  tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestaciones (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            descripcion TEXT NOT NULL
-          );`;
-
+  
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,13 +52,10 @@ export class DataBaseService {
             nombre_empresa TEXT,
             descripcion_corta TEXT, 
             foto_perfil TEXT,
-            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
-            amonestacion_id INTEGER,
-            detalle_amonestacion TEXT,
+            estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL, 
             fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
             tipo_usuario_id INTEGER NOT NULL,
-            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id),
-            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
+            FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario(id)
           );`; //aca se le agrego el amonestada, para el tema de que modifque si es inapropiado un campo
 
   tblDireccion: string = `CREATE TABLE IF NOT EXISTS direccion(
@@ -83,7 +77,7 @@ export class DataBaseService {
 
   tblSubcategoria: string = `CREATE TABLE IF NOT EXISTS subcategoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
+            nombre TEXT NOT NULL UNIQUE,
             categoria_id INTEGER NOT NULL,
             estado_subcategoria TEXT CHECK(estado_subcategoria IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL,
             FOREIGN KEY (categoria_id) REFERENCES categoria(id)
@@ -100,12 +94,10 @@ export class DataBaseService {
             foto_producto TEXT,
             subcategoria_id INTEGER NOT NULL,
             fecha_agregado TEXT DEFAULT(datetime('now')),
-            estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada', 'amonestada', 'en revision')) DEFAULT 'activa' NOT NULL, 
-            amonestacion_id INTEGER,
-            detalle_amonestacion TEXT,
+            estado_producto TEXT CHECK(estado_producto IN ('activa', 'deshabilitada')) DEFAULT 'activa' NOT NULL, 
             FOREIGN KEY (proveedor_id) REFERENCES usuario(id),
-            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id),
-            FOREIGN KEY (amonestacion_id) REFERENCES amonestaciones(id)
+            FOREIGN KEY (subcategoria_id) REFERENCES subcategoria(id)
+            
           );`;
 
   tblCarroCompra: string = `CREATE TABLE IF NOT EXISTS carro_compra (
@@ -128,6 +120,17 @@ export class DataBaseService {
             FOREIGN KEY (producto_id) REFERENCES producto(id),
             PRIMARY KEY (id, carro_id)
           );`;
+
+  //agregado de la tabla amonestaciones
+  tblAmonestaciones: string = `CREATE TABLE IF NOT EXISTS amonestacion (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    id_producto INTEGER,
+    descripcion TEXT NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (id_producto) REFERENCES producto(id)
+  );`;
+
 
   //variables para realizar la precarga inicial de datos
   registroCategoria: string = `INSERT OR IGNORE INTO categoria (id,nombre) VALUES
@@ -370,54 +373,6 @@ export class DataBaseService {
 
   //declaracion de las tablas de respaldo, para compararlo con la inserccion inicial
 
-  tblRespaldoCategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_categoria (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL UNIQUE
-);`;
-
-  tblRespaldoSubcategoria: string = `CREATE TABLE IF NOT EXISTS respaldo_subcategoria (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL,
-  categoria_id INTEGER NOT NULL
-);`;
-
-  tblRespaldoUsuario: string = `CREATE TABLE IF NOT EXISTS respaldo_usuario (
-  id INTEGER PRIMARY KEY NOT NULL,
-  nombre TEXT NOT NULL,
-  segundo_nombre TEXT,
-  apellido_paterno TEXT NOT NULL,
-  apellido_materno TEXT,
-  email TEXT UNIQUE NOT NULL,
-  contrasena TEXT NOT NULL,
-  nombre_empresa TEXT,
-  descripcion_corta TEXT, 
-  foto_perfil TEXT,
-  estado_cuenta TEXT CHECK(estado_cuenta IN ('activa', 'deshabilitada')) NOT NULL,
-  fecha_registro TEXT DEFAULT(datetime('now', 'localtime')),
-  tipo_usuario_id INTEGER NOT NULL
-);`;
-
-  tblRespaldoProducto: string = `CREATE TABLE IF NOT EXISTS respaldo_producto (
-  id INTEGER PRIMARY KEY NOT NULL,
-  proveedor_id INTEGER NOT NULL,
-  nombre TEXT NOT NULL,
-  descripcion TEXT,
-  precio INTEGER NOT NULL,
-  stock INTEGER NOT NULL,
-  organico INTEGER NOT NULL CHECK(organico IN (0, 1)),
-  foto_producto TEXT,
-  subcategoria_id INTEGER NOT NULL,
-  fecha_agregado TEXT DEFAULT(datetime('now'))
-);`;
-
-  tblRespaldoDirecciones: string = `CREATE TABLE IF NOT EXISTS respaldo_direccion(
-  id INTEGER NOT NULL,  -- ID como parte de la llave compuesta
-  usuario_id INTEGER NOT NULL,
-  comuna_id INTEGER NOT NULL,
-  direccion TEXT NOT NULL,
-  PRIMARY KEY (id, usuario_id)  -- Llave compuesta
-);`;
-
   //variable para el status de la Base de datos
   private isDBReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
@@ -426,7 +381,7 @@ export class DataBaseService {
     private sqlite: SQLite,
     private platform: Platform,
     private alertController: AlertController,
-    
+
   ) {
     this.createBD();
   }
@@ -473,7 +428,7 @@ export class DataBaseService {
   async crearTablas() {
     try {
       //ejecuto la creación de Tablas
-      await this.database.executeSql(this.tblAmonestaciones, []);
+      
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
       await this.database.executeSql(this.tblTipoUsuario, []);
@@ -484,13 +439,7 @@ export class DataBaseService {
       await this.database.executeSql(this.tblProducto, []);
       await this.database.executeSql(this.tblCarroCompra, []);
       await this.database.executeSql(this.tblDetalleCarroCompra, []);
-
-      //creacion de las tablas de respaldo
-      await this.database.executeSql(this.tblRespaldoCategoria, []);
-      await this.database.executeSql(this.tblRespaldoSubcategoria, []);
-      await this.database.executeSql(this.tblRespaldoUsuario, []);
-      await this.database.executeSql(this.tblRespaldoProducto, []);
-      await this.database.executeSql(this.tblRespaldoDirecciones, []);
+      await this.database.executeSql(this.tblAmonestaciones, []);
 
       //ejecuto los insert por defecto en el caso que existan
       await this.database.executeSql(this.registroCategoria, []);
@@ -514,128 +463,11 @@ export class DataBaseService {
       await this.database.executeSql(this.registroProducto, []);
       await this.seleccionarProductos();
 
-      await this.eliminarDatosIniciales(); //y ahora como se modifican deben actualizarse todos los observables afectados
-      await this.seleccionarUsuarios();
-      await this.seleccionarCbmProveedores();
-      await this.seleccionarCategorias();
-      await this.seleccionarSubCategorias();
-      await this.seleccionarProductos();
-
       this.isDBReady.next(true);
     } catch (e) {
       this.presentAlert(
         'Creación de Tablas',
         'Error en crear las tablas: ' + JSON.stringify(e)
-      );
-    }
-  }
-
-  async eliminarDatosIniciales() {
-    try {
-      // Eliminar categorías iniciales
-      const categoriasIniciales = await this.database.executeSql(
-        'SELECT * FROM categoria',
-        []
-      );
-      for (let i = 0; i < categoriasIniciales.rows.length; i++) {
-        const categoria = categoriasIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_categoria WHERE id = ?',
-          [categoria.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM categoria WHERE id = ?', [
-            categoria.id,
-          ]);
-        }
-      }
-
-      // Eliminar subcategorías iniciales
-      const subcategoriasIniciales = await this.database.executeSql(
-        'SELECT * FROM subcategoria',
-        []
-      );
-      for (let i = 0; i < subcategoriasIniciales.rows.length; i++) {
-        const subcategoria = subcategoriasIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_subcategoria WHERE id = ?',
-          [subcategoria.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql(
-            'DELETE FROM subcategoria WHERE id = ?',
-            [subcategoria.id]
-          );
-        }
-      }
-
-      // Eliminar productos iniciales
-      const productosIniciales = await this.database.executeSql(
-        'SELECT * FROM producto',
-        []
-      );
-      for (let i = 0; i < productosIniciales.rows.length; i++) {
-        const producto = productosIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_producto WHERE id = ?',
-          [producto.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM producto WHERE id = ?', [
-            producto.id,
-          ]);
-        }
-      }
-
-      // Eliminar usuarios iniciales
-      const usuariosIniciales = await this.database.executeSql(
-        'SELECT * FROM usuario',
-        []
-      );
-      for (let i = 0; i < usuariosIniciales.rows.length; i++) {
-        const usuario = usuariosIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_usuario WHERE id = ?',
-          [usuario.id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql('DELETE FROM usuario WHERE id = ?', [
-            usuario.id,
-          ]);
-        }
-      }
-      // Eliminar direcciones iniciales
-      const direccionesIniciales = await this.database.executeSql(
-        'SELECT * FROM direccion',
-        []
-      );
-      for (let i = 0; i < direccionesIniciales.rows.length; i++) {
-        const direccion = direccionesIniciales.rows.item(i);
-        const res = await this.database.executeSql(
-          'SELECT COUNT(*) as count FROM respaldo_direccion WHERE id = ? AND usuario_id = ?',
-          [direccion.id, direccion.usuario_id]
-        );
-        const count = res.rows.item(0).count;
-
-        if (count > 0) {
-          await this.database.executeSql(
-            'DELETE FROM direccion WHERE id = ? AND usuario_id = ?',
-            [direccion.id, direccion.usuario_id]
-          );
-        }
-      }
-    } catch (e) {
-      this.presentAlert(
-        'Eliminar Datos Iniciales',
-        'Error: ' + JSON.stringify(e)
       );
     }
   }
@@ -755,6 +587,9 @@ JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id WHERE u.id > 1`,
             items.push({
               id: res.rows.item(i).id,
               nombre: res.rows.item(i).nombre,
+              estado_categoria: res.rows.item(i).estado_categoria,
+
+
             });
           }
         }
@@ -766,7 +601,7 @@ JOIN tipo_usuario tu ON u.tipo_usuario_id = tu.id WHERE u.id > 1`,
   seleccionarSubCategorias() {
     return this.database
       .executeSql(
-        `SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria
+        `SELECT sbct.id, sbct.nombre, sbct.categoria_id, ct.nombre as nombreCategoria, sbct.estado_subcategoria 
 FROM subcategoria sbct
 JOIN categoria ct  ON sbct.categoria_id = ct.id`,
         []
@@ -784,6 +619,7 @@ JOIN categoria ct  ON sbct.categoria_id = ct.id`,
               nombre: res.rows.item(i).nombre,
               categoria_id: res.rows.item(i).categoria_id,
               nombreCategoria: res.rows.item(i).nombreCategoria,
+              estado_subcategoria: res.rows.item(i).estado_subcategoria,
             });
           }
         }
@@ -810,6 +646,7 @@ JOIN categoria ct  ON sbct.categoria_id = ct.id`,
     p.foto_producto,
     p.subcategoria_id,
     p.fecha_agregado,
+    p.estado_producto,
     s.nombre AS nombre_subcategoria,
     s.categoria_id AS categoria_id, -- ID de la categoría desde la subcategoría
     u.nombre_empresa AS nombre_proveedor,
@@ -844,6 +681,7 @@ JOIN
               foto_producto: res.rows.item(i).foto_producto,
               subcategoria_id: res.rows.item(i).subcategoria_id,
               fecha_agregado: res.rows.item(i).fecha_agregado,
+              estado_producto: res.rows.item(i).estado_producto,
               nombre_subcategoria: res.rows.item(i).nombre_subcategoria,
               categoria_id: res.rows.item(i).categoria_id,
               nombre_proveedor: res.rows.item(i).nombre_proveedor,
@@ -975,115 +813,194 @@ JOIN
       });
   }
 
-  //todos los modificares
+//todos los modificares
 
-  modificarUsuario(
-    id: number,
-    nombre: string,
-    segundo_nombre: string,
-    apellido_paterno: string,
-    apellido_materno: string,
-    email: string,
-    nombre_empresa: string,
-    descripcion_corta: string,
-    foto_perfil: string,
-    estado_cuenta: string,
-    tipo_usuario_id: number
-  ) {
-    return this.database
-      .executeSql(
-        'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',
-        [
-          nombre,
-          segundo_nombre,
-          apellido_paterno,
-          apellido_materno,
-          email,
-          nombre_empresa,
-          descripcion_corta,
-          foto_perfil,
-          estado_cuenta,
-          tipo_usuario_id,
-          id,
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Usuario Modificado');
-        this.seleccionarUsuarios(); //actualizar en su seccion en sí
-        this.seleccionarCbmProveedores();
-        this.seleccionarProductos();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
-      });
-  }
+//todos los modificares
 
-  modificarCategoria(id: number, nombre: string) {
-    return this.database
-      .executeSql('UPDATE categoria SET nombre = ? WHERE id = ?', [nombre, id])
-      .then((res) => {
-        this.presentAlert('Modificar', 'Categoría Modificada');
-        this.seleccionarCategorias(); //actualizar en su seccion en sí
-        this.seleccionarSubCategorias();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
-      });
-  }
-
-  modificarSubCategoria(id: number, nombre: string, categoria_id: number) {
-    return this.database
-      .executeSql(
-        'UPDATE subcategoria SET nombre = ?, categoria_id = ? WHERE id = ?',
-        [nombre, categoria_id, id]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'SubCategoría Modificada');
-        this.seleccionarSubCategorias(); //actualizar en su seccion en sí
-        this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
-      })
-      .catch((e) => {
+modificarUsuario(
+  id: number,
+  nombre: string,
+  segundo_nombre: string,
+  apellido_paterno: string,
+  apellido_materno: string,
+  email: string,
+  nombre_empresa: string,
+  descripcion_corta: string,
+  foto_perfil: string,
+  estado_cuenta: string,
+  tipo_usuario_id: number
+) {
+  return this.esRegistroProtegido('usuario', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
         this.presentAlert(
-          'Modificar SubCategoría',
-          'Error: ' + JSON.stringify(e)
+          'Modificar',
+          'No se puede modificar este usuario porque es un registro protegido.'
         );
-      });
-  }
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ? WHERE id = ?',
+            [
+              nombre,
+              segundo_nombre,
+              apellido_paterno,
+              apellido_materno,
+              email,
+              nombre_empresa,
+              descripcion_corta,
+              foto_perfil,
+              estado_cuenta,
+              tipo_usuario_id,
+              id,
+            ]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'Usuario Modificado');
+            this.seleccionarUsuarios(); //actualizar en su seccion en sí
+            this.seleccionarCbmProveedores();
+            this.seleccionarProductos();
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
 
-  modificarProducto(
-    id: number,
-    proveedor_id: number,
-    nombre: string,
-    descripcion: string,
-    precio: number,
-    stock: number,
-    organico: number,
-    foto_producto: string,
-    subcategoria_id: number
-  ) {
-    return this.database
-      .executeSql(
-        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ? WHERE id = ?',
-        [
-          proveedor_id,
-          nombre,
-          descripcion,
-          precio,
-          stock,
-          organico,
-          foto_producto,
-          subcategoria_id,
-          id,
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Producto Modificado');
-        this.seleccionarProductos(); //actualizar en su seccion en sí
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
-      });
-  }
+modificarCategoria(id: number, estado_categoria: string, nombre: string) {
+  return this.esRegistroProtegido('categoria', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar esta categoría porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
+          .then((res) => {
+            this.presentAlert('Modificar', 'Categoría Modificada');
+            this.seleccionarCategorias(); //actualizar en su seccion en sí
+            this.seleccionarSubCategorias();
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
+  return this.esRegistroProtegido('subcategoria', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar esta subcategoría porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
+            [nombre, categoria_id, estado_subcategoria, id]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'SubCategoría Modificada');
+            this.seleccionarSubCategorias(); //actualizar en su seccion en sí
+            this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
+          })
+          .catch((e) => {
+            this.presentAlert(
+              'Modificar SubCategoría',
+              'Error: ' + JSON.stringify(e)
+            );
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+modificarProducto(
+  id: number,
+  proveedor_id: number,
+  nombre: string,
+  descripcion: string,
+  precio: number,
+  stock: number,
+  organico: number,
+  foto_producto: string,
+  subcategoria_id: number,
+  estado_producto: string
+) {
+  return this.esRegistroProtegido('producto', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar este producto porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ? WHERE id = ?',
+            [
+              proveedor_id,
+              nombre,
+              descripcion,
+              precio,
+              stock,
+              organico,
+              foto_producto,
+              subcategoria_id,
+              estado_producto,
+              id
+            ]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'Producto Modificado');
+            this.seleccionarProductos(); //actualizar en su seccion en sí
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+
+
 
   //todos los inserts.
 
@@ -1205,18 +1122,7 @@ JOIN
 
   //accion de eliminar de todos los cruds de la parte de administracion
   eliminarUsuario(
-    id: number,
-    nombre: string,
-    segundo_nombre: string,
-    apellido_paterno: string,
-    apellido_materno: string,
-    email: string,
-    contrasena: string,
-    nombre_empresa: string,
-    descripcion_corta: string,
-    foto_perfil: string,
-    estado_cuenta: string,
-    tipo_usuario_id: number
+    id: number
   ) {
     this.esRegistroProtegido('usuario', id)
       .then((esProtegido) => {
@@ -1227,50 +1133,10 @@ JOIN
           );
         } else {
           // Actualizar registros en las tablas que dependen de usuario
-          this.database
-            .executeSql(
-              'UPDATE producto SET proveedor_id = 1 WHERE proveedor_id = ?',
+          this.database.executeSql(
+              'UPDATE usuario SET estado_cuenta = "deshabilitada" WHERE id = ?',
               [id]
             )
-            .then(() => {
-              return this.database.executeSql(
-                'UPDATE direccion SET usuario_id = 1 WHERE usuario_id = ?',
-                [id]
-              );
-            })
-            .then(() => {
-              return this.database.executeSql(
-                'UPDATE carro_compra SET usuario_id = 1 WHERE usuario_id = ?',
-                [id]
-              );
-            })
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_usuario(id, nombre, segundo_nombre, apellido_paterno, apellido_materno, email, contrasena, nombre_empresa, descripcion_corta, foto_perfil, estado_cuenta, tipo_usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-                [
-                  id,
-                  nombre,
-                  segundo_nombre,
-                  apellido_paterno,
-                  apellido_materno,
-                  email,
-                  contrasena,
-                  nombre_empresa,
-                  descripcion_corta,
-                  foto_perfil,
-                  estado_cuenta,
-                  tipo_usuario_id,
-                ]
-              );
-            })
-            .then(() => {
-              // Finalmente, eliminar el usuario
-              return this.database.executeSql(
-                'DELETE FROM usuario WHERE id = ?',
-                [id]
-              );
-            })
             .then(() => {
               this.presentAlert('Eliminar', 'Usuario eliminado con éxito');
               this.seleccionarUsuarios(); // Actualizar la lista de usuarios
@@ -1290,7 +1156,7 @@ JOIN
       });
   }
 
-  eliminarCategoria(id: number, nombre: string) {
+  eliminarCategoria(id: number) {
     this.esRegistroProtegido('categoria', id)
       .then((esProtegido) => {
         if (esProtegido) {
@@ -1306,17 +1172,10 @@ JOIN
               [id]
             )
             .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_categoria (id, nombre) VALUES (?, ?)',
-                [id, nombre]
-              );
-            })
-            .then(() => {
               // Luego, eliminar la categoría
 
               return this.database.executeSql(
-                'DELETE FROM categoria WHERE id = ?',
+                'UPDATE categoria SET estado_categoria = "deshabilitada" WHERE id = ?',
                 [id]
               );
             })
@@ -1338,7 +1197,7 @@ JOIN
       });
   }
 
-  eliminarSubcategoria(id: number, nombre: string, categoria_id: number) {
+  eliminarSubcategoria(id: number) {
     this.esRegistroProtegido('subcategoria', id)
       .then((esProtegido) => {
         if (esProtegido) {
@@ -1350,24 +1209,9 @@ JOIN
           // Actualizar registros en la tabla de productos
           this.database
             .executeSql(
-              'UPDATE producto SET subcategoria_id = 1 WHERE subcategoria_id = ?',
+              'UPDATE subcategoria SET estado_subcategoria = "deshabilitada" WHERE id = ?',
               [id]
             )
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_subcategoria (id, nombre, categoria_id) VALUES (?, ?, ?)',
-                [id, nombre, categoria_id]
-              );
-            })
-
-            .then(() => {
-              // Finalmente, eliminar la subcategoría
-              return this.database.executeSql(
-                'DELETE FROM subcategoria WHERE id = ?',
-                [id]
-              );
-            })
             .then(() => {
               this.presentAlert('Eliminar', 'Subcategoría eliminada con éxito');
               this.seleccionarSubCategorias(); // Actualizar la lista de subcategorías
@@ -1387,15 +1231,7 @@ JOIN
   }
 
   eliminarProducto(
-    id: number,
-    proveedor_id: number,
-    nombre_producto: string,
-    descripcion_producto: string,
-    precio: number,
-    stock: number,
-    organico: number,
-    foto_producto: string,
-    subcategoria_id: number
+    id: number
   ) {
     this.esRegistroProtegido('producto', id)
       .then((esProtegido) => {
@@ -1408,35 +1244,9 @@ JOIN
           // Actualizar registros en la tabla de detalle_carro_compra
           this.database
             .executeSql(
-              'UPDATE detalle_carro_compra SET producto_id = 1 WHERE producto_id = ?',
+              'UPDATE producto SET estado_producto = "deshabilitada" WHERE id = ?',
               [id]
             )
-            .then(() => {
-              // Insertar en la tabla de respaldo antes de eliminar
-              return this.database.executeSql(
-                'INSERT INTO respaldo_producto (id, proveedor_id, nombre, descripcion, precio, stock, organico, foto_producto, subcategoria_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                  id,
-                  proveedor_id,
-                  nombre_producto,
-                  descripcion_producto,
-                  precio,
-                  stock,
-                  organico,
-                  foto_producto,
-                  subcategoria_id,
-                ]
-              );
-            })
-
-            .then(() => {
-              // Finalmente, eliminar el producto
-              return this.database.executeSql(
-                'DELETE FROM producto WHERE id = ?',
-                [id]
-              );
-            })
-
             .then(() => {
               this.presentAlert('Eliminar', 'Producto eliminado con éxito');
               this.seleccionarProductos(); // Actualizar la lista de productos
@@ -2546,7 +2356,7 @@ JOIN
   // Recuperar contraseña por correo
   async recuperarcon(correo: string): Promise<any> {
     const verificationCode = this.generateVerificationCode(); // Generar un código de verificación aleatorio
-    
+
     try {
       const result = await this.database.executeSql(
         'SELECT * FROM usuario WHERE email = ?',
@@ -2602,5 +2412,213 @@ JOIN
       .then(() => console.log('Contraseña actualizada para el correo:', correo))
       .catch(error => console.error('Error al actualizar la contraseña:', error));
   }
+
+
+
+// prueba de funciones  amonestaciones 
+  // Método para enviar una amonestación al usuario
+  async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
+    try {
+      // Obtener el usuario por correo
+      // Ejecuta una consulta SQL para buscar un usuario en la base de datos utilizando el correo proporcionado
+      const result = await this.database.executeSql(
+        'SELECT * FROM usuario WHERE email = ?',
+        [correo]
+      );
+
+      // Verificar si el usuario existe
+      // Si no se encuentra ningún usuario con el correo proporcionado, muestra una alerta y termina la función
+      if (result.rows.length === 0) {
+        await this.presentAlert('Error', 'El usuario con este correo no existe.');
+        return;
+      }
+
+      // Obtener el ID del usuario encontrado
+      const user = result.rows.item(0);
+      const usuarioId = user.id;
+
+      // Insertar la amonestación en la tabla amonestaciones
+      // Ejecuta una consulta SQL para insertar una nueva amonestación en la base de datos, asociada al ID del usuario y opcionalmente al ID del producto
+      await this.database.executeSql(
+        'INSERT INTO amonestaciones (usuario_id, descripcion, id_producto) VALUES (?, ?, ?)',
+        [usuarioId, descripcion, idProducto]
+      );
+
+      // Enviar el correo de amonestación
+      // Llama a la función para enviar un correo al usuario notificando sobre la amonestación
+      this.sendAmonestacionEmail(correo, descripcion);
+
+      // Mensaje de confirmación en la consola
+      console.log('Amonestación enviada y registrada para el usuario:', correo);
+    } catch (error) {
+      // Captura y muestra cualquier error que ocurra durante el proceso
+      console.error('Error al enviar la amonestación:', error);
+      throw error;
+    }
+  }
+
+  // Función para enviar el correo de amonestación
+  private sendAmonestacionEmail(correo: string, descripcion: string) {
+    // Utiliza el servicio OlvideContraService para enviar un correo al usuario con la descripción de la amonestación
+    this.olvideContraService.enviarCorreo(correo, descripcion).subscribe({
+      next: () => console.log('Correo de amonestación enviado al usuario:', correo),
+      error: (err) => console.error('Error en el envío de correo de amonestación:', err)
+    });
+  }
+
+//========================================================================================
+//CONSTRUCCION COMBOBOX PARA MOSTRAR LOS PRODUCTOS DEL USUARIO EN LAS AMONESTACIONES
+
+listadoCmbProdAmnstones = new BehaviorSubject([]);
+
+fetchCmbProdAmnstones(): Observable<CmbProdAmnstones[]> {
+  return this.listadoCmbProdAmnstones.asObservable();
+}
+
+
+seleccionarCmbProdaAmonestar(idProveedor: number) {
+  return this.database
+    .executeSql(
+      'SELECT id, nombre FROM producto WHERE estado_producto = "activa" AND proveedor_id = ?',
+      [idProveedor]
+    )
+    .then((res) => {
+      //variable para almacenar el resultado de la consulta
+      let items: CmbProdAmnstones[] = [];
+      //valido si trae al menos un registro
+      if (res.rows.length > 0) {
+        //recorro mi resultado
+        for (var i = 0; i < res.rows.length; i++) {
+          //agrego los registros a mi lista
+          items.push({
+            id: res.rows.item(i).id,
+            nombre: res.rows.item(i).nombre,
+          });
+        }
+      }
+      //actualizar el observable de usuarios
+      this.listadoCmbProdAmnstones.next(items as any);
+    });
+    //insertar la amonestacion
+    //listar amonestaciones, para visualizarlas
+}
+
+    //creacion de las funciones para el resto de cosas de la amonestación
+
+    listadoAmonestaciones = new BehaviorSubject([]);
+
+    fetchAmonestaciones(): Observable<Amonestaciones[]> {
+      return this.listadoAmonestaciones.asObservable();
+    }  
+
+    //insertar la amonestacion
+    insertarAmonestacion(
+      usuario_id: number,
+      id_producto: number,
+      descripcion: string,
+
+    ) {
+      return this.database
+        .executeSql(
+          'INSERT INTO amonestacion(usuario_id, id_producto, descripcion) VALUES (?,?,?)',
+          [
+            usuario_id,
+            id_producto,
+            descripcion
+          ]
+        )
+        .then((res) => {
+          this.presentAlert('Insertar', 'Amonestación Registrada');
+          this.seleccionarAmonestaciones();
+        })
+        .catch((e) => {
+          this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+        });
+    }
+
+    //listar amonestaciones, para visualizarlas
+
+    seleccionarAmonestaciones() {
+      return this.database
+        .executeSql(`SELECT 
+    a.id,
+    a.usuario_id,
+    (SELECT u.nombre || ' ' || COALESCE(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || COALESCE(u.apellido_materno, '') 
+     FROM usuario u WHERE u.id = a.usuario_id) AS nombre_usuario,
+    (SELECT COALESCE(u.nombre_empresa, 'Cuenta Cliente') 
+     FROM usuario u WHERE u.id = a.usuario_id) AS nombre_empresa,
+    CASE 
+        WHEN a.id_producto IS NULL THEN 'Amonestación sin Producto'
+        ELSE a.id_producto
+    END AS id_producto,
+    CASE 
+        WHEN a.id_producto IS NULL THEN 'Amonestación sin Producto'
+        ELSE (SELECT p.nombre FROM producto p WHERE p.id = a.id_producto)
+    END AS nombre_producto,
+    a.descripcion
+FROM 
+    amonestacion a;
+`, [])
+        .then((res) => {
+          //variable para almacenar el resultado de la consulta
+          let items: Amonestaciones[] = [];
+          //valido si trae al menos un registro
+          if (res.rows.length > 0) {
+            //recorro mi resultado
+            for (var i = 0; i < res.rows.length; i++) {
+              //agrego los registros a mi lista
+              items.push({
+                id: res.rows.item(i).id,
+                usuario_id: res.rows.item(i).usuario_id,
+                nombre_usuario: res.rows.item(i).nombre_usuario,
+                nombre_empresa: res.rows.item(i).nombre_empresa,
+                id_producto: res.rows.item(i).id_producto,
+                nombre_producto: res.rows.item(i).nombre_producto,
+                descripcion: res.rows.item(i).descripcion,
+
+              });
+            }
+          }
+          //actualizar el observable de usuarios
+          this.listadoAmonestaciones.next(items as any);
+        });
+    }
+
+
+
+    //corroborar si la amonestacíon se ejectuo: (esta vale pico, no se va a hacer por tiempo)
+
+
+    verificarCategoriaExistente(categoria: string): Promise<boolean> {
+      return this.database
+        .executeSql('SELECT COUNT(*) AS count FROM categoria WHERE nombre = ?', [
+          categoria,
+        ])
+        .then((res) => {
+          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+        });
+    }
+
+
+    verificarSubcategoriaExistente(subcategoria: string): Promise<boolean> {
+      return this.database
+        .executeSql('SELECT COUNT(*) AS count FROM subcategoria WHERE nombre = ?', [
+          subcategoria,
+        ])
+        .then((res) => {
+          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+        });
+    }
+
+    
+
+
+
+    
+
+
+
+
+
 
 }

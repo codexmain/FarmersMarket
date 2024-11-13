@@ -14,5 +14,13 @@
       <ion-input [disabled]="isDisabled" type="text" [(ngModel)]="nombre" name="nombre"></ion-input>
     </ion-item>
 
+    <ion-item>
+      <ion-label>Estado Categoría:</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="estado_categoria" name="estado_categoria">
+        <ion-select-option value="activa">Categoría Activa</ion-select-option>
+        <ion-select-option value="deshabilitada">Categoría Deshabilitada</ion-select-option>
+      </ion-select>
+    </ion-item>
+
 </ion-card>
 </ion-content>

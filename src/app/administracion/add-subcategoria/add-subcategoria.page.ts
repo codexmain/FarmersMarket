@@ -58,9 +58,17 @@ export class AddSubcategoriaPage implements OnInit {
 
   const subCategoryPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s]{5,50}$/;
   if (this.nombre && !subCategoryPattern.test(this.nombre)) {
-    this.presentAlert('Error', 'El nombre de la Subcategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
+    this.presentAlert('Error', 'El nombre de la SubCategoría debe tener entre 5 y 50 caracteres. Y solo debe contener letras, números y espacios');
     return;
   }
+
+  // Validar si el correo ya existe
+  const subCatExistente = await this.bd.verificarSubcategoriaExistente(this.nombre);
+  if (subCatExistente) {
+    this.presentAlert('Error', 'Esta SubCategoría ya existe.');
+    return;
+  }
+
   // Validar región
   if (!this.categoria_id) {
      this.presentAlert('Error', 'La Categoría es obligatoria.');

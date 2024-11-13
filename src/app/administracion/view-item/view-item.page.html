@@ -115,6 +115,13 @@
         name="descripcion_producto"></ion-input>
     </ion-item>
 
+    <ion-item>
+      <ion-label>Estado Producto:</ion-label>
+      <ion-select [disabled]="isDisabled" [(ngModel)]="estado_producto" name="estado_producto">
+        <ion-select-option value="activa">Producto Activo</ion-select-option>
+        <ion-select-option value="deshabilitada">Producto Deshabilitado</ion-select-option>
+      </ion-select>
+    </ion-item>
 
     <ion-item>
       <ion-label position="floating">Precio Producto (CLP)</ion-label>
@@ -152,5 +159,6 @@
       </ion-select>
     </ion-item>
 
+    
   </ion-card>
 </ion-content>
