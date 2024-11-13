@@ -7,23 +7,20 @@
   </ion-toolbar>
 </ion-header>
 
-
-
-
-<ion-content *ngIf="producto">
+<ion-content>
   <ion-card>
-    <form>
+    <form (ngSubmit)="guardarCambios()">
       <ion-item style="align-items: center; flex-direction: column;">
 
 
         <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center;">
           <ion-avatar
             style="background-color: #F5F5DC; width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
-            <img *ngIf="producto.foto_producto && producto.foto_producto !== ''" [src]="producto.foto_producto"
-              alt="Foto del Producto" style="width: 100%; height: 100%; object-fit: cover;" />
+            <img *ngIf="foto_producto && foto_producto !== ''" [src]="foto_producto" alt="Foto del Producto"
+              style="width: 100%; height: 100%; object-fit: cover;" />
 
             <!-- Mostrar imagen por defecto según el ID -->
-            <ng-container *ngIf="!producto.foto_producto || producto.foto_producto === ''">
+            <ng-container *ngIf="!foto_producto || foto_producto === ''">
               <ng-container *ngIf="productoId === 1">
                 <img src="../../assets/imgProductos/producto1.png" alt="Imagen por Defecto"
                   style="width: 100%; height: 100%; object-fit: cover;" />
@@ -109,86 +106,52 @@
                   style="width: 100%; height: 100%; object-fit: cover;" />
               </ng-container>
             </ng-container>
+
+            <img *ngIf="foto_producto" [src]="foto_producto" alt="avatar"
+              style="width: 100%; height: 100%; object-fit: cover;" />
           </ion-avatar>
         </div>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Nombre del Producto</ion-label>
-        <ion-input [(ngModel)]="producto.nombre" name="producto.nombre" disabled></ion-input>
+        <ion-input [(ngModel)]="nombre" name="nombre" disabled></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Descripción</ion-label>
-        <ion-input [(ngModel)]="producto.descripcion" name="producto.descripcion" disabled></ion-input>
+        <ion-input [(ngModel)]="descripcion" name="descripcion" disabled></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Precio</ion-label>
-        <ion-input type="number" [(ngModel)]="producto.precio" name="producto.precio" disabled></ion-input>
+        <ion-input type="number" [(ngModel)]="precio" name="precio" disabled></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Stock</ion-label>
-        <ion-input type="number" [(ngModel)]="producto.stock" name="producto.stock" disabled></ion-input>
+        <ion-input type="number" [(ngModel)]="stock" name="stock" disabled></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-label>¿Producto Orgánico?</ion-label>
-        <ion-label *ngIf="producto.organico === 1; else noOrganico">Es Orgánico</ion-label>
+        <ion-label>¿Producto Orgánico?: </ion-label>
+        <ion-label *ngIf="organico === 1; else noOrganico">  Es Orgánico</ion-label>
         <ng-template #noOrganico>
-          <ion-label>No es Orgánico</ion-label>
+          <ion-label>  No es Orgánico</ion-label>
         </ng-template>
       </ion-item>
+      
 
       <ion-item>
-        <ion-label position="stacked">Fecha de Agregado</ion-label>
-        <ion-input [(ngModel)]="producto.fecha_agregado" name="producto.fecha_agregado" disabled></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Estado del Producto</ion-label>
-        <ion-input [(ngModel)]="producto.estado_producto" name="producto.estado_producto" disabled></ion-input>
-      </ion-item>
-
-      <ion-item *ngIf="producto.detalle_amonestacion">
-        <ion-label position="stacked">Detalle de Amonestación</ion-label>
-        <ion-input [(ngModel)]="producto.detalle_amonestacion" name="producto.detalle_amonestacion"
-          disabled></ion-input>
+        <ion-label>Categoría: </ion-label>
+        <ion-input [(ngModel)]="  categoriaNombre" disabled></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked">Proveedor</ion-label>
-        <ion-input [(ngModel)]="producto.proveedor_nombre" name="producto.proveedor_nombre" disabled></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Empresa</ion-label>
-        <ion-input [(ngModel)]="producto.proveedor_empresa" name="producto.proveedor_empresa" disabled></ion-input>
-      </ion-item>
-
-      <ion-item *ngIf="producto.amonestacion_descripcion">
-        <ion-label position="stacked">Amonestación del Producto</ion-label>
-        <ion-input [(ngModel)]="producto.amonestacion_descripcion" name="producto.amonestacion_descripcion"
-          disabled></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Categoría</ion-label>
-        <ion-input [(ngModel)]="producto.categoria_nombre" name="producto.categoria_nombre" disabled></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Subcategoría</ion-label>
-        <ion-input [(ngModel)]="producto.subcategoria_nombre" name="producto.subcategoria_nombre" disabled></ion-input>
+        <ion-label>Subcategoría: </ion-label>
+        <ion-input [(ngModel)]="  subcategoriaNombre" disabled></ion-input>
       </ion-item>
 
     </form>
   </ion-card>
-</ion-content>
-
-<ion-content *ngIf="!producto">
-  <ion-text color="danger">
-    <p>Producto no encontrado.</p>
-  </ion-text>
 </ion-content>

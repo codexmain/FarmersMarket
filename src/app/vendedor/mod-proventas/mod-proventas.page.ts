@@ -11,16 +11,14 @@ import { AlertController, ToastController } from '@ionic/angular';
 })
 export class ModProventasPage implements OnInit {
   productoId: number = 0;
-  producto: any = {
-    nombre: '',
-    descripcion: '',
-    precio: 0,
-    stock: 0,
-    organico: 0, // 0 = No orgánico, 1 = Orgánico
-    categoriaId: 0, // Ajuste para almacenar id de la categoría
-    subcategoriaId: 0, // Ajuste para almacenar id de la subcategoría
-    foto_producto: ''
-  };
+  nombre: string = '';
+  descripcion: string = '';
+  precio: number = 0;
+  stock: number = 0;
+  organico: number = 0; // 0 = No orgánico, 1 = Orgánico
+  categoriaId: number = 0;
+  subcategoriaId: number = 0;
+  foto_producto: string = ''; // Nueva propiedad para la foto
   imagen: any;
 
   categorias: Array<{ id: number, nombre: string }> = [];
@@ -51,25 +49,16 @@ export class ModProventasPage implements OnInit {
 
   async obtenerProducto(productoId: number) {
     try {
-      const producto = await this.db.getProductoselect(productoId);
-      if (producto) {
-        // Asignar los datos obtenidos al objeto `producto`
-        this.producto = {
-          nombre: producto.nombre,
-          descripcion: producto.descripcion,
-          precio: producto.precio,
-          stock: producto.stock,
-          organico: producto.organico,
-          categoriaId: this.categorias.find(c => c.nombre === producto.categoria_nombre)?.id || 0,
-          subcategoriaId: producto.subcategoria_id,
-          foto_producto: producto.foto_producto
-        };
-
-        if (this.producto.categoriaId) {
-          // Cargar subcategorías asociadas a la categoría del producto
-          await this.cargarSubcategorias(this.producto.categoriaId);
-        }
-      }
+      const producto = await this.db.obtenerProducto(productoId);
+      this.nombre = producto.nombre;
+      this.descripcion = producto.descripcion;
+      this.precio = producto.precio;
+      this.stock = producto.stock;
+      this.organico = producto.organico;
+      this.categoriaId = producto.categoria_id;
+      this.subcategoriaId = producto.subcategoria_id;
+      this.foto_producto = producto.foto_producto; // Asignar la foto del producto
+      await this.cargarSubcategorias(this.categoriaId);
     } catch (error) {
       console.error('Error al obtener el producto:', error);
       this.mostrarAlertaError('No se pudo cargar el producto.');
@@ -86,70 +75,95 @@ export class ModProventasPage implements OnInit {
   }
 
   async onCategoriaChange(categoriaId: number) {
-    this.producto.categoriaId = categoriaId;
+    this.categoriaId = categoriaId;
     await this.cargarSubcategorias(categoriaId);
   }
 
-  validarPrecio(precio: number): boolean {
-    return Number.isInteger(precio) && precio > 0 && precio <= 9999999;
-  }
-
-  validarStock(stock: number): boolean {
-    return Number.isInteger(stock) && stock >= 0 && stock <= 99999;
-  }
-
-  async validarCampos(): Promise<boolean> {
-    const { nombre, descripcion, precio, stock, organico, categoria_nombre, subcategoriaId } = this.producto;
-
-    if (!nombre.trim()) {
-      await this.mostrarAlertaError('El Nombre del Producto es un campo obligatorio.');
-      return false;
+      // Validar precio
+    validarPrecio(precio: number): boolean {
+      const esEntero = Number.isInteger(precio);
+      const esValido = esEntero && precio > 0 && precio <= 9999999;
+      return esValido;
     }
-    if (nombre.length < 3 || nombre.length > 40) {
-      await this.mostrarAlertaError('El Nombre del producto debe tener entre 3 y 40 caracteres.');
-      return false;
-    }
-    if (descripcion && (descripcion.length < 10 || descripcion.length > 255)) {
-      await this.mostrarAlertaError('La Descripción del producto debe tener entre 10 y 255 caracteres.');
-      return false;
-    }
-    if (!precio || !this.validarPrecio(precio)) {
-      await this.mostrarAlertaError('El Precio debe ser un número entero positivo y no debe superar los 7 dígitos.');
-      return false;
-    }
-    if (stock === null || stock === undefined || !this.validarStock(stock)) {
-      await this.mostrarAlertaError('El Stock debe ser un número entero entre 0 y 99999.');
-      return false;
-    }
-    if (organico === null || organico === undefined) {
-      await this.mostrarAlertaError('La procedencia del producto (Orgánico/No Orgánico) es un campo obligatorio.');
-      return false;
-    }
-    if (categoria_nombre === '') {
-      await this.mostrarAlertaError('La Categoría es un campo obligatorio.');
-      return false;
-    }
-    if (subcategoriaId === 0) {
-      await this.mostrarAlertaError('La Subcategoría es un campo obligatorio.');
-      return false;
+  
+    // Validar stock
+    validarStock(stock: number): boolean {
+      const esEntero = Number.isInteger(stock);
+      const esValido = esEntero && stock >= 0 && stock <= 99999; // Longitud de cinco, mayor o igual a cero
+      return esValido;
     }
 
-    return true;
-  }
+
+
+    async validarCampos(): Promise<boolean> {
+
+      if (!this.nombre.trim()) {
+        await this.mostrarAlertaError('El Nombre del Producto es un campo obligatorio.');
+        return false;
+      }
+      if (this.nombre.length < 3 || this.nombre.length > 40) {
+        await this.mostrarAlertaError('El Nombre del producto debe tener entre 3 y 40 caracteres.');
+        return false;
+      }
+
+      if (this.descripcion && 
+        (this.descripcion.length < 10 || this.descripcion.length > 255)) {
+         this.mostrarAlertaError('La Descripción del producto debe tener entre 10 y 255 caracteres.');
+         return false;
+      }
+
+      if (!this.precio) {
+        await this.mostrarAlertaError('El Precio del producto es un campo obligatorio.');
+        return false;
+      }
+
+      
+      if (!this.validarPrecio(this.precio)) {
+        await this.mostrarAlertaError('El Precio del producto debe ser un número entero mayor a 0 y no debe superar los 7 dígitos.');
+        return false;
+      }
+
+      if (this.stock === null || this.stock === undefined) {
+        await this.mostrarAlertaError('El Stock/Existencias es un campo obligatorio.');
+        return false;
+      }
+
+      if (!this.validarStock(this.stock)) {
+        await this.mostrarAlertaError('El Stock del producto debe ser un número entero mayor o igual a cero y no debe superar los 5 dígitos.');
+        return false;
+      }
+
+      if (this.organico === null || this.organico === undefined) {
+        await this.mostrarAlertaError('La procedencia del producto (Orgánico/No Orgánico) es un campo obligatorio.');
+        return false;
+      }
+  
+      if (this.categoriaId === 0) {
+        await this.mostrarAlertaError('La Categoría es un campo obligatorio.');
+        return false;
+      }
+  
+      if (this.subcategoriaId === 0) {
+        await this.mostrarAlertaError('La Subcategoría es un campo obligatorio.');
+        return false;
+      }
+
+      return true; // Todos los campos son válidos
+    };
+
 
   async guardarCambios() {
     if (await this.validarCampos()) {
       try {
-        const { nombre, descripcion, precio, stock, organico, subcategoriaId, foto_producto } = this.producto;
         await this.db.modProducto(
           this.productoId,
-          nombre,
-          descripcion,
-          precio,
-          stock,
-          organico,
-          subcategoriaId,
-          foto_producto
+          this.nombre,
+          this.descripcion,
+          this.precio,
+          this.stock,
+          this.organico,
+          this.subcategoriaId,
+          this.foto_producto
         );
         this.mostrarToast('Producto modificado exitosamente.', 'success');
         this.router.navigate(['/proventas']);
@@ -169,7 +183,7 @@ export class ModProventasPage implements OnInit {
       });
 
       if (image && image.webPath) {
-        this.producto.foto_producto = image.webPath; // Asignar la ruta de la foto
+        this.foto_producto = image.webPath; // Asignar la ruta de la foto
         this.imagen = image.webPath;
         this.mostrarToast('Foto tomada exitosamente.', 'success');
       }
@@ -197,11 +211,13 @@ export class ModProventasPage implements OnInit {
     await toast.present();
   }
 
-  clearProductName() {
-    this.producto.nombre = '';
+  clearProductName(){
+    this.nombre = '';
   }
 
-  clearProductDesc() {
-    this.producto.descripcion = '';
+  clearProductDesc(){
+    this.descripcion = '';
   }
+
+  
 }
