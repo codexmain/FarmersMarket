@@ -122,7 +122,7 @@ export class SubcategoriasPage implements OnInit {
   }
 
   eliminar(x: any) {
-    this.bd.eliminarSubcategoria(x.id, x.nombre, x.categoria_id)
+    this.bd.eliminarSubcategoria(x.id)
   }
   
   agregar() {
