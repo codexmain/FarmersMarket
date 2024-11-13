@@ -15,9 +15,7 @@ import { LocationValidationService } from 'src/app/services/location-validation.
   styleUrls: ['./mod-usuario.page.scss'],
 })
 export class ModUsuarioPage implements OnInit {
-
   // Variables del usuario
-  isDisabled = true;
   usuario: any = {
     nombre: '',
     segundo_nombre: '',
@@ -32,10 +30,9 @@ export class ModUsuarioPage implements OnInit {
     comuna_id: null, // ID de la comuna seleccionada
   };
   imagen: any;
-  datos: any;
 
-  selectedRegion!: number;
-  selectedComuna!: number;
+  selectedRegion: number | null = null;
+  selectedComuna: number | null = null;
   regiones: any[] = [];
   comunas: any[] = [];
   direcciones: any[] = []; // Lista de direcciones del usuario
@@ -75,28 +72,16 @@ export class ModUsuarioPage implements OnInit {
   async cargarDatosUsuario() {
     try {
       const email = await this.nativeStorage.getItem('userEmail');
-      const usuarioData = await this.dataBase.getUsuarioByEmail(email);
-      this.datos = await this.dataBase.getUsuarioByEmail(email);
+      const usuarioData = await this.dataBase.obtenerUsuarioPorEmail(email);
       
       if (usuarioData) {
         this.usuario = usuarioData;
-        
-        // Cargar las regiones y asignar el valor correspondiente a region_id
-        await this.cargarRegiones();
-        
-        // Buscar la región correspondiente y asignarla al usuario
-        const regionEncontrada = this.regiones.find(region => region.nombre === this.datos.region);
-        if (regionEncontrada) {
-          this.usuario.region_id = regionEncontrada.id;
-          this.selectedRegion = this.usuario.region_id;
-          await this.cargarcomunas(this.selectedRegion);
-          
-          // Buscar la comuna correspondiente y asignarla al usuario
-          const comunaEncontrada = this.comunas.find(comuna => comuna.nombre === this.datos.comuna);
-          if (comunaEncontrada) {
-            this.usuario.comuna_id = comunaEncontrada.id;
-            this.selectedComuna = this.usuario.comuna_id;
-          }
+        this.selectedRegion = usuarioData.region_id; // Asignar la región seleccionada
+        this.selectedComuna = usuarioData.comuna_id; // Asignar la comuna seleccionada
+
+        // Llamar a cargarcomunas solo si selectedRegion no es null
+        if (this.selectedRegion !== null) {
+          await this.cargarcomunas(this.selectedRegion); // Cargar comunas de la región seleccionada
         }
       } else {
         await this.presentAlert('Error', 'No se encontró el usuario.');
@@ -106,7 +91,7 @@ export class ModUsuarioPage implements OnInit {
       await this.presentAlert('Error', 'Error al cargar los datos del usuario.');
     }
   }
-  
+
   async cargarRegiones() {
     try {
       this.regiones = await this.dataBase.Regiones();
@@ -114,7 +99,7 @@ export class ModUsuarioPage implements OnInit {
       console.error('Error al cargar regiones:', error);
     }
   }
-  
+
   async cargarcomunas(regionId: number) {
     if (regionId) {
       try {
@@ -166,7 +151,11 @@ export class ModUsuarioPage implements OnInit {
       return false;
     }
 
-   
+    // Validar empresa
+    if (!this.usuario.nombre_empresa) {
+      await this.presentAlert('Error', 'El nombre de la empresa es obligatorio.');
+      return false;
+    }
     
     const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
     if (!empresaPattern.test(this.usuario.nombre_empresa)) {
@@ -175,7 +164,11 @@ export class ModUsuarioPage implements OnInit {
     }
     
 
-    
+    // Validar descripción de la empresa
+    if (!this.usuario.descripcion_corta) {
+      await this.presentAlert('Error', 'La descripción de la empresa es obligatoria.');
+      return false;
+    }
 
     const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
     if (!descEmpresaPattern.test(this.usuario.descripcion_corta)) {
@@ -347,4 +340,7 @@ export class ModUsuarioPage implements OnInit {
     });
     toast.present();
   }
+
+
+
 }
