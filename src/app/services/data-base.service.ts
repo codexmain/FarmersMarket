@@ -813,117 +813,194 @@ JOIN
       });
   }
 
-  //todos los modificares
+//todos los modificares
 
-  modificarUsuario(
-    id: number,
-    nombre: string,
-    segundo_nombre: string,
-    apellido_paterno: string,
-    apellido_materno: string,
-    email: string,
-    nombre_empresa: string,
-    descripcion_corta: string,
-    foto_perfil: string,
-    estado_cuenta: string,
-    tipo_usuario_id: number
-  ) {
-    return this.database
-      .executeSql(
-        'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ?  WHERE id = ?',
-        [
-          nombre,
-          segundo_nombre,
-          apellido_paterno,
-          apellido_materno,
-          email,
-          nombre_empresa,
-          descripcion_corta,
-          foto_perfil,
-          estado_cuenta,
-          tipo_usuario_id,
-          id,
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Usuario Modificado');
-        this.seleccionarUsuarios(); //actualizar en su seccion en sí
-        this.seleccionarCbmProveedores();
-        this.seleccionarProductos();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
-      });
-  }
+//todos los modificares
 
-  modificarCategoria(id: number, estado_categoria:string ,nombre: string) {
-    return this.database
-      .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
-      .then((res) => {
-        this.presentAlert('Modificar', 'Categoría Modificada');
-        this.seleccionarCategorias(); //actualizar en su seccion en sí
-        this.seleccionarSubCategorias();
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
-      });
-  }
-
-  modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
-    return this.database
-      .executeSql(
-        'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
-        [nombre, categoria_id, estado_subcategoria, id]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'SubCategoría Modificada');
-        this.seleccionarSubCategorias(); //actualizar en su seccion en sí
-        this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
-      })
-      .catch((e) => {
+modificarUsuario(
+  id: number,
+  nombre: string,
+  segundo_nombre: string,
+  apellido_paterno: string,
+  apellido_materno: string,
+  email: string,
+  nombre_empresa: string,
+  descripcion_corta: string,
+  foto_perfil: string,
+  estado_cuenta: string,
+  tipo_usuario_id: number
+) {
+  return this.esRegistroProtegido('usuario', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
         this.presentAlert(
-          'Modificar SubCategoría',
-          'Error: ' + JSON.stringify(e)
+          'Modificar',
+          'No se puede modificar este usuario porque es un registro protegido.'
         );
-      });
-  }
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ? WHERE id = ?',
+            [
+              nombre,
+              segundo_nombre,
+              apellido_paterno,
+              apellido_materno,
+              email,
+              nombre_empresa,
+              descripcion_corta,
+              foto_perfil,
+              estado_cuenta,
+              tipo_usuario_id,
+              id,
+            ]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'Usuario Modificado');
+            this.seleccionarUsuarios(); //actualizar en su seccion en sí
+            this.seleccionarCbmProveedores();
+            this.seleccionarProductos();
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
 
-  modificarProducto(
-    id: number,
-    proveedor_id: number,
-    nombre: string,
-    descripcion: string,
-    precio: number,
-    stock: number,
-    organico: number,
-    foto_producto: string,
-    subcategoria_id: number,
-    estado_producto: string
-  ) {
-    return this.database
-      .executeSql(
-        'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ?  WHERE id = ?',
-        [
-          proveedor_id,
-          nombre,
-          descripcion,
-          precio,
-          stock,
-          organico,
-          foto_producto,
-          subcategoria_id,
-          estado_producto,
-          id
-        ]
-      )
-      .then((res) => {
-        this.presentAlert('Modificar', 'Producto Modificado');
-        this.seleccionarProductos(); //actualizar en su seccion en sí
-      })
-      .catch((e) => {
-        this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
-      });
-  }
+modificarCategoria(id: number, estado_categoria: string, nombre: string) {
+  return this.esRegistroProtegido('categoria', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar esta categoría porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
+          .then((res) => {
+            this.presentAlert('Modificar', 'Categoría Modificada');
+            this.seleccionarCategorias(); //actualizar en su seccion en sí
+            this.seleccionarSubCategorias();
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
+  return this.esRegistroProtegido('subcategoria', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar esta subcategoría porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
+            [nombre, categoria_id, estado_subcategoria, id]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'SubCategoría Modificada');
+            this.seleccionarSubCategorias(); //actualizar en su seccion en sí
+            this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
+          })
+          .catch((e) => {
+            this.presentAlert(
+              'Modificar SubCategoría',
+              'Error: ' + JSON.stringify(e)
+            );
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+modificarProducto(
+  id: number,
+  proveedor_id: number,
+  nombre: string,
+  descripcion: string,
+  precio: number,
+  stock: number,
+  organico: number,
+  foto_producto: string,
+  subcategoria_id: number,
+  estado_producto: string
+) {
+  return this.esRegistroProtegido('producto', id)
+    .then((esProtegido) => {
+      if (esProtegido) {
+        this.presentAlert(
+          'Modificar',
+          'No se puede modificar este producto porque es un registro protegido.'
+        );
+        return Promise.resolve();
+      } else {
+        return this.database
+          .executeSql(
+            'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ? WHERE id = ?',
+            [
+              proveedor_id,
+              nombre,
+              descripcion,
+              precio,
+              stock,
+              organico,
+              foto_producto,
+              subcategoria_id,
+              estado_producto,
+              id
+            ]
+          )
+          .then((res) => {
+            this.presentAlert('Modificar', 'Producto Modificado');
+            this.seleccionarProductos(); //actualizar en su seccion en sí
+          })
+          .catch((e) => {
+            this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+          });
+      }
+    })
+    .catch((e) => {
+      this.presentAlert(
+        'Modificar',
+        'Error al verificar el registro: ' + JSON.stringify(e)
+      );
+      return Promise.reject(e);
+    });
+}
+
+
+
 
   //todos los inserts.
 
@@ -1045,18 +1122,7 @@ JOIN
 
   //accion de eliminar de todos los cruds de la parte de administracion
   eliminarUsuario(
-    id: number,
-    nombre: string,
-    segundo_nombre: string,
-    apellido_paterno: string,
-    apellido_materno: string,
-    email: string,
-    contrasena: string,
-    nombre_empresa: string,
-    descripcion_corta: string,
-    foto_perfil: string,
-    estado_cuenta: string,
-    tipo_usuario_id: number
+    id: number
   ) {
     this.esRegistroProtegido('usuario', id)
       .then((esProtegido) => {
@@ -1090,7 +1156,7 @@ JOIN
       });
   }
 
-  eliminarCategoria(id: number, nombre: string) {
+  eliminarCategoria(id: number) {
     this.esRegistroProtegido('categoria', id)
       .then((esProtegido) => {
         if (esProtegido) {
@@ -1131,7 +1197,7 @@ JOIN
       });
   }
 
-  eliminarSubcategoria(id: number, nombre: string, categoria_id: number) {
+  eliminarSubcategoria(id: number) {
     this.esRegistroProtegido('subcategoria', id)
       .then((esProtegido) => {
         if (esProtegido) {
@@ -1165,15 +1231,7 @@ JOIN
   }
 
   eliminarProducto(
-    id: number,
-    proveedor_id: number,
-    nombre_producto: string,
-    descripcion_producto: string,
-    precio: number,
-    stock: number,
-    organico: number,
-    foto_producto: string,
-    subcategoria_id: number
+    id: number
   ) {
     this.esRegistroProtegido('producto', id)
       .then((esProtegido) => {
