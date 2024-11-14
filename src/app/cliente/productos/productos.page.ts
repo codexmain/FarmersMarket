@@ -62,14 +62,13 @@ export class ProductosPage implements OnInit {
     if (this.searchTerm.trim() === '') {
       this.filtrados = this.productos;
     } else {
-      // Filtrar por nombre o descripción
+      // Filtrar por nombre_producto o descripción
       const resultados = this.productos.filter(producto =>
-        producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        producto.nombre_producto.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         producto.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
       // Si no se encuentran productos, establecer lista vacía
       this.filtrados = resultados.length > 0 ? resultados : [];
-
     }
   }
 }
