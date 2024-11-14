@@ -163,9 +163,15 @@ const routes: Routes = [
     loadChildren: () => import('./administracion/view-amonestaciones/view-amonestaciones.module').then( m => m.ViewAmonestacionesPageModule)
   },
   {
+    path: 'renombrar-password',
+    loadChildren: () => import('./users/renombrar-password/renombrar-password.module').then( m => m.RenombrarPasswordPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./users/notfound/notfound.module').then( m => m.NotfoundPageModule)
   }
+  
+
 
 
 
