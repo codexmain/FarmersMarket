@@ -94,10 +94,14 @@
               </ng-container>
               
             </ion-avatar>
-          <ion-card-title>{{ producto.nombre }}</ion-card-title>
+          <ion-card-title>{{ producto.nombre_producto }}</ion-card-title>
           <ion-card-subtitle>{{ producto.descripcion }}</ion-card-subtitle>
           <p><strong>Precio:</strong> $ {{ producto.precio }}</p>
           <p><strong>Stock:</strong> {{ producto.stock }}</p>
+          <p><strong>Organico:</strong> {{ producto.organico === 1 ? 'Sí' : 'No' }}</p>
+          <p><strong>Categoria:</strong> {{ producto.categoria }}</p>
+          <p><strong>Subcategoria:</strong> {{ producto.subcategoria }}</p>
+
           <ion-button color="primary" (click)="verDetalle(producto.id)">
             Acceder
           </ion-button>

@@ -83,32 +83,6 @@
           name="email" readonly></ion-input>
       </ion-item>
 
-      <!-- Empresa (Opcional) -->
-      <ion-item>
-        <ion-input label="Nombre de la Empresa (Opcional)" type="text" [(ngModel)]="usuario.nombre_empresa"
-          labelPlacement="stacked" placeholder="Ingresar Nombre de la Empresa" name="nombre_empresa" minlength="3"
-          maxlength="30" #empresaCtrl="ngModel"></ion-input>
-        <ion-button fill="outline" slot="end" (click)="clearEmpresa()">
-          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-        </ion-button>
-      </ion-item>
-      <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
-        El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
-      </div>
-
-      <!-- Descripción Corta (Opcional) -->
-      <ion-item>
-        <ion-input label="Descripción Corta (Opcional)" type="text" [(ngModel)]="usuario.descripcion_corta"
-          labelPlacement="stacked" placeholder="Ingresar Descripción Corta" name="descripcion_corta" minlength="10"
-          maxlength="90" #descEmpresaCtrl="ngModel"></ion-input>
-        <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()">
-          <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-        </ion-button>
-      </ion-item>
-      <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)" class="error-message">
-        La descripción de la empresa debe tener entre 10 y 90 caracteres.
-      </div>
-
 
       <ion-item>
         <ion-label>Región</ion-label>

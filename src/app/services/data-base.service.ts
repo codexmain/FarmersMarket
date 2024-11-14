@@ -1467,13 +1467,21 @@ JOIN
 
   async getProductosPorProveedor(proveedorId: number): Promise<any[]> {
     const query = `
-      SELECT * FROM producto WHERE proveedor_id = ?;
+      SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
+             p.organico, p.foto_producto, p.fecha_agregado, p.estado_producto,
+             s.nombre AS subcategoria, c.nombre AS categoria
+      FROM producto p
+      JOIN subcategoria s ON p.subcategoria_id = s.id
+      JOIN categoria c ON s.categoria_id = c.id
+      WHERE p.proveedor_id = ?;
     `;
+    
     const result = await this.database.executeSql(query, [proveedorId]);
     const productos = [];
     for (let i = 0; i < result.rows.length; i++) {
       productos.push(result.rows.item(i));
     }
+  
     return productos;
   }
 
@@ -1481,18 +1489,22 @@ JOIN
   // Función para obtener todos los productos disponibles
   async getProductosPorRegion(regionId: number): Promise<any[]> {
     const query = `
-      SELECT p.*
+      SELECT p.*, s.nombre AS subcategoria, c.nombre AS categoria
       FROM producto p
       JOIN usuario u ON p.proveedor_id = u.id
-      JOIN comuna c ON u.comuna_id = c.id
-      JOIN region r ON c.region_id = r.id
+      JOIN comuna co ON u.comuna_id = co.id
+      JOIN region r ON co.region_id = r.id
+      JOIN subcategoria s ON p.subcategoria_id = s.id
+      JOIN categoria c ON s.categoria_id = c.id
       WHERE r.id = ?
     `;
-    const productos = await this.database.executeSql(query, [regionId]);
-    let items: any[] = [];
-    for (let i = 0; i < productos.rows.length; i++) {
-      items.push(productos.rows.item(i));
+    
+    const result = await this.database.executeSql(query, [regionId]);
+    const items: any[] = [];
+    for (let i = 0; i < result.rows.length; i++) {
+      items.push(result.rows.item(i));
     }
+  
     return items;
   }
 
@@ -1528,7 +1540,6 @@ JOIN
     }
   }
 
-  //obtener productos con el nombre del proveedor y empresa asociada
   public async getProductosConProveedorPorRegion(
     usuarioClienteId: number
   ): Promise<any[]> {
@@ -1536,23 +1547,25 @@ JOIN
       const query = `
         SELECT p.id, p.nombre AS nombre_producto, p.descripcion, p.precio, p.stock, 
                p.organico, p.foto_producto, s.nombre AS subcategoria, 
-               u.nombre AS nombre_proveedor, u.nombre_empresa AS empresa_proveedor
+               c.nombre AS categoria, u.nombre AS nombre_proveedor, 
+               u.nombre_empresa AS empresa_proveedor
         FROM producto p
         JOIN usuario u ON p.proveedor_id = u.id
         JOIN subcategoria s ON p.subcategoria_id = s.id
+        JOIN categoria c ON s.categoria_id = c.id
         JOIN direccion d_proveedor ON u.id = d_proveedor.usuario_id
         JOIN direccion d_cliente ON d_cliente.usuario_id = ?
         JOIN comuna c_proveedor ON d_proveedor.comuna_id = c_proveedor.id
         JOIN comuna c_cliente ON d_cliente.comuna_id = c_cliente.id
         WHERE c_proveedor.region_id = c_cliente.region_id;
       `;
-
+  
       const result = await this.database.executeSql(query, [usuarioClienteId]);
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-
+  
       console.log(
         'Productos con proveedor en la misma región obtenidos:',
         productos
@@ -1670,11 +1683,23 @@ JOIN
   }
 
   async getProducto(productoId: number): Promise<any> {
-    const result = await this.database.executeSql(
-      'SELECT * FROM producto WHERE id = ?',
-      [productoId]
-    );
-    return result.rows.item(0); // Devuelve el producto
+    const query = `
+      SELECT p.*, 
+             s.nombre AS subcategoria, 
+             c.nombre AS categoria
+      FROM producto p
+      JOIN subcategoria s ON p.subcategoria_id = s.id
+      JOIN categoria c ON s.categoria_id = c.id
+      WHERE p.id = ?
+    `;
+    
+    const result = await this.database.executeSql(query, [productoId]);
+    
+    if (result.rows.length > 0) {
+      return result.rows.item(0); // Devuelve el producto con categoría y subcategoría
+    } else {
+      return null; // Devuelve null si no se encuentra el producto
+    }
   }
 
   async createCarroCompra(usuarioId: number) {
