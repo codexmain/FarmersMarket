@@ -11,9 +11,9 @@
     <ion-card [style.background-color]="'#e0ac08'">
         <ion-list *ngIf="getFechasCarros().length > 0">
             <!-- Iteramos sobre las fechas de los carros -->
-            <ion-item-group *ngFor="let fecha of getFechasCarros()">
+            <ion-item-group *ngFor="let fecha of getFechasCarros().slice().reverse()">
                 <!-- Iteramos sobre los carros de esa fecha -->
-                <ion-card *ngFor="let carro of carrosComprados[fecha]">
+                <ion-card *ngFor="let carro of carrosComprados[fecha].slice().reverse()">
                     <ion-card-header>
                         <ion-card-subtitle>Fecha: {{ carro.fecha_creacion.split(' ')[0] }}</ion-card-subtitle>
                         <ion-card-title>ID Compra: {{ carro.id }}</ion-card-title>

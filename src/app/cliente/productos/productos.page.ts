@@ -47,7 +47,7 @@ export class ProductosPage implements OnInit {
     try {
       this.productos = await this.dbService.getProductosConProveedorPorRegion(this.usuario.id); // Obtener productos();
       console.log('Productos cargados:', this.productos); // Log para verificar los productos
-      this.filtrados = this.productos.slice(1); // Omitir el primer producto
+      this.filtrados = this.productos; 
     } catch (error) {
       console.error('Error al cargar productos:', error);
     }
@@ -60,10 +60,10 @@ export class ProductosPage implements OnInit {
   searchItems() {
     // Si el término de búsqueda está vacío, mostrar todos los productos
     if (this.searchTerm.trim() === '') {
-      this.filtrados = this.productos.slice(1);
+      this.filtrados = this.productos;
     } else {
       // Filtrar por nombre o descripción
-      const resultados = this.productos.slice(1).filter(producto =>
+      const resultados = this.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         producto.descripcion.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
