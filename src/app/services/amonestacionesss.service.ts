@@ -10,9 +10,9 @@ import { OlvideContraService } from './olvide-contra.service'; // Servicio de en
 })
 export class AmonestacionesssService {
   private apiUrl = 'https://api.emailjs.com/api/v1.0/email/send'; // URL de la API de envío de correos
-  private publicKey = 'pMgYuxH-AjMbTJdXF'; // API key de SendGrid
-  private services_key = 'service_88b994g';
-  private template_id = 'template_sh3syat'; // Reemplaza con el ID de tu plantilla de correo
+  private publicKey = 'APICHULITA'; // API key de SendGrid
+  private services_key = 'APICHULITA';
+  private template_id = 'APICHULITA'; // Reemplaza con el ID de tu plantilladecorreo
 
   listadoCmbProdAmnstones = new BehaviorSubject([]);
   listadoAmonestaciones = new BehaviorSubject([]);
@@ -30,7 +30,7 @@ export class AmonestacionesssService {
       user_id: this.publicKey,
       template_params: {
         email: correo,
-        mensaje: `Alerta, tienes un poblema con tu cuenta:
+        message: `Alerta, tienes un poblema con tu cuenta:
         ID Producto: ${idProducto}
         Detalles: ${descripcion}`
       }
