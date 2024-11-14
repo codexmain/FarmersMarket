@@ -22,7 +22,7 @@ export class DataBaseService {
   public database!: SQLiteObject;
   private correoExiste = new BehaviorSubject<boolean>(false);
 
-  
+
   //variables para creacion de tablas
   tblRegion: string = `CREATE TABLE IF NOT EXISTS region (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -426,7 +426,7 @@ export class DataBaseService {
   async crearTablas() {
     try {
       //ejecuto la creación de Tablas
-      
+
       await this.database.executeSql(this.tblRegion, []);
       await this.database.executeSql(this.tblComuna, []);
       await this.database.executeSql(this.tblTipoUsuario, []);
@@ -811,191 +811,191 @@ JOIN
       });
   }
 
-//todos los modificares
+  //todos los modificares
 
-//todos los modificares
+  //todos los modificares
 
-modificarUsuario(
-  id: number,
-  nombre: string,
-  segundo_nombre: string,
-  apellido_paterno: string,
-  apellido_materno: string,
-  email: string,
-  nombre_empresa: string,
-  descripcion_corta: string,
-  foto_perfil: string,
-  estado_cuenta: string,
-  tipo_usuario_id: number
-) {
-  return this.esRegistroProtegido('usuario', id)
-    .then((esProtegido) => {
-      if (esProtegido) {
+  modificarUsuario(
+    id: number,
+    nombre: string,
+    segundo_nombre: string,
+    apellido_paterno: string,
+    apellido_materno: string,
+    email: string,
+    nombre_empresa: string,
+    descripcion_corta: string,
+    foto_perfil: string,
+    estado_cuenta: string,
+    tipo_usuario_id: number
+  ) {
+    return this.esRegistroProtegido('usuario', id)
+      .then((esProtegido) => {
+        if (esProtegido) {
+          this.presentAlert(
+            'Modificar',
+            'No se puede modificar este usuario porque es un registro protegido.'
+          );
+          return Promise.resolve();
+        } else {
+          return this.database
+            .executeSql(
+              'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ? WHERE id = ?',
+              [
+                nombre,
+                segundo_nombre,
+                apellido_paterno,
+                apellido_materno,
+                email,
+                nombre_empresa,
+                descripcion_corta,
+                foto_perfil,
+                estado_cuenta,
+                tipo_usuario_id,
+                id,
+              ]
+            )
+            .then((res) => {
+              this.presentAlert('Modificar', 'Usuario Modificado');
+              this.seleccionarUsuarios(); //actualizar en su seccion en sí
+              this.seleccionarCbmProveedores();
+              this.seleccionarProductos();
+            })
+            .catch((e) => {
+              this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
+            });
+        }
+      })
+      .catch((e) => {
         this.presentAlert(
           'Modificar',
-          'No se puede modificar este usuario porque es un registro protegido.'
+          'Error al verificar el registro: ' + JSON.stringify(e)
         );
-        return Promise.resolve();
-      } else {
-        return this.database
-          .executeSql(
-            'UPDATE usuario SET nombre = ?, segundo_nombre = ?, apellido_paterno = ?, apellido_materno = ?, email = ?, nombre_empresa = ?, descripcion_corta = ?, foto_perfil = ?, estado_cuenta = ?, tipo_usuario_id = ? WHERE id = ?',
-            [
-              nombre,
-              segundo_nombre,
-              apellido_paterno,
-              apellido_materno,
-              email,
-              nombre_empresa,
-              descripcion_corta,
-              foto_perfil,
-              estado_cuenta,
-              tipo_usuario_id,
-              id,
-            ]
-          )
-          .then((res) => {
-            this.presentAlert('Modificar', 'Usuario Modificado');
-            this.seleccionarUsuarios(); //actualizar en su seccion en sí
-            this.seleccionarCbmProveedores();
-            this.seleccionarProductos();
-          })
-          .catch((e) => {
-            this.presentAlert('Modificar Usuario', 'Error: ' + JSON.stringify(e));
-          });
-      }
-    })
-    .catch((e) => {
-      this.presentAlert(
-        'Modificar',
-        'Error al verificar el registro: ' + JSON.stringify(e)
-      );
-      return Promise.reject(e);
-    });
-}
+        return Promise.reject(e);
+      });
+  }
 
-modificarCategoria(id: number, estado_categoria: string, nombre: string) {
-  return this.esRegistroProtegido('categoria', id)
-    .then((esProtegido) => {
-      if (esProtegido) {
+  modificarCategoria(id: number, estado_categoria: string, nombre: string) {
+    return this.esRegistroProtegido('categoria', id)
+      .then((esProtegido) => {
+        if (esProtegido) {
+          this.presentAlert(
+            'Modificar',
+            'No se puede modificar esta categoría porque es un registro protegido.'
+          );
+          return Promise.resolve();
+        } else {
+          return this.database
+            .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
+            .then((res) => {
+              this.presentAlert('Modificar', 'Categoría Modificada');
+              this.seleccionarCategorias(); //actualizar en su seccion en sí
+              this.seleccionarSubCategorias();
+            })
+            .catch((e) => {
+              this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
+            });
+        }
+      })
+      .catch((e) => {
         this.presentAlert(
           'Modificar',
-          'No se puede modificar esta categoría porque es un registro protegido.'
+          'Error al verificar el registro: ' + JSON.stringify(e)
         );
-        return Promise.resolve();
-      } else {
-        return this.database
-          .executeSql('UPDATE categoria SET nombre = ?, estado_categoria = ? WHERE id = ?', [nombre, estado_categoria, id])
-          .then((res) => {
-            this.presentAlert('Modificar', 'Categoría Modificada');
-            this.seleccionarCategorias(); //actualizar en su seccion en sí
-            this.seleccionarSubCategorias();
-          })
-          .catch((e) => {
-            this.presentAlert('Modificar Categoría', 'Error: ' + JSON.stringify(e));
-          });
-      }
-    })
-    .catch((e) => {
-      this.presentAlert(
-        'Modificar',
-        'Error al verificar el registro: ' + JSON.stringify(e)
-      );
-      return Promise.reject(e);
-    });
-}
+        return Promise.reject(e);
+      });
+  }
 
-modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
-  return this.esRegistroProtegido('subcategoria', id)
-    .then((esProtegido) => {
-      if (esProtegido) {
+  modificarSubCategoria(id: number, nombre: string, categoria_id: number, estado_subcategoria: string) {
+    return this.esRegistroProtegido('subcategoria', id)
+      .then((esProtegido) => {
+        if (esProtegido) {
+          this.presentAlert(
+            'Modificar',
+            'No se puede modificar esta subcategoría porque es un registro protegido.'
+          );
+          return Promise.resolve();
+        } else {
+          return this.database
+            .executeSql(
+              'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
+              [nombre, categoria_id, estado_subcategoria, id]
+            )
+            .then((res) => {
+              this.presentAlert('Modificar', 'SubCategoría Modificada');
+              this.seleccionarSubCategorias(); //actualizar en su seccion en sí
+              this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
+            })
+            .catch((e) => {
+              this.presentAlert(
+                'Modificar SubCategoría',
+                'Error: ' + JSON.stringify(e)
+              );
+            });
+        }
+      })
+      .catch((e) => {
         this.presentAlert(
           'Modificar',
-          'No se puede modificar esta subcategoría porque es un registro protegido.'
+          'Error al verificar el registro: ' + JSON.stringify(e)
         );
-        return Promise.resolve();
-      } else {
-        return this.database
-          .executeSql(
-            'UPDATE subcategoria SET nombre = ?, categoria_id = ?, estado_subcategoria = ? WHERE id = ?',
-            [nombre, categoria_id, estado_subcategoria, id]
-          )
-          .then((res) => {
-            this.presentAlert('Modificar', 'SubCategoría Modificada');
-            this.seleccionarSubCategorias(); //actualizar en su seccion en sí
-            this.seleccionarProductos(); //actualizar en su seccion donde tiene dependencias
-          })
-          .catch((e) => {
-            this.presentAlert(
-              'Modificar SubCategoría',
-              'Error: ' + JSON.stringify(e)
-            );
-          });
-      }
-    })
-    .catch((e) => {
-      this.presentAlert(
-        'Modificar',
-        'Error al verificar el registro: ' + JSON.stringify(e)
-      );
-      return Promise.reject(e);
-    });
-}
+        return Promise.reject(e);
+      });
+  }
 
-modificarProducto(
-  id: number,
-  proveedor_id: number,
-  nombre: string,
-  descripcion: string,
-  precio: number,
-  stock: number,
-  organico: number,
-  foto_producto: string,
-  subcategoria_id: number,
-  estado_producto: string
-) {
-  return this.esRegistroProtegido('producto', id)
-    .then((esProtegido) => {
-      if (esProtegido) {
+  modificarProducto(
+    id: number,
+    proveedor_id: number,
+    nombre: string,
+    descripcion: string,
+    precio: number,
+    stock: number,
+    organico: number,
+    foto_producto: string,
+    subcategoria_id: number,
+    estado_producto: string
+  ) {
+    return this.esRegistroProtegido('producto', id)
+      .then((esProtegido) => {
+        if (esProtegido) {
+          this.presentAlert(
+            'Modificar',
+            'No se puede modificar este producto porque es un registro protegido.'
+          );
+          return Promise.resolve();
+        } else {
+          return this.database
+            .executeSql(
+              'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ? WHERE id = ?',
+              [
+                proveedor_id,
+                nombre,
+                descripcion,
+                precio,
+                stock,
+                organico,
+                foto_producto,
+                subcategoria_id,
+                estado_producto,
+                id
+              ]
+            )
+            .then((res) => {
+              this.presentAlert('Modificar', 'Producto Modificado');
+              this.seleccionarProductos(); //actualizar en su seccion en sí
+            })
+            .catch((e) => {
+              this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
+            });
+        }
+      })
+      .catch((e) => {
         this.presentAlert(
           'Modificar',
-          'No se puede modificar este producto porque es un registro protegido.'
+          'Error al verificar el registro: ' + JSON.stringify(e)
         );
-        return Promise.resolve();
-      } else {
-        return this.database
-          .executeSql(
-            'UPDATE producto SET proveedor_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, organico = ?, foto_producto = ?, subcategoria_id = ?, estado_producto = ? WHERE id = ?',
-            [
-              proveedor_id,
-              nombre,
-              descripcion,
-              precio,
-              stock,
-              organico,
-              foto_producto,
-              subcategoria_id,
-              estado_producto,
-              id
-            ]
-          )
-          .then((res) => {
-            this.presentAlert('Modificar', 'Producto Modificado');
-            this.seleccionarProductos(); //actualizar en su seccion en sí
-          })
-          .catch((e) => {
-            this.presentAlert('Modificar Producto', 'Error: ' + JSON.stringify(e));
-          });
-      }
-    })
-    .catch((e) => {
-      this.presentAlert(
-        'Modificar',
-        'Error al verificar el registro: ' + JSON.stringify(e)
-      );
-      return Promise.reject(e);
-    });
-}
+        return Promise.reject(e);
+      });
+  }
 
 
 
@@ -1132,9 +1132,9 @@ modificarProducto(
         } else {
           // Actualizar registros en las tablas que dependen de usuario
           this.database.executeSql(
-              'UPDATE usuario SET estado_cuenta = "deshabilitada" WHERE id = ?',
-              [id]
-            )
+            'UPDATE usuario SET estado_cuenta = "deshabilitada" WHERE id = ?',
+            [id]
+          )
             .then(() => {
               this.presentAlert('Eliminar', 'Usuario eliminado con éxito');
               this.seleccionarUsuarios(); // Actualizar la lista de usuarios
@@ -1380,12 +1380,24 @@ modificarProducto(
 
   async registrarUsuario(usuario: any): Promise<boolean> {
     try {
+      // Verificar si el correo ya existe
+      const emailCheckQuery = `SELECT COUNT(*) AS count FROM usuario WHERE email = ?`;
+      const emailCheckResult = await this.database.executeSql(emailCheckQuery, [usuario.email]);
+      const emailExists = emailCheckResult.rows.item(0).count > 0;
+
+      if (emailExists) {
+        // Mostrar alerta de error si el correo ya está registrado
+        this.presentAlert('Error', 'El correo ya está registrado. Intente con otro correo.');
+        return false; // Retorna false para indicar que el registro no se completó
+      }
+
+      // Insertar nuevo usuario
       const sqlUsuario = `
-        INSERT INTO usuario(
-          nombre, segundo_nombre, apellido_paterno, apellido_materno, 
-          email, contrasena, nombre_empresa, descripcion_corta, 
-          foto_perfil, estado_cuenta, tipo_usuario_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', 1)`;
+            INSERT INTO usuario(
+              nombre, segundo_nombre, apellido_paterno, apellido_materno, 
+              email, contrasena, nombre_empresa, descripcion_corta, 
+              foto_perfil, estado_cuenta, tipo_usuario_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'activa', 1)`;
 
       const result = await this.database.executeSql(sqlUsuario, [
         usuario.nombre,
@@ -1401,10 +1413,10 @@ modificarProducto(
 
       const usuarioId = result.insertId; // Obtener el ID del usuario recién insertado
 
-      // Query para insertar dirección asociada al usuario
+      // Insertar la dirección asociada al usuario
       const sqlDireccion = `
-        INSERT INTO direccion(id, usuario_id, comuna_id, direccion) 
-        VALUES (?, ?, ?, ?)`;
+            INSERT INTO direccion(id, usuario_id, comuna_id, direccion) 
+            VALUES (?, ?, ?, ?)`;
 
       await this.database.executeSql(sqlDireccion, [
         1,
@@ -2115,13 +2127,13 @@ modificarProducto(
         });
     });
   }
-  
 
-//VIEW-PROVENTAS
-// Obtener producto por ID
-async getProductoselect(productoId: number) {
-  try {
-    const query = `
+
+  //VIEW-PROVENTAS
+  // Obtener producto por ID
+  async getProductoselect(productoId: number) {
+    try {
+      const query = `
           SELECT 
               p.id,
               p.nombre AS producto_nombre,
@@ -2156,34 +2168,34 @@ async getProductoselect(productoId: number) {
               p.id = ?;
       `;
 
-    const result = await this.database.executeSql(query, [productoId]);
+      const result = await this.database.executeSql(query, [productoId]);
 
-    if (result.rows.length > 0) {
-      const item = result.rows.item(0);
-      return {
-        id: item.id,
-        nombre: item.producto_nombre,
-        descripcion: item.producto_descripcion,
-        precio: item.precio,
-        stock: item.stock,
-        organico: item.organico,
-        foto_producto: item.foto_producto,
-        fecha_agregado: item.fecha_agregado,
-        estado_producto: item.estado_producto,
-        proveedor_nombre: item.proveedor_nombre,
-        proveedor_empresa: item.proveedor_empresa,
-        subcategoria_nombre: item.subcategoria_nombre,
-        subcategoria_id: item.subcategoria_id,
-        categoria_nombre: item.categoria_nombre,
-      };
-    } else {
-      return null; // No product found
+      if (result.rows.length > 0) {
+        const item = result.rows.item(0);
+        return {
+          id: item.id,
+          nombre: item.producto_nombre,
+          descripcion: item.producto_descripcion,
+          precio: item.precio,
+          stock: item.stock,
+          organico: item.organico,
+          foto_producto: item.foto_producto,
+          fecha_agregado: item.fecha_agregado,
+          estado_producto: item.estado_producto,
+          proveedor_nombre: item.proveedor_nombre,
+          proveedor_empresa: item.proveedor_empresa,
+          subcategoria_nombre: item.subcategoria_nombre,
+          subcategoria_id: item.subcategoria_id,
+          categoria_nombre: item.categoria_nombre,
+        };
+      } else {
+        return null; // No product found
+      }
+    } catch (error) {
+      console.error('Error al obtener los datos del producto:', error);
+      throw error; // Propagate the error for further handling
     }
-  } catch (error) {
-    console.error('Error al obtener los datos del producto:', error);
-    throw error; // Propagate the error for further handling
   }
-}
 
   //REGVENTAS
 
@@ -2563,7 +2575,7 @@ async getProductoselect(productoId: number) {
 
 
 
-// prueba de funciones  amonestaciones 
+  // prueba de funciones  amonestaciones 
   // Método para enviar una amonestación al usuario
   async enviarAmonestacion(correo: string, descripcion: string, idProducto: number | null = null): Promise<void> {
     try {
@@ -2614,81 +2626,81 @@ async getProductoselect(productoId: number) {
     });
   }
 
-//========================================================================================
-//CONSTRUCCION COMBOBOX PARA MOSTRAR LOS PRODUCTOS DEL USUARIO EN LAS AMONESTACIONES
+  //========================================================================================
+  //CONSTRUCCION COMBOBOX PARA MOSTRAR LOS PRODUCTOS DEL USUARIO EN LAS AMONESTACIONES
 
-listadoCmbProdAmnstones = new BehaviorSubject([]);
+  listadoCmbProdAmnstones = new BehaviorSubject([]);
 
-fetchCmbProdAmnstones(): Observable<CmbProdAmnstones[]> {
-  return this.listadoCmbProdAmnstones.asObservable();
-}
+  fetchCmbProdAmnstones(): Observable<CmbProdAmnstones[]> {
+    return this.listadoCmbProdAmnstones.asObservable();
+  }
 
 
-seleccionarCmbProdaAmonestar(idProveedor: number) {
-  return this.database
-    .executeSql(
-      'SELECT id, nombre FROM producto WHERE estado_producto = "activa" AND proveedor_id = ?',
-      [idProveedor]
-    )
-    .then((res) => {
-      //variable para almacenar el resultado de la consulta
-      let items: CmbProdAmnstones[] = [];
-      //valido si trae al menos un registro
-      if (res.rows.length > 0) {
-        //recorro mi resultado
-        for (var i = 0; i < res.rows.length; i++) {
-          //agrego los registros a mi lista
-          items.push({
-            id: res.rows.item(i).id,
-            nombre: res.rows.item(i).nombre,
-          });
+  seleccionarCmbProdaAmonestar(idProveedor: number) {
+    return this.database
+      .executeSql(
+        'SELECT id, nombre FROM producto WHERE estado_producto = "activa" AND proveedor_id = ?',
+        [idProveedor]
+      )
+      .then((res) => {
+        //variable para almacenar el resultado de la consulta
+        let items: CmbProdAmnstones[] = [];
+        //valido si trae al menos un registro
+        if (res.rows.length > 0) {
+          //recorro mi resultado
+          for (var i = 0; i < res.rows.length; i++) {
+            //agrego los registros a mi lista
+            items.push({
+              id: res.rows.item(i).id,
+              nombre: res.rows.item(i).nombre,
+            });
+          }
         }
-      }
-      //actualizar el observable de usuarios
-      this.listadoCmbProdAmnstones.next(items as any);
-    });
+        //actualizar el observable de usuarios
+        this.listadoCmbProdAmnstones.next(items as any);
+      });
     //insertar la amonestacion
     //listar amonestaciones, para visualizarlas
-}
+  }
 
-    //creacion de las funciones para el resto de cosas de la amonestación
+  //creacion de las funciones para el resto de cosas de la amonestación
 
-    listadoAmonestaciones = new BehaviorSubject([]);
+  listadoAmonestaciones = new BehaviorSubject([]);
 
-    fetchAmonestaciones(): Observable<Amonestaciones[]> {
-      return this.listadoAmonestaciones.asObservable();
-    }  
+  fetchAmonestaciones(): Observable<Amonestaciones[]> {
+    return this.listadoAmonestaciones.asObservable();
+  }
 
-    //insertar la amonestacion
-    insertarAmonestacion(
-      usuario_id: number,
-      id_producto: number,
-      descripcion: string,
+  //insertar la amonestacion
+  insertarAmonestacion(
+    usuario_id: number,
+    id_producto: number,
+    descripcion: string,
 
-    ) {
-      return this.database
-        .executeSql(
-          'INSERT INTO amonestacion(usuario_id, id_producto, descripcion) VALUES (?,?,?)',
-          [
-            usuario_id,
-            id_producto,
-            descripcion
-          ]
-        )
-        .then((res) => {
-          this.presentAlert('Insertar', 'Amonestación Registrada');
-          this.seleccionarAmonestaciones();
-        })
-        .catch((e) => {
-          this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
-        });
-    }
+  ) {
+    return this.database
+      .executeSql(
+        'INSERT INTO amonestacion(usuario_id, id_producto, descripcion) VALUES (?,?,?)',
+        [
+          usuario_id,
+          id_producto,
+          descripcion
+        ]
+      )
+      .then((res) => {
+        this.presentAlert('Insertar', 'Amonestación Registrada');
+        this.seleccionarAmonestaciones();
+      })
+      .catch((e) => {
+        this.presentAlert('Insertar', 'Error: ' + JSON.stringify(e));
+      });
+  }
 
-    //listar amonestaciones, para visualizarlas
+  //listar amonestaciones, para visualizarlas
 
-    seleccionarAmonestaciones() {
-      return this.database
-        .executeSql(`SELECT 
+  seleccionarAmonestaciones() {
+    return this.database
+      .executeSql(`SELECT 
     a.id,
     a.usuario_id,
     (SELECT u.nombre || ' ' || COALESCE(u.segundo_nombre, '') || ' ' || u.apellido_paterno || ' ' || COALESCE(u.apellido_materno, '') 
@@ -2707,56 +2719,56 @@ seleccionarCmbProdaAmonestar(idProveedor: number) {
 FROM 
     amonestacion a;
 `, [])
-        .then((res) => {
-          //variable para almacenar el resultado de la consulta
-          let items: Amonestaciones[] = [];
-          //valido si trae al menos un registro
-          if (res.rows.length > 0) {
-            //recorro mi resultado
-            for (var i = 0; i < res.rows.length; i++) {
-              //agrego los registros a mi lista
-              items.push({
-                id: res.rows.item(i).id,
-                usuario_id: res.rows.item(i).usuario_id,
-                nombre_usuario: res.rows.item(i).nombre_usuario,
-                nombre_empresa: res.rows.item(i).nombre_empresa,
-                id_producto: res.rows.item(i).id_producto,
-                nombre_producto: res.rows.item(i).nombre_producto,
-                descripcion: res.rows.item(i).descripcion,
+      .then((res) => {
+        //variable para almacenar el resultado de la consulta
+        let items: Amonestaciones[] = [];
+        //valido si trae al menos un registro
+        if (res.rows.length > 0) {
+          //recorro mi resultado
+          for (var i = 0; i < res.rows.length; i++) {
+            //agrego los registros a mi lista
+            items.push({
+              id: res.rows.item(i).id,
+              usuario_id: res.rows.item(i).usuario_id,
+              nombre_usuario: res.rows.item(i).nombre_usuario,
+              nombre_empresa: res.rows.item(i).nombre_empresa,
+              id_producto: res.rows.item(i).id_producto,
+              nombre_producto: res.rows.item(i).nombre_producto,
+              descripcion: res.rows.item(i).descripcion,
 
-              });
-            }
+            });
           }
-          //actualizar el observable de usuarios
-          this.listadoAmonestaciones.next(items as any);
-        });
-    }
+        }
+        //actualizar el observable de usuarios
+        this.listadoAmonestaciones.next(items as any);
+      });
+  }
 
 
 
-    //corroborar si la amonestacíon se ejectuo: (esta vale pico, no se va a hacer por tiempo)
+  //corroborar si la amonestacíon se ejectuo: (esta vale pico, no se va a hacer por tiempo)
 
 
-    verificarCategoriaExistente(categoria: string): Promise<boolean> {
-      return this.database
-        .executeSql('SELECT COUNT(*) AS count FROM categoria WHERE nombre = ?', [
-          categoria,
-        ])
-        .then((res) => {
-          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
-        });
-    }
+  verificarCategoriaExistente(categoria: string): Promise<boolean> {
+    return this.database
+      .executeSql('SELECT COUNT(*) AS count FROM categoria WHERE nombre = ?', [
+        categoria,
+      ])
+      .then((res) => {
+        return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+      });
+  }
 
 
-    verificarSubcategoriaExistente(subcategoria: string): Promise<boolean> {
-      return this.database
-        .executeSql('SELECT COUNT(*) AS count FROM subcategoria WHERE nombre = ?', [
-          subcategoria,
-        ])
-        .then((res) => {
-          return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
-        });
-    }
+  verificarSubcategoriaExistente(subcategoria: string): Promise<boolean> {
+    return this.database
+      .executeSql('SELECT COUNT(*) AS count FROM subcategoria WHERE nombre = ?', [
+        subcategoria,
+      ])
+      .then((res) => {
+        return res.rows.item(0).count > 0; // Devuelve true si el correo ya existe   //1 es true, 0 es false
+      });
+  }
 
 
 
