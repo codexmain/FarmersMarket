@@ -76,95 +76,82 @@ export class RecuperarPasswordPage implements OnInit {
     await alert.present();
   }
 
-  // Alert para ingresar la nueva contraseña
-  async presentAlertPrompt() {
-    let showPassword = false; // Bandera para alternar visibilidad de la contraseña
+// Alert para ingresar la nueva contraseña
+async presentAlertPrompt() {
+  const alert = await this.alertController.create({
+    header: 'Recuperar Contraseña',
+    inputs: [
+      {
+        name: 'newPassword',
+        type: 'password',
+        placeholder: 'Ingrese nueva contraseña',
+      },
+      {
+        name: 'confirmPassword',
+        type: 'password',
+        placeholder: 'Repita la nueva contraseña',
+      },
+    ],
+    buttons: [
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        handler: () => {
+          console.log('Operación cancelada');
+          return true;
+        },
+      },
+      {
+        text: 'Guardar',
+        handler: async (data) => {
+          const password = data.newPassword;
+          const confirmPassword = data.confirmPassword;
 
-    const alert = await this.alertController.create({
-      header: 'Recuperar Contraseña',
-      inputs: [
-        {
-          name: 'newPassword',
-          type: showPassword ? 'text' : 'password', // Alterna entre 'text' y 'password'
-          placeholder: 'Ingrese nueva contraseña',
-          id: 'new-password-field'
-        },
-        {
-          name: 'confirmPassword',
-          type: showPassword ? 'text' : 'password', // Alterna entre 'text' y 'password'
-          placeholder: 'Repita la nueva contraseña',
-          id: 'confirm-password-field'
-        },
-      ],
-      buttons: [
-        {
-          text: showPassword ? 'Ocultar' : 'Mostrar', // Cambia el texto del botón
-          handler: () => {
-            showPassword = !showPassword; // Alterna la visibilidad
-            alert.dismiss();
-            this.presentAlertPrompt(); // Reinicia el alert con la nueva visibilidad
-            return false; // Previene el cierre automático del alert
+          // Validar si ambas contraseñas coinciden
+          if (password !== confirmPassword) {
+            await this.presentAlert('Error', 'Las contraseñas no coinciden.');
+            return false;
+          }
+
+          // Validaciones de la contraseña
+          if (password.length < 10 || password.length > 30) {
+            await this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
+            return false;
+          }
+
+          if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            await this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
+            return false;
+          }
+
+          if (/(\d)\1/.test(password) || /([a-zA-Z])\1/.test(password)) {
+            await this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
+            return false;
+          }
+
+          if (!/(?=(.*[A-Z]){2})/.test(password)) {
+            await this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+            return false;
+          }
+
+          // CAMBIO: Actualizar la contraseña en la base de datos si todas las validaciones son correctas
+          try {
+            await this.DataBase.resetPassword(this.correo, password);
+            await this.presentAlert('Éxito', 'Contraseña actualizada correctamente.');
+            this.dismiss();
+            return true;
+          } catch (error) {
+            console.error('Error al actualizar la contraseña:', error);
+            await this.presentAlert('Error', 'No se pudo actualizar la contraseña.');
+            return false;
           }
         },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Operación cancelada');
-            return true;
-          },
-        },
-        {
-          text: 'Guardar',
-          handler: async (data) => {
-            const password = data.newPassword;
-            const confirmPassword = data.confirmPassword;
+      },
+    ],
+  });
 
-            // Validar si ambas contraseñas coinciden
-            if (password !== confirmPassword) {
-              await this.presentAlert('Error', 'Las contraseñas no coinciden.');
-              return false;
-            }
-
-            // Validaciones de la contraseña
-            if (password.length < 10 || password.length > 30) {
-              await this.presentAlert('Error', 'La contraseña debe tener entre 10 y 30 caracteres.');
-              return false;
-            }
-
-            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-              await this.presentAlert('Error', 'La contraseña debe contener al menos un carácter especial.');
-              return false;
-            }
-
-            if (/(\d)\1/.test(password) || /([a-zA-Z])\1/.test(password)) {
-              await this.presentAlert('Error', 'La contraseña no debe contener caracteres o números consecutivos repetidos.');
-              return false;
-            }
-
-            if (!/(?=(.*[A-Z]){2})/.test(password)) {
-              await this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-              return false;
-            }
-
-            // CAMBIO: Actualizar la contraseña en la base de datos si todas las validaciones son correctas
-            try {
-              await this.DataBase.resetPassword(this.correo, password);
-              await this.presentAlert('Éxito', 'Contraseña actualizada correctamente.');
-              this.dismiss();
-              return true;
-            } catch (error) {
-              console.error('Error al actualizar la contraseña:', error);
-              await this.presentAlert('Error', 'No se pudo actualizar la contraseña.');
-              return false;
-            }
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
+  await alert.present();
+}
 
 
 
