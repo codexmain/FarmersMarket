@@ -1475,13 +1475,13 @@ JOIN
       JOIN categoria c ON s.categoria_id = c.id
       WHERE p.proveedor_id = ?;
     `;
-    
+
     const result = await this.database.executeSql(query, [proveedorId]);
     const productos = [];
     for (let i = 0; i < result.rows.length; i++) {
       productos.push(result.rows.item(i));
     }
-  
+
     return productos;
   }
 
@@ -1498,13 +1498,13 @@ JOIN
       JOIN categoria c ON s.categoria_id = c.id
       WHERE r.id = ?
     `;
-    
+
     const result = await this.database.executeSql(query, [regionId]);
     const items: any[] = [];
     for (let i = 0; i < result.rows.length; i++) {
       items.push(result.rows.item(i));
     }
-  
+
     return items;
   }
 
@@ -1559,13 +1559,13 @@ JOIN
         JOIN comuna c_cliente ON d_cliente.comuna_id = c_cliente.id
         WHERE c_proveedor.region_id = c_cliente.region_id;
       `;
-  
+
       const result = await this.database.executeSql(query, [usuarioClienteId]);
       const productos = [];
       for (let i = 0; i < result.rows.length; i++) {
         productos.push(result.rows.item(i));
       }
-  
+
       console.log(
         'Productos con proveedor en la misma región obtenidos:',
         productos
@@ -1692,9 +1692,9 @@ JOIN
       JOIN categoria c ON s.categoria_id = c.id
       WHERE p.id = ?
     `;
-    
+
     const result = await this.database.executeSql(query, [productoId]);
-    
+
     if (result.rows.length > 0) {
       return result.rows.item(0); // Devuelve el producto con categoría y subcategoría
     } else {
@@ -2589,7 +2589,7 @@ JOIN
 
   // Función para cambiar la contraseña del usuario
   resetPassword(correo: string, newPassword: string): Promise<void> {
-    const query = `UPDATE usuario SET password = ? WHERE correo = ?`;
+    const query = `UPDATE usuario SET contrasena = ? WHERE correo = ?`;
     return this.database
       .executeSql(query, [newPassword, correo])
       .then(() => console.log('Contraseña actualizada para el correo:', correo))

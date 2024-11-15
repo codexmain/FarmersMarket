@@ -78,21 +78,34 @@ export class RecuperarPasswordPage implements OnInit {
 
   // Alert para ingresar la nueva contraseña
   async presentAlertPrompt() {
+    let showPassword = false; // Bandera para alternar visibilidad de la contraseña
+
     const alert = await this.alertController.create({
       header: 'Recuperar Contraseña',
       inputs: [
         {
           name: 'newPassword',
-          type: 'password',
+          type: showPassword ? 'text' : 'password', // Alterna entre 'text' y 'password'
           placeholder: 'Ingrese nueva contraseña',
+          id: 'new-password-field'
         },
         {
           name: 'confirmPassword',
-          type: 'password',
+          type: showPassword ? 'text' : 'password', // Alterna entre 'text' y 'password'
           placeholder: 'Repita la nueva contraseña',
+          id: 'confirm-password-field'
         },
       ],
       buttons: [
+        {
+          text: showPassword ? 'Ocultar' : 'Mostrar', // Cambia el texto del botón
+          handler: () => {
+            showPassword = !showPassword; // Alterna la visibilidad
+            alert.dismiss();
+            this.presentAlertPrompt(); // Reinicia el alert con la nueva visibilidad
+            return false; // Previene el cierre automático del alert
+          }
+        },
         {
           text: 'Cancelar',
           role: 'cancel',
@@ -152,6 +165,7 @@ export class RecuperarPasswordPage implements OnInit {
 
     await alert.present();
   }
+
 
 
   // Mostrar alertas de notificación
