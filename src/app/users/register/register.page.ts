@@ -30,6 +30,7 @@ export class RegisterPage implements OnInit {
   estado_cuenta: string = 'activa';
   tipo_usuario_id: number = 1;
   imagen: any;
+  confirmPassword: string = '';
 
   selectedRegion: number | null = null;
   selectedComuna: number | null = null;
@@ -212,6 +213,12 @@ export class RegisterPage implements OnInit {
     
     if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
       this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+      return false;
+    }
+
+     // Validar que ambas contraseñas coincidan
+     if (this.password !== this.confirmPassword) {
+      this.presentAlert('Error', 'Las contraseñas no coinciden.');
       return false;
     }
 
