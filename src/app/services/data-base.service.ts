@@ -1686,17 +1686,23 @@ JOIN
     const query = `
       SELECT p.*, 
              s.nombre AS subcategoria, 
-             c.nombre AS categoria
+             c.nombre AS categoria,
+             u.nombre_empresa AS proveedor_empresa,
+             r.nombre AS proveedor_region
       FROM producto p
       JOIN subcategoria s ON p.subcategoria_id = s.id
       JOIN categoria c ON s.categoria_id = c.id
+      JOIN usuario u ON p.proveedor_id = u.id
+      JOIN direccion dir ON dir.usuario_id = u.id 
+      JOIN comuna com ON dir.comuna_id = com.id
+      JOIN region r ON com.region_id = r.id
       WHERE p.id = ?
     `;
 
     const result = await this.database.executeSql(query, [productoId]);
 
     if (result.rows.length > 0) {
-      return result.rows.item(0); // Devuelve el producto con categoría y subcategoría
+      return result.rows.item(0); // Devuelve el producto con todos los datos adicionales
     } else {
       return null; // Devuelve null si no se encuentra el producto
     }
@@ -2598,7 +2604,7 @@ JOIN
 
   // Función para cambiar la contraseña del usuario
   resetPassword(correo: string, newPassword: string): Promise<void> {
-    const query = `UPDATE usuario SET contrasena = ? WHERE correo = ?`;
+    const query = `UPDATE usuario SET password = ? WHERE correo = ?`;
     return this.database
       .executeSql(query, [newPassword, correo])
       .then(() => console.log('Contraseña actualizada para el correo:', correo))

@@ -13,8 +13,8 @@
 <ion-content [fullscreen]="true">
   <ion-card>
     <ion-list *ngIf="detalles.length > 0">
-      <ion-item *ngFor="let detalle of detalles">
-        <ion-card-header>
+      <ion-item *ngFor="let detalle of detalles.slice().reverse()" style="display: flex; justify-content: space-between; align-items: stretch;">
+        <ion-card-content style="flex: 1; margin-right: 8px;">
           <ion-avatar style="background-color: #F5F5DC; margin: 10px;">
             <img *ngIf="detalle.foto_producto && detalle.foto_producto !== ''" [src]="detalle.foto_producto"
               alt="Foto del Producto" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -113,11 +113,18 @@
           </ion-avatar>
           <p><strong>{{ detalle.nombre }}</strong></p>
           <p>{{ detalle.descripcion }}</p>
-        </ion-card-header>
-        <ion-card-content>
+          <p>{{ detalle.categoria }}</p>
+          <p>{{ detalle.subcategoria }}</p>
+        </ion-card-content>
+        <ion-card-content style="flex: 1; margin-left: 8px;">
+
+          <p><strong>{{ detalle.proveedor_region }}</strong></p>
+          <p>{{ detalle.proveedor_empresa }}</p>
+          <p><strong>Orgánico:</strong> {{ detalle.organico === 1 ? 'Sí' : 'No' }}</p>
           <p><strong>Precio:</strong> ${{ detalle.precio }}</p>
           <p><strong>Cantidad:</strong> {{ detalle.cantidad }}</p>
           <p><strong>Subtotal:</strong> ${{ detalle.subtotal }}</p>
+
           <ion-button color="danger" (click)="eliminarProducto(detalle.producto_identificador)">
             Eliminar
           </ion-button>
