@@ -59,85 +59,39 @@
             El apellido paterno es obligatorio y debe tener entre 2 y 40 caracteres.
           </div>
 
-          <!-- Segundo Nombre -->
-          <ion-item>
-            <ion-input label="Segundo Nombre (Opcional)" type="text" [(ngModel)]="sNombre" labelPlacement="stacked"
-              placeholder="Ingresar Nombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
-            <ion-button fill="outline" slot="end" (click)="clearSNombre()">
-              <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-            </ion-button>
-          </ion-item>
-          <div *ngIf="sNombreCtrl.invalid && (sNombreCtrl.dirty || sNombreCtrl.touched)" class="error-message">
-            El segundo nombre debe tener al menos 2 caracteres y no contener números.
-          </div>
-
-          <!-- Apellido Materno -->
-          <ion-item>
-            <ion-input label="Apellido Materno (Opcional)" type="text" [(ngModel)]="aMaterno" labelPlacement="stacked"
-              placeholder="Ingresar Apellido" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
-            <ion-button fill="outline" slot="end" (click)="clearAMaterno()">
-              <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-            </ion-button>
-          </ion-item>
-          <div *ngIf="aMaternoCtrl.invalid && (aMaternoCtrl.dirty || aMaternoCtrl.touched)" class="error-message">
-            El apellido materno debe tener al menos 2 caracteres y no contener números.
-          </div>
-
-          <!-- Empresa -->
-          <ion-item>
-            <ion-input label="Empresa (Opcional)" type="text" [(ngModel)]="empresa" labelPlacement="stacked"
-              placeholder="Ingresar Empresa" name="empresa" (ionChange)="onFieldsChange()"
-              #empresaCtrl="ngModel"></ion-input>
-            <ion-button fill="outline" slot="end" (click)="clearEmpresa()" (ionChange)="onFieldsChange()">
-              <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-            </ion-button>
-          </ion-item>
-          <div *ngIf="empresaCtrl.invalid && (empresaCtrl.dirty || empresaCtrl.touched)" class="error-message">
-            El nombre de la empresa debe entre 3 y 30 caracteres y solo puede contener letras, números y espacios.
-          </div>
-
-          <!-- Descripción Corta -->
-          <ion-item>
-            <ion-input label="Descripción Corta (Opcional)" type="text" [(ngModel)]="descripcion_corta"
-              labelPlacement="stacked" placeholder="Ingresar descripcion" name="descripcion_corta"
-              (ionChange)="onFieldsChange()" #descEmpresaCtrl="ngModel"></ion-input>
-            <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()" (ionChange)="onFieldsChange()">
-              <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-            </ion-button>
-          </ion-item>
-          <div *ngIf="descEmpresaCtrl.invalid && (descEmpresaCtrl.dirty || descEmpresaCtrl.touched)"
-            class="error-message">
-            La descripción de la empresa debe tener al menos 10 caracteres y máximo 90, solo puede contener letras,
-            números y espacios.
-          </div>
-
-          <!-- Email -->
-          <ion-item>
-            <ion-input label="Correo" type="email" [(ngModel)]="email" labelPlacement="stacked" name="email"
-              placeholder="Ingresar Correo" required email #emailCtrl="ngModel"></ion-input>
-            <ion-button fill="outline" slot="end" (click)="clearMail()">
-              <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
-            </ion-button>
-          </ion-item>
-          <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error-message">
-            El email es obligatorio y debe tener un formato válido.
-          </div>
-
           <!-- Contraseña -->
           <ion-item>
-            <ion-input label="Contraseña" type="password" [(ngModel)]="password" labelPlacement="stacked"
-              placeholder="Ingresar Contraseña" name="password" required minlength="10" #passwordCtrl="ngModel">
-              <div slot="end">
-                <ion-input-password-toggle></ion-input-password-toggle>
-              </div>
+            <ion-input label="Contraseña" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password"
+              labelPlacement="stacked" placeholder="Ingresar Contraseña" name="password" required minlength="10"
+              #passwordCtrl="ngModel">
             </ion-input>
+            <ion-button fill="clear" slot="end" (click)="showPassword = !showPassword">
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
           </ion-item>
           <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error-message">
             Requisitos Contraseña:
-            Entre 10 y 30 caracteres.
-            Minimo 1 caracter especial.
-            No tener caracteres o numeros consecutivos.
-            Tener 2 letras mayusculas.
+            <ul>
+              <li>Entre 10 y 30 caracteres.</li>
+              <li>Debe contener al menos un carácter especial.</li>
+              <li>No tener caracteres o números consecutivos repetidos.</li>
+              <li>Debe contener al menos dos letras mayúsculas.</li>
+            </ul>
+          </div>
+
+          <!-- Confirmar Contraseña -->
+          <ion-item>
+            <ion-input label="Confirmar Contraseña" [type]="showConfirmPassword ? 'text' : 'password'"
+              [(ngModel)]="confirmPassword" labelPlacement="stacked" placeholder="Repetir Contraseña"
+              name="confirmPassword" required minlength="10" #confirmPasswordCtrl="ngModel">
+            </ion-input>
+            <ion-button fill="clear" slot="end" (click)="showConfirmPassword = !showConfirmPassword">
+              <ion-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div *ngIf="confirmPasswordCtrl.invalid && (confirmPasswordCtrl.dirty || confirmPasswordCtrl.touched)"
+            class="error-message">
+            Las contraseñas deben coincidir.
           </div>
 
           <!-- Región -->
