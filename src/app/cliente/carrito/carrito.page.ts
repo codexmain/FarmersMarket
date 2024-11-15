@@ -25,6 +25,12 @@ export class CarritoPage implements OnInit {
     await this.cargarCarrito();
   }
 
+
+  async ionViewWillEnter() {
+    // Recargar datos cada vez que la vista está a punto de entrar
+    await this.cargarCarrito();
+  }
+
   async vaciarCarrito() {
     if (this.detalles.length > 0) {
       // Iterar sobre una copia de `detalles` para evitar modificar la lista durante la eliminación
