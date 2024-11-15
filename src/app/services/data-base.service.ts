@@ -2598,9 +2598,8 @@ JOIN
 
   // Función para cambiar la contraseña del usuario
   resetPassword(correo: string, newPassword: string): Promise<void> {
-    const query = `UPDATE usuario SET contrasena = ? WHERE correo = ?`;
     return this.database
-      .executeSql(query, [newPassword, correo])
+      .executeSql(`UPDATE usuario SET contrasena = ? WHERE email = ?`, [newPassword, correo])
       .then(() => console.log('Contraseña actualizada para el correo:', correo))
       .catch((error) =>
         console.error('Error al actualizar la contraseña:', error)
