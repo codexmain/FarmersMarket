@@ -121,10 +121,13 @@
                         </ion-avatar>
                         <ion-label>
                             <p><strong>{{ producto.nombre }}</strong></p>
-                            <p>Descripción: {{ producto.descripcion }}</p>
+                            <p>{{ producto.descripcion }}</p>
                             <p>Precio: ${{ producto.precio}}</p>
                             <p>Cantidad: {{ producto.cantidad }}</p>
                             <p>Subtotal: ${{ producto.subtotal }}</p>
+                            <p>{{producto.proveedor_email}}</p>
+                            <p>{{producto.proveedor_nombre_empresa}}</p>
+                            <p>{{producto.proveedor_region}}</p>
                         </ion-label>
                     </ion-item>
                 </ion-card>

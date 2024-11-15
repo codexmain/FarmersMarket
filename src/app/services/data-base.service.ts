@@ -1774,9 +1774,18 @@ JOIN
 
   async getProductosCompradosPorCarroId(carroId: number): Promise<any[]> {
     const query = `
-      SELECT d.*, p.*
+      SELECT d.*, p.*, 
+             u.nombre AS proveedor_nombre, u.segundo_nombre AS proveedor_segundo_nombre, 
+             u.apellido_paterno AS proveedor_apellido_paterno, u.apellido_materno AS proveedor_apellido_materno, 
+             u.email AS proveedor_email, u.nombre_empresa AS proveedor_nombre_empresa, 
+             u.descripcion_corta AS proveedor_descripcion_corta, u.foto_perfil AS proveedor_foto_perfil,
+             r.nombre AS proveedor_region
       FROM detalle_carro_compra d
       JOIN producto p ON d.producto_id = p.id
+      JOIN usuario u ON p.proveedor_id = u.id
+      JOIN direccion dir ON dir.usuario_id = u.id 
+      JOIN comuna c ON dir.comuna_id = c.id
+      JOIN region r ON c.region_id = r.id
       WHERE d.carro_id = ?
     `;
 
