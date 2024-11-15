@@ -107,11 +107,7 @@ async presentAlertPrompt() {
           const password = data.newPassword;
           const confirmPassword = data.confirmPassword;
 
-          // Validar si ambas contraseñas coinciden
-          if (password !== confirmPassword) {
-            await this.presentAlert('Error', 'Las contraseñas no coinciden.');
-            return false;
-          }
+          
 
           // Validaciones de la contraseña
           if (password.length < 10 || password.length > 30) {
@@ -131,6 +127,12 @@ async presentAlertPrompt() {
 
           if (!/(?=(.*[A-Z]){2})/.test(password)) {
             await this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+            return false;
+          }
+
+          // Validar si ambas contraseñas coinciden
+          if (password !== confirmPassword) {
+            await this.presentAlert('Error', 'Las contraseñas no coinciden.');
             return false;
           }
 
