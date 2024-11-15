@@ -67,8 +67,14 @@ export class CarritoPage implements OnInit {
       if (producto) {
         detalle.nombre = producto.nombre;
         detalle.descripcion = producto.descripcion;
-        detalle.precio = producto.precio; // Asignar el precio del producto al detalle
+        detalle.precio = producto.precio;
+        detalle.categoria = producto.categoria;
+        detalle.subcategoria = producto.subcategoria;
+        detalle.organico = producto.organico;
+        detalle.proveedor_empresa = producto.proveedor_empresa;
+        detalle.proveedor_region = producto.proveedor_region;
         detalle.subtotal = detalle.precio * detalle.cantidad; // Actualiza el subtotal
+
       }
     }
   }
