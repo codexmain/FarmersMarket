@@ -14,12 +14,12 @@ export class RecuperarPasswordPage implements OnInit {
 
   constructor(
     private DataBase: DataBaseService,
-    private alertController: AlertController, 
-    private modalController: ModalController, 
+    private alertController: AlertController,
+    private modalController: ModalController,
     private menu: MenuController
-  ) {}
+  ) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   // Verificar si el correo es válido para habilitar el botón
   onInputChange() {
@@ -30,16 +30,16 @@ export class RecuperarPasswordPage implements OnInit {
   async recuperarPassword() {
     try {
       // CAMBIO: Verificar si el correo existe en la base de datos y enviar el código de verificación
-       const existe = await this.DataBase.recuperarcon(this.correo);
-       if (existe) {
-          this.presentCodigoVerificacionPrompt(); // NUEVO: Solicitar el código de verificación
-        }
+      const existe = await this.DataBase.recuperarcon(this.correo);
+      if (existe) {
+        this.presentCodigoVerificacionPrompt(); // NUEVO: Solicitar el código de verificación
+      }
     } catch (error) {
       this.presentAlert('Error', 'Ocurrió un error al intentar verificar el correo.');
       throw error;
     }
   }
-  
+
 
   // NUEVO: Alert para ingresar el código de verificación
   async presentCodigoVerificacionPrompt() {
@@ -86,6 +86,11 @@ export class RecuperarPasswordPage implements OnInit {
           type: 'password',
           placeholder: 'Ingrese nueva contraseña',
         },
+        {
+          name: 'confirmPassword',
+          type: 'password',
+          placeholder: 'Repita la nueva contraseña',
+        },
       ],
       buttons: [
         {
@@ -100,6 +105,13 @@ export class RecuperarPasswordPage implements OnInit {
           text: 'Guardar',
           handler: async (data) => {
             const password = data.newPassword;
+            const confirmPassword = data.confirmPassword;
+
+            // Validar si ambas contraseñas coinciden
+            if (password !== confirmPassword) {
+              await this.presentAlert('Error', 'Las contraseñas no coinciden.');
+              return false;
+            }
 
             // Validaciones de la contraseña
             if (password.length < 10 || password.length > 30) {
@@ -119,7 +131,7 @@ export class RecuperarPasswordPage implements OnInit {
 
             if (!/(?=(.*[A-Z]){2})/.test(password)) {
               await this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
-              return false; 
+              return false;
             }
 
             // CAMBIO: Actualizar la contraseña en la base de datos si todas las validaciones son correctas
@@ -137,9 +149,10 @@ export class RecuperarPasswordPage implements OnInit {
         },
       ],
     });
-  
+
     await alert.present();
   }
+
 
   // Mostrar alertas de notificación
   async presentAlert(header: string, message: string) {
