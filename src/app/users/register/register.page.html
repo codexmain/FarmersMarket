@@ -38,9 +38,8 @@
 
           <!-- Nombre -->
           <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input type="text" [(ngModel)]="pNombre" name="pNombre" required minlength="2"
-              #pNombreCtrl="ngModel"></ion-input>
+            <ion-input label="Nombre" type="text" [(ngModel)]="pNombre" labelPlacement="stacked"
+              placeholder="Ingresar Nombre" name="pNombre" required minlength="2" #pNombreCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearPNombre()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -51,9 +50,7 @@
 
           <!-- Apellido Paterno -->
           <ion-item>
-            <ion-label position="floating">Apellido Paterno</ion-label>
-            <ion-input type="text" [(ngModel)]="aPaterno" name="aPaterno" required minlength="2"
-              #aPaternoCtrl="ngModel"></ion-input>
+            <ion-input label="Apellido Paterno" type="text" placeholder="Ingresar Apellido" [(ngModel)]="aPaterno" labelPlacement="stacked" name="aPaterno" required minlength="2"  #aPaternoCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearAPaterno()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -64,8 +61,7 @@
 
           <!-- Segundo Nombre -->
           <ion-item>
-            <ion-label position="floating">Segundo Nombre (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="sNombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
+            <ion-input label="Segundo Nombre(opcional)" labelPlacement="stacked" placeholder="Ingresar Segundo Nombre" type="text" [(ngModel)]="sNombre" name="sNombre" #sNombreCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearSNombre()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -76,8 +72,7 @@
 
           <!-- Apellido Materno -->
           <ion-item>
-            <ion-label position="floating">Apellido Materno (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="aMaterno" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
+            <ion-input label="Apellido Materno(opcional)" labelPlacement="stacked" placeholder="Ingresar Apellido Materno" type="text" [(ngModel)]="aMaterno" name="aMaterno" #aMaternoCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearAMaterno()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
             </ion-button>
@@ -88,8 +83,7 @@
 
           <!-- Empresa -->
           <ion-item>
-            <ion-label position="floating">Empresa (Opcional)</ion-label>
-            <ion-input type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()"
+            <ion-input label="Empresa(opcional)" labelPlacement="stacked" placeholder="Ingresar Empresa" type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()"
               #empresaCtrl="ngModel"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearEmpresa()" (ionChange)="onFieldsChange()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
@@ -102,8 +96,7 @@
 
           <!-- Descripción Corta -->
           <ion-item>
-            <ion-label position="floating">Descripción Corta (Opcional)</ion-label>
-            <ion-textarea [(ngModel)]="descripcion_corta" name="descripcion_corta" (ionChange)="onFieldsChange()"
+            <ion-textarea label="Descripción Corta(opcional)" labelPlacement="stacked" placeholder="Ingresar Descripción" [(ngModel)]="descripcion_corta" name="descripcion_corta" (ionChange)="onFieldsChange()"
               #descEmpresaCtrl="ngModel"></ion-textarea>
             <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()" (ionChange)="onFieldsChange()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
@@ -146,15 +139,13 @@
           </div>
 
           <ion-item>
-            <ion-input label="Confirmar Contraseña" [(ngModel)]="confirmPassword" labelPlacement="stacked"
+            <ion-input label="Confirmar Contraseña" type="password" [(ngModel)]="confirmPassword" labelPlacement="stacked"
               placeholder="Repetir Contraseña" name="confirmPassword" required minlength="10"
               #confirmPasswordCtrl="ngModel">
               <div slot="end">
                 <ion-input-password-toggle></ion-input-password-toggle>
               </div>
             </ion-input>
-
-
           </ion-item>
           <div *ngIf="confirmPasswordCtrl.invalid && (confirmPasswordCtrl.dirty || confirmPasswordCtrl.touched)"
             class="error-message">
@@ -191,8 +182,7 @@
 
           <!-- Dirección -->
           <ion-item>
-            <ion-label position="floating">Dirección</ion-label>
-            <ion-input id="autoscroll-input" type="text" [(ngModel)]="direccion" name="direccion" required
+            <ion-input label="Dirección" labelPlacement="stacked" id="autoscroll-input" type="text" [(ngModel)]="direccion" name="direccion" required
               #dirCtrl="ngModel" placeholder="Escribe la ubicación o usa el Marcador (automatico)"></ion-input>
             <ion-button fill="outline" slot="end" (click)="clearDirr()">
               <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>

@@ -118,7 +118,6 @@ export class RegisterPage implements OnInit {
     const registroExitoso = await this.dataBase.registrarUsuario(nuevoUsuario);
 
     if (registroExitoso) {
-      await this.presentAlert('Éxito', 'Usuario registrado exitosamente.');
       this.router.navigate(['/login']);
     } else {
       await this.presentAlert('Error', 'Hubo un problema al registrar el usuario.');
