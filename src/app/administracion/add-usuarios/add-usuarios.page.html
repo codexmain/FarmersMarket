@@ -142,6 +142,19 @@
     </div>
 
     <ion-item>
+      <ion-label position="floating">Confirmar Contraseña</ion-label>
+      <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required minlength="10"
+      #confirmPasswordCtrl="ngModel"></ion-input>
+      <ion-button fill="outline" slot="end" (click)="clearClave()">
+        <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <div *ngIf="confirmPasswordCtrl.invalid && (confirmPasswordCtrl.dirty || confirmPasswordCtrl.touched)"
+      class="error-message">
+      Las contraseñas deben coincidir.
+    </div>
+
+    <ion-item>
       <ion-label>Región:</ion-label>
       <ion-select [(ngModel)]="region" name="region" #regionCtrl="ngModel" required (ionChange)="onRegionChange($event)">
         <ion-select-option *ngFor="let region of arrayCmbRegiones" [value]="region.id">{{ region.nombre }}</ion-select-option>
