@@ -364,6 +364,10 @@ export class AddUsuariosPage implements OnInit {
     this.password = '';
 
   }
+  clearConfirm() {
+    this.confirmPassword = '';
+
+  }
   clearDirr() {
     this.direccion = '';
 
