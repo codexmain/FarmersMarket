@@ -56,6 +56,7 @@ export class AddUsuariosPage implements OnInit {
   descEmpresaObligatoria: boolean = false;
   foto_perfil: string = '';
   imagen: any;
+  confirmPassword: string = '';
 
   constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) {
 
@@ -274,6 +275,12 @@ export class AddUsuariosPage implements OnInit {
 
     if (!/(?=.*[A-Z].*[A-Z])/.test(this.password)) {
       this.presentAlert('Error', 'La contraseña debe contener al menos dos letras mayúsculas.');
+      return;
+    }
+
+    // Validar que ambas contraseñas coincidan
+    if (this.password !== this.confirmPassword) {
+      this.presentAlert('Error', 'Las contraseñas no coinciden.');
       return;
     }
 
