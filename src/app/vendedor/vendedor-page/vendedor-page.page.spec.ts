@@ -1,17 +1,86 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VendedorPagePage } from './vendedor-page.page';
+import { Router } from '@angular/router';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { DataBaseService } from 'src/app/services/data-base.service';
 
 describe('VendedorPagePage', () => {
   let component: VendedorPagePage;
   let fixture: ComponentFixture<VendedorPagePage>;
+  let routerMock: any;
+  let nativeStorageMock: any;
+  let dbServiceMock: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Mock del Router
+    routerMock = {
+      navigate: jasmine.createSpy('navigate'),
+    };
+
+    // Mock del NativeStorage
+    nativeStorageMock = {
+      getItem: jasmine.createSpy('getItem').and.returnValue(Promise.resolve('test@example.com')),
+    };
+
+    // Mock del DataBaseService
+    dbServiceMock = {
+      getUsuarioByEmail: jasmine.createSpy('getUsuarioByEmail').and.returnValue(Promise.resolve({ id: 1, nombre: 'Usuario Test' })),
+    };
+
+    await TestBed.configureTestingModule({
+      declarations: [VendedorPagePage],
+      providers: [
+        { provide: Router, useValue: routerMock },
+        { provide: NativeStorage, useValue: nativeStorageMock },
+        { provide: DataBaseService, useValue: dbServiceMock },
+      ],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(VendedorPagePage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeTruthy(); // Comprobación inicial de creación del componente.
+  });
+
+  // Prueba de cargarDatosUsuario
+  describe('cargarDatosUsuario', () => {
+    it('debería obtener el correo y cargar los datos del usuario correctamente', async () => {
+      await component.cargarDatosUsuario();
+      expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail');
+      expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com');
+      expect(component.userData).toEqual({ id: 1, nombre: 'Usuario Test' });
+    });
+
+    it('debería manejar el error si ocurre un fallo al cargar los datos del usuario', async () => {
+      spyOn(console, 'error');
+      dbServiceMock.getUsuarioByEmail.and.returnValue(Promise.reject('Error en el servicio'));
+      await component.cargarDatosUsuario();
+      expect(console.error).toHaveBeenCalledWith('Error al cargar los datos del usuario:', 'Error en el servicio');
+    });
+  });
+
+  // Prueba de navigateToUsuario
+  describe('navigateToUsuario', () => {
+    it('debería navegar a la página de usuario con los datos correctos', () => {
+      component.userData = { id: 1, nombre: 'Usuario Test' };
+      component.navigateToUsuario();
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/usuario'], {
+        state: { id: 1, nombre: 'Usuario Test' },
+      });
+    });
+  });
+
+  // Prueba de navigateToRegventas
+  describe('navigateToRegventas', () => {
+    it('debería navegar a la página de regventas con los datos correctos', () => {
+      component.userData = { id: 1, nombre: 'Usuario Test' };
+      component.navigateToRegventas();
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/regventas'], {
+        state: { id: 1, nombre: 'Usuario Test' },
+      });
+    });
   });
 });
