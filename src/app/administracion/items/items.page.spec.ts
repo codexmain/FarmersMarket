@@ -1,20 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ItemsPage } from './items.page';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'; // Importa ambos
+import { RegventasPage } from 'src/app/vendedor/regventas/regventas.page';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'; // Importamos según la instrucción
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-describe('ItemsPage', () => {
-  let component: ItemsPage;
-  let fixture: ComponentFixture<ItemsPage>;
+describe('RegventasPage', () => {
+  let component: RegventasPage;
+  let fixture: ComponentFixture<RegventasPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ItemsPage],
+      declarations: [RegventasPage],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // Proporciona HttpClient con soporte para interceptores
+        provideHttpClient(withInterceptorsFromDi()), // Configuración de HttpClient con interceptores
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Para manejar los componentes personalizados de Ionic
     }).compileComponents();
+  });
 
-    fixture = TestBed.createComponent(ItemsPage);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RegventasPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -23,4 +27,3 @@ describe('ItemsPage', () => {
     expect(component).toBeTruthy();
   });
 });
-

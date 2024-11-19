@@ -4,6 +4,9 @@ import { DataBaseService } from '../../services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
+import { provideRouter } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('UsuarioPage', () => {
   let component: UsuarioPage;
@@ -46,15 +49,18 @@ describe('UsuarioPage', () => {
     await TestBed.configureTestingModule({
       declarations: [UsuarioPage],
       imports: [
-        IonicModule.forRoot(), // Agrega IonicModule para los componentes de Ionic
+        IonicModule.forRoot(), // Soporte para Ionic
+        FormsModule, // Soporte para formularios con [(ngModel)]
+        ReactiveFormsModule, // Soporte para formularios reactivos
       ],
       providers: [
+        provideHttpClient(withInterceptorsFromDi()), // Configuración moderna de HttpClient
+        provideRouter([]), // Configuración moderna de rutas
         { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },
         { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proveer el mock de ActivatedRoute
-        { provide: NavController, useValue: navControllerMock },   // Proveer el mock de NavController
-
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: NavController, useValue: navControllerMock },
       ],
     }).compileComponents();
 
@@ -67,7 +73,6 @@ describe('UsuarioPage', () => {
     expect(component).toBeTruthy();
   });
 
-  // Pruebas de cargarDatosUsuario
   describe('cargarDatosUsuario', () => {
     it('debería obtener el correo y cargar los datos del usuario correctamente', async () => {
       await component.cargarDatosUsuario();
@@ -91,7 +96,6 @@ describe('UsuarioPage', () => {
     });
   });
 
-  // Pruebas de recibirDatosDesdeNavegacion
   describe('recibirDatosDesdeNavegacion', () => {
     it('debería actualizar el estado del usuario con datos de navegación', () => {
       const usuarioMock = { id: 2, nombre: 'Usuario Navegación' };
@@ -116,15 +120,6 @@ describe('UsuarioPage', () => {
     });
   });
 
-  // Pruebas de irAModUsuario
-  describe('irAModUsuario', () => {
-    it('debería navegar a la página de modificación del usuario', () => {
-      component.irAModUsuario();
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/mod-usuario']);
-    });
-  });
-
-  // Pruebas de inicialización del componente
   describe('ngOnInit', () => {
     it('debería cargar los datos del usuario al inicializarse', async () => {
       spyOn(component, 'cargarDatosUsuario');
@@ -136,6 +131,13 @@ describe('UsuarioPage', () => {
       spyOn(component, 'recibirDatosDesdeNavegacion');
       component.ngOnInit();
       expect(component.recibirDatosDesdeNavegacion).toHaveBeenCalled();
+    });
+  });
+
+  describe('irAModUsuario', () => {
+    it('debería navegar a la página de modificación del usuario', () => {
+      component.irAModUsuario();
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/mod-usuario']);
     });
   });
 });
