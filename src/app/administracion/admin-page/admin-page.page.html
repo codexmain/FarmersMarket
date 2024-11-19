@@ -2,7 +2,6 @@
   <ion-toolbar>
     <ion-title class="ion-text-center">Administración</ion-title>
   </ion-toolbar>
-
 </ion-header>
 
 <ion-content>
@@ -14,7 +13,16 @@
         </ion-avatar>
       </div>
       <ion-card-title class="ion-text-center">Modulo de Administración</ion-card-title>
-      <ion-card-subtitle>Bienvenido "{{ userData.nombre || 'N/A' }} {{ userData.apellido_paterno || 'N/A' }}"</ion-card-subtitle>
+      
+      <!-- Usar *ngIf para verificar si userData está definido -->
+      <ion-card-subtitle *ngIf="userData; else noUser">
+        Bienvenido "{{ userData.nombre || 'N/A' }} {{ userData.apellido_paterno || 'N/A' }}"
+      </ion-card-subtitle>
+
+      <!-- Contenido mostrado si userData no está disponible -->
+      <ng-template #noUser>
+        <ion-card-subtitle>Bienvenido "N/A N/A"</ion-card-subtitle>
+      </ng-template>
     </ion-card-header>
     <ion-card-content>
       Acá podras realizar diferentes acciones, principalmente para gestionar los usuarios de la aplicación.
@@ -25,37 +33,25 @@
     <ion-item>
       <ion-label class="ion-text-center"><strong>Opciones de Administración</strong></ion-label>
     </ion-item>
-    <br>
+    <br />
     <div class="button-container">
-      <ion-button id="modal-users" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        (click)="navigateToUsers()">Usuarios</ion-button>
+      <ion-button id="modal-users" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToUsers()">Usuarios</ion-button>
       
-      <ion-button id="modal-products" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        [routerLink]="'/items'">Productos</ion-button>
+      <ion-button id="modal-products" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/items'">Productos</ion-button>
     </div>
-    <br>
+    <br />
     <div style="display: flex; justify-content: center;">
-      <ion-button id="modal-category" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        [routerLink]="'/categorias'">Categorías</ion-button>
+      <ion-button id="modal-category" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/categorias'">Categorías</ion-button>
 
-      <ion-button id="modal-subcategory" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        [routerLink]="'/subcategorias'">SubCategorías</ion-button> 
+      <ion-button id="modal-subcategory" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/subcategorias'">SubCategorías</ion-button>
     </div>
-    <br>
+    <br />
     <div style="display: flex; justify-content: center;">
-      <ion-button  id="modal-amonestaciones" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        [routerLink]="'/view-amonestaciones'">Amonestaciones</ion-button>    
+      <ion-button id="modal-amonestaciones" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/view-amonestaciones'">Amonestaciones</ion-button>
     </div>
-
-
-    
-
-
-
-
   </ion-card>
+
   <div style="display: flex; justify-content: center;">
-    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'"
-      [routerLink]="'/login'">Cerrar Sesión</ion-button>
+    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'" [routerLink]="'/login'">Cerrar Sesión</ion-button>
   </div>
 </ion-content>
