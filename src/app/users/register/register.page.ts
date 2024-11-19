@@ -179,20 +179,7 @@ export class RegisterPage implements OnInit {
       return false;
     }
     
-    if (!this.selectedRegion) {
-      this.presentAlert('Error', 'La región es obligatoria.');
-      return false;
-    }
     
-    if (!this.selectedComuna) {
-      this.presentAlert('Error', 'La comuna es obligatoria.');
-      return false;
-    }
-    
-    if (!direccionPattern.test(this.direccion)) {
-      this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
-      return false;
-    }
 
     // Validar contraseña aquí
     if (this.password.length < 10 || this.password.length > 30) {
@@ -218,6 +205,21 @@ export class RegisterPage implements OnInit {
      // Validar que ambas contraseñas coincidan
      if (this.password !== this.confirmPassword) {
       this.presentAlert('Error', 'Las contraseñas no coinciden.');
+      return false;
+    }
+
+    if (!this.selectedRegion) {
+      this.presentAlert('Error', 'La región es obligatoria.');
+      return false;
+    }
+    
+    if (!this.selectedComuna) {
+      this.presentAlert('Error', 'La comuna es obligatoria.');
+      return false;
+    }
+    
+    if (!direccionPattern.test(this.direccion)) {
+      this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
       return false;
     }
 
