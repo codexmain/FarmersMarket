@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModProventasPage } from './mod-proventas.page';
-import { ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
-import { IonicModule } from '@ionic/angular'; // Importa IonicModule
+import { ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing'; // Importa HttpClientTestingModule
 
 describe('ModProventasPage', () => {
   let component: ModProventasPage;
@@ -16,7 +17,10 @@ describe('ModProventasPage', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ModProventasPage],
-      imports: [IonicModule.forRoot()], // Agrega IonicModule para los componentes de Ionic
+      imports: [
+        IonicModule.forRoot(), // Agrega IonicModule para los componentes de Ionic
+        HttpClientTestingModule, // Agrega HttpClientTestingModule en imports
+      ],
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proporciona el mock de ActivatedRoute
       ],
@@ -31,4 +35,3 @@ describe('ModProventasPage', () => {
     expect(component).toBeTruthy();
   });
 });
-

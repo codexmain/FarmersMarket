@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UsuarioPage } from './usuario.page';
 import { DataBaseService } from '../../services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { Router, ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
-import { IonicModule } from '@ionic/angular'; // Importa IonicModule
+import { Router, ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 
 describe('UsuarioPage', () => {
   let component: UsuarioPage;
@@ -24,7 +24,11 @@ describe('UsuarioPage', () => {
     };
 
     routerMock = {
-      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue(null),
+      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue({
+        extras: {
+          state: { usuario: { id: 2, nombre: 'Usuario Mock Navegación' } },
+        },
+      }),
       navigate: jasmine.createSpy('navigate'),
     };
 
@@ -42,7 +46,7 @@ describe('UsuarioPage', () => {
         { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },
         { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proporciona el mock de ActivatedRoute
+        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proveer el mock de ActivatedRoute
       ],
     }).compileComponents();
 
@@ -52,7 +56,7 @@ describe('UsuarioPage', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy(); // P
+    expect(component).toBeTruthy();
   });
 
   // Pruebas de cargarDatosUsuario
@@ -61,13 +65,13 @@ describe('UsuarioPage', () => {
       await component.cargarDatosUsuario();
       expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail');
       expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(component.usuario).toEqual({ id: 1, nombre: 'Usuario Test' }); // P
+      expect(component.usuario).toEqual({ id: 1, nombre: 'Usuario Test' });
     });
 
     it('debería manejar el caso cuando no hay correo electrónico', async () => {
       nativeStorageMock.getItem.and.returnValue(Promise.resolve(null));
       await component.cargarDatosUsuario();
-      expect(component.usuario).toBeUndefined(); // P
+      expect(component.usuario).toBeUndefined();
     });
 
     it('debería manejar el error cuando el servicio arroja un error', async () => {
@@ -75,7 +79,7 @@ describe('UsuarioPage', () => {
       dbServiceMock.getUsuarioByEmail.and.returnValue(Promise.reject('Error en el servicio'));
       await component.cargarDatosUsuario();
       expect(component.usuario).toBeUndefined();
-      expect(console.error).toHaveBeenCalledWith('Error al cargar los datos del usuario:', 'Error en el servicio'); // P
+      expect(console.error).toHaveBeenCalledWith('Error al cargar los datos del usuario:', 'Error en el servicio');
     });
   });
 
@@ -86,21 +90,21 @@ describe('UsuarioPage', () => {
       routerMock.getCurrentNavigation.and.returnValue({ extras: { state: { usuario: usuarioMock } } });
 
       component.recibirDatosDesdeNavegacion();
-      expect(component.usuario).toEqual(usuarioMock); // P
+      expect(component.usuario).toEqual(usuarioMock);
     });
 
     it('no debería actualizar el usuario si no hay datos de navegación', () => {
       routerMock.getCurrentNavigation.and.returnValue(null);
 
       component.recibirDatosDesdeNavegacion();
-      expect(component.usuario).toBeUndefined(); // P
+      expect(component.usuario).toBeUndefined();
     });
 
     it('debería manejar el caso en que los datos de navegación son incompletos', () => {
       routerMock.getCurrentNavigation.and.returnValue({ extras: { state: {} } });
 
       component.recibirDatosDesdeNavegacion();
-      expect(component.usuario).toBeUndefined(); // P
+      expect(component.usuario).toBeUndefined();
     });
   });
 
@@ -108,7 +112,7 @@ describe('UsuarioPage', () => {
   describe('irAModUsuario', () => {
     it('debería navegar a la página de modificación del usuario', () => {
       component.irAModUsuario();
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/mod-usuario']); // P
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/mod-usuario']);
     });
   });
 
@@ -117,13 +121,13 @@ describe('UsuarioPage', () => {
     it('debería cargar los datos del usuario al inicializarse', async () => {
       spyOn(component, 'cargarDatosUsuario');
       await component.ngOnInit();
-      expect(component.cargarDatosUsuario).toHaveBeenCalled(); // P
+      expect(component.cargarDatosUsuario).toHaveBeenCalled();
     });
 
     it('debería recibir datos de navegación al inicializarse', () => {
       spyOn(component, 'recibirDatosDesdeNavegacion');
       component.ngOnInit();
-      expect(component.recibirDatosDesdeNavegacion).toHaveBeenCalled(); // P
+      expect(component.recibirDatosDesdeNavegacion).toHaveBeenCalled();
     });
   });
 });
