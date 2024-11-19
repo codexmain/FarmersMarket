@@ -1,27 +1,46 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminPagePage } from './admin-page.page';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { DataBaseService } from 'src/app/services/data-base.service';
-import { OlvideContraService } from 'src/app/services/olvide-contra.service';
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
 import { of } from 'rxjs';
 
-class MockSQLite {
-  create() {
-    return Promise.resolve({
-      executeSql: () => Promise.resolve({ rows: { length: 0, item: () => null } }),
-    });
+class MockRouter {
+  getCurrentNavigation() {
+    return {
+      extras: {
+        state: {
+          nombre: 'Usuario de prueba', // Simulación de datos pasados a través de NavigationExtras
+        },
+      },
+    };
+  }
+
+  navigate() {
+    return Promise.resolve(true);
   }
 }
 
+class MockActivatedRoute {
+  params = of({ id: '123' }); // Simula parámetros de ruta
+}
+
 class MockNativeStorage {
-  getItem() {
-    return Promise.resolve({});
+  getItem(key: string) {
+    if (key === 'userEmail') {
+      return Promise.resolve('test@example.com'); // Simula un email almacenado
+    }
+    return Promise.resolve(null);
   }
-  setItem() {
-    return Promise.resolve({});
+}
+
+class MockDataBaseService {
+  getUsuarioByEmail(email: string) {
+    return Promise.resolve({
+      nombre: 'Usuario de prueba', // Simulación de datos de usuario desde la base de datos
+      email,
+    });
   }
 }
 
@@ -33,21 +52,11 @@ describe('AdminPagePage', () => {
     await TestBed.configureTestingModule({
       declarations: [AdminPagePage],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: { params: of({ id: '123' }) }, // Mock para ActivatedRoute
-        },
-        {
-          provide: NativeStorage,
-          useClass: MockNativeStorage, // Mock para NativeStorage
-        },
-        {
-          provide: SQLite,
-          useClass: MockSQLite, // Mock para SQLite
-        },
+        { provide: Router, useClass: MockRouter }, // Mock para Router
+        { provide: ActivatedRoute, useClass: MockActivatedRoute }, // Mock para ActivatedRoute
+        { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
+        { provide: DataBaseService, useClass: MockDataBaseService }, // Mock para DataBaseService
         provideHttpClient(withInterceptorsFromDi()), // Configuración moderna para HttpClient
-        DataBaseService, // Proveedor para DataBaseService
-        OlvideContraService, // Proveedor para OlvideContraService
       ],
     }).compileComponents();
 
@@ -58,5 +67,13 @@ describe('AdminPagePage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load user data correctly', async () => {
+    await component.cargarDatosUsuario();
+    expect(component.userData).toEqual({
+      nombre: 'Usuario de prueba',
+      email: 'test@example.com',
+    });
   });
 });
