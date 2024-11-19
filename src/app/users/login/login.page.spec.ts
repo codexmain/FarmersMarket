@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginPage } from './login.page';
-import { ModalController } from '@ionic/angular'; // Importa ModalController
+import { ModalController, IonicModule } from '@ionic/angular'; // Importa ModalController e IonicModule
 
 describe('LoginPage', () => {
   let component: LoginPage;
@@ -16,6 +16,7 @@ describe('LoginPage', () => {
 
     await TestBed.configureTestingModule({
       declarations: [LoginPage],
+      imports: [IonicModule.forRoot()], // Agrega IonicModule para los componentes de Ionic
       providers: [
         { provide: ModalController, useValue: modalControllerMock }, // Proporciona el mock de ModalController
       ],

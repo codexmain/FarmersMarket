@@ -3,6 +3,7 @@ import { UsuarioPage } from './usuario.page';
 import { DataBaseService } from '../../services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { Router, ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
+import { IonicModule } from '@ionic/angular'; // Importa IonicModule
 
 describe('UsuarioPage', () => {
   let component: UsuarioPage;
@@ -34,6 +35,9 @@ describe('UsuarioPage', () => {
     // Configurar el TestBed
     await TestBed.configureTestingModule({
       declarations: [UsuarioPage],
+      imports: [
+        IonicModule.forRoot(), // Agrega IonicModule para los componentes de Ionic
+      ],
       providers: [
         { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },

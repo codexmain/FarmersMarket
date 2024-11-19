@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterPage } from './register.page';
-import { ModalController } from '@ionic/angular'; // Importa ModalController
+import { ModalController, IonicModule } from '@ionic/angular'; // Importa ModalController e IonicModule
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
@@ -16,6 +16,7 @@ describe('RegisterPage', () => {
 
     await TestBed.configureTestingModule({
       declarations: [RegisterPage],
+      imports: [IonicModule.forRoot()], // Agrega IonicModule para los componentes de Ionic
       providers: [
         { provide: ModalController, useValue: modalControllerMock }, // Proporciona el mock de ModalController
       ],
@@ -30,3 +31,4 @@ describe('RegisterPage', () => {
     expect(component).toBeTruthy();
   });
 });
+
