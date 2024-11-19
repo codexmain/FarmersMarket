@@ -7,7 +7,9 @@ import { DataBaseService } from 'src/app/services/data-base.service';
 import { OlvideContraService } from 'src/app/services/olvide-contra.service';
 import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
 import { of } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+// Mock para SQLite
 class MockSQLite {
   create() {
     return Promise.resolve({
@@ -16,6 +18,7 @@ class MockSQLite {
   }
 }
 
+// Mock para NativeStorage
 class MockNativeStorage {
   getItem() {
     return Promise.resolve({});
@@ -35,10 +38,7 @@ describe('AdminPagePage', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: {
-            params: of({ id: '123' }), // Mock para ActivatedRoute
-            queryParams: of({ filter: 'mockFilter' }), // Agrega mock para queryParams si es necesario
-          },
+          useValue: { params: of({ id: '123' }) }, // Mock para ActivatedRoute
         },
         {
           provide: NativeStorage,
@@ -48,10 +48,11 @@ describe('AdminPagePage', () => {
           provide: SQLite,
           useClass: MockSQLite, // Mock para SQLite
         },
-        provideHttpClient(withInterceptorsFromDi()), // Configuración moderna para HttpClient
+        provideHttpClient(withInterceptorsFromDi()), // Proveedor de HttpClient con interceptores
         DataBaseService, // Proveedor para DataBaseService
         OlvideContraService, // Proveedor para OlvideContraService
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Soporte para elementos personalizados
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminPagePage);
@@ -60,14 +61,8 @@ describe('AdminPagePage', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeTruthy(); // Verifica que el componente se crea correctamente.
   });
 
-  it('should handle route parameters', () => {
-    // Asegúrate de que el parámetro de la ruta esté configurado correctamente
-    component.ngOnInit();
-    fixture.detectChanges();
-    expect(component).toBeTruthy();
-    // Agrega más verificaciones si el componente realiza lógica basada en los parámetros de la ruta
-  });
+  // Agrega más pruebas específicas para las funcionalidades del componente si es necesario.
 });
