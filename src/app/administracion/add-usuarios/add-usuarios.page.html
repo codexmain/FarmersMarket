@@ -78,7 +78,7 @@
         <ion-label position="floating">Empresa (Opcional)</ion-label>
         <ion-input type="text" [(ngModel)]="empresa" name="empresa" (ionChange)="onFieldsChange()"
           #empresaCtrl="ngModel"></ion-input>
-        <ion-button fill="outline" slot="end" (click)="clearEmpresa()">
+        <ion-button fill="outline" slot="end" (click)="clearEmpresa()" (ionChange)="onFieldsChange()">
           <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
         </ion-button>
       </ion-item>
@@ -90,7 +90,7 @@
         <ion-label position="floating">Descripcion Empresa (Opcional)</ion-label>
         <ion-input type="text" [(ngModel)]="descEmpresa" name="descEmpresa" (ionChange)="onFieldsChange()"
           #descEmpresaCtrl="ngModel"></ion-input>
-        <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()">
+        <ion-button fill="outline" slot="end" (click)="clearDescEmpresa()" (ionChange)="onFieldsChange()">
           <ion-icon name="trash-bin-sharp" color="danger"></ion-icon>
         </ion-button>
       </ion-item>
@@ -101,7 +101,7 @@
 
       <ion-item>
         <ion-label>Tipo de Usuario:</ion-label>
-        <ion-select [(ngModel)]="tipoUsuario" name="tipoUsuario" #tipUserCtrl="ngModel" required>
+        <ion-select [disabled]="isDisabledTipUser" [(ngModel)]="tipoUsuario" name="tipoUsuario" #tipUserCtrl="ngModel" required>
           <ion-select-option *ngFor="let tipUsuario of arrayCmbTipoUsuario" [value]="tipUsuario.id">{{
             tipUsuario.descripcion }}</ion-select-option>
         </ion-select>
