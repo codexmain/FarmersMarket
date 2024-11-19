@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UsuarioPage } from './usuario.page';
 import { DataBaseService } from '../../services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
 
 describe('UsuarioPage', () => {
   let component: UsuarioPage;
@@ -10,6 +10,7 @@ describe('UsuarioPage', () => {
   let dbServiceMock: any;
   let nativeStorageMock: any;
   let routerMock: any;
+  let activatedRouteMock: any;
 
   beforeEach(async () => {
     // Crear mocks
@@ -26,6 +27,10 @@ describe('UsuarioPage', () => {
       navigate: jasmine.createSpy('navigate'),
     };
 
+    activatedRouteMock = {
+      snapshot: { paramMap: { get: (key: string) => 'mockValue' } }, // Simula parámetros de ruta
+    };
+
     // Configurar el TestBed
     await TestBed.configureTestingModule({
       declarations: [UsuarioPage],
@@ -33,6 +38,7 @@ describe('UsuarioPage', () => {
         { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },
         { provide: Router, useValue: routerMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proporciona el mock de ActivatedRoute
       ],
     }).compileComponents();
 

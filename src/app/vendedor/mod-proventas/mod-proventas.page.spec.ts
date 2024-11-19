@@ -1,11 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModProventasPage } from './mod-proventas.page';
+import { ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
 
 describe('ModProventasPage', () => {
   let component: ModProventasPage;
   let fixture: ComponentFixture<ModProventasPage>;
+  let activatedRouteMock: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Crea un mock para ActivatedRoute
+    activatedRouteMock = {
+      snapshot: { paramMap: { get: (key: string) => 'mockValue' } }, // Simula la obtención de parámetros de la ruta
+    };
+
+    await TestBed.configureTestingModule({
+      declarations: [ModProventasPage],
+      providers: [
+        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Proporciona el mock de ActivatedRoute
+      ],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(ModProventasPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
