@@ -24,7 +24,9 @@ describe('VendedorPagePage', () => {
 
     // Mock del DataBaseService
     dbServiceMock = {
-      getUsuarioByEmail: jasmine.createSpy('getUsuarioByEmail').and.returnValue(Promise.resolve({ id: 1, nombre: 'Usuario Test' })),
+      getUsuarioByEmail: jasmine.createSpy('getUsuarioByEmail').and.returnValue(
+        Promise.resolve({ id: 1, nombre: 'Usuario Test' })
+      ),
     };
 
     await TestBed.configureTestingModule({
@@ -42,23 +44,26 @@ describe('VendedorPagePage', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy(); // Comprobación inicial de creación del componente.
+    expect(component).toBeTruthy(); // Verifica que el componente se crea correctamente.
   });
 
   // Prueba de cargarDatosUsuario
   describe('cargarDatosUsuario', () => {
     it('debería obtener el correo y cargar los datos del usuario correctamente', async () => {
       await component.cargarDatosUsuario();
-      expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail');
-      expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(component.userData).toEqual({ id: 1, nombre: 'Usuario Test' });
+      expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail'); // Verifica que se llama a NativeStorage con "userEmail".
+      expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com'); // Verifica que se consulta el usuario por email.
+      expect(component.userData).toEqual({ id: 1, nombre: 'Usuario Test' }); // Verifica que los datos del usuario se asignan correctamente.
     });
 
     it('debería manejar el error si ocurre un fallo al cargar los datos del usuario', async () => {
-      spyOn(console, 'error');
+      spyOn(console, 'error'); // Espía en `console.error` para capturar errores.
       dbServiceMock.getUsuarioByEmail.and.returnValue(Promise.reject('Error en el servicio'));
       await component.cargarDatosUsuario();
-      expect(console.error).toHaveBeenCalledWith('Error al cargar los datos del usuario:', 'Error en el servicio');
+      expect(console.error).toHaveBeenCalledWith(
+        'Error al cargar los datos del usuario:',
+        'Error en el servicio'
+      ); // Verifica que el error se maneja correctamente.
     });
   });
 
@@ -68,7 +73,7 @@ describe('VendedorPagePage', () => {
       component.userData = { id: 1, nombre: 'Usuario Test' };
       component.navigateToUsuario();
       expect(routerMock.navigate).toHaveBeenCalledWith(['/usuario'], {
-        state: { id: 1, nombre: 'Usuario Test' },
+        state: { id: 1, nombre: 'Usuario Test' }, // Verifica que se navega con los datos correctos.
       });
     });
   });
@@ -79,8 +84,26 @@ describe('VendedorPagePage', () => {
       component.userData = { id: 1, nombre: 'Usuario Test' };
       component.navigateToRegventas();
       expect(routerMock.navigate).toHaveBeenCalledWith(['/regventas'], {
-        state: { id: 1, nombre: 'Usuario Test' },
+        state: { id: 1, nombre: 'Usuario Test' }, // Verifica que se navega con los datos correctos.
       });
+    });
+  });
+
+  // Prueba de error en navigateToUsuario si no hay datos
+  describe('navigateToUsuario without userData', () => {
+    it('should handle missing userData gracefully', () => {
+      component.userData = null; // Simula la ausencia de datos del usuario.
+      component.navigateToUsuario();
+      expect(routerMock.navigate).not.toHaveBeenCalled(); // Verifica que no se intenta navegar.
+    });
+  });
+
+  // Prueba de error en navigateToRegventas si no hay datos
+  describe('navigateToRegventas without userData', () => {
+    it('should handle missing userData gracefully', () => {
+      component.userData = null; // Simula la ausencia de datos del usuario.
+      component.navigateToRegventas();
+      expect(routerMock.navigate).not.toHaveBeenCalled(); // Verifica que no se intenta navegar.
     });
   });
 });

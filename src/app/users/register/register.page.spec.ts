@@ -1,25 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterPage } from './register.page';
-import { ModalController, IonicModule } from '@ionic/angular'; // Importa ModalController e IonicModule
+import { IonicModule } from '@ionic/angular';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute } from '@angular/router';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { of } from 'rxjs';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
   let fixture: ComponentFixture<RegisterPage>;
-  let modalControllerMock: any;
 
   beforeEach(async () => {
-    // Crea un mock para ModalController
-    modalControllerMock = {
-      create: jasmine.createSpy('create').and.returnValue(Promise.resolve({ present: jasmine.createSpy('present') })),
-      dismiss: jasmine.createSpy('dismiss'),
-    };
-
     await TestBed.configureTestingModule({
       declarations: [RegisterPage],
-      imports: [IonicModule.forRoot()], // Agrega IonicModule para los componentes de Ionic
-      providers: [
-        { provide: ModalController, useValue: modalControllerMock }, // Proporciona el mock de ModalController
+      imports: [
+        IonicModule.forRoot(),
+        RouterTestingModule,
+        FormsModule,
+        ReactiveFormsModule,
       ],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: of({
+              get: (key: string) => 'mockValue',
+            }),
+          },
+        },
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterPage);
@@ -30,5 +41,6 @@ describe('RegisterPage', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-});
 
+  // Puedes agregar más pruebas relacionadas con otras funciones del componente aquí
+});

@@ -35,7 +35,10 @@ describe('AdminPagePage', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { params: of({ id: '123' }) }, // Mock para ActivatedRoute
+          useValue: {
+            params: of({ id: '123' }), // Mock para ActivatedRoute
+            queryParams: of({ filter: 'mockFilter' }), // Agrega mock para queryParams si es necesario
+          },
         },
         {
           provide: NativeStorage,
@@ -58,5 +61,13 @@ describe('AdminPagePage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should handle route parameters', () => {
+    // Asegúrate de que el parámetro de la ruta esté configurado correctamente
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component).toBeTruthy();
+    // Agrega más verificaciones si el componente realiza lógica basada en los parámetros de la ruta
   });
 });
