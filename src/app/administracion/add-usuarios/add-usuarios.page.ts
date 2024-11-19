@@ -58,6 +58,8 @@ export class AddUsuariosPage implements OnInit {
   imagen: any;
   confirmPassword: string = '';
 
+  isDisabledTipUser: boolean = true;
+
   constructor(private bd: DataBaseService, private toastController: ToastController, private modalController: ModalController, private menu: MenuController, private route: ActivatedRoute, private router: Router, public alertController: AlertController, private navParams: NavParams, private geocodingService: GeocodingService, private locationValidationService: LocationValidationService) {
 
   }
@@ -174,9 +176,31 @@ export class AddUsuariosPage implements OnInit {
       return;
     }
 
+    // Validar pNombre, sNombre, aPaterno, aMaterno
+    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
+    if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
+      (this.sNombre && !namePattern.test(this.sNombre)) ||
+      (this.aMaterno && !namePattern.test(this.aMaterno))) {
+      this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
+      return;
+    }
+
     // Validar empresa y descEmpresa si se han marcado como obligatorios
     if ((this.empresaObligatoria && !this.empresa) || (this.descEmpresaObligatoria && !this.descEmpresa)) {
       this.presentAlert('Error', 'Los campos "Empresa" y "Descripción Empresa" son obligatorios.');
+      return;
+    }
+
+    // Validar empresa
+    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
+    if (this.empresa && !empresaPattern.test(this.empresa)) {
+      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios..');
+      return;
+    }
+
+    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
+    if (this.descEmpresa && !descEmpresaPattern.test(this.descEmpresa)) {
+      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
       return;
     }
 
@@ -199,43 +223,6 @@ export class AddUsuariosPage implements OnInit {
       return;
     }
 
-    // Validar región
-    if (!this.region) {
-      this.presentAlert('Error', 'La región es obligatoria.');
-      return;
-    }
-
-    // Validar comuna
-    if (!this.comuna) {
-      this.presentAlert('Error', 'La comuna es obligatoria.');
-      return;
-    }
-
-    // Validar pNombre, sNombre, aPaterno, aMaterno
-    const namePattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{2,40}$/;
-    if (!namePattern.test(this.pNombre) || !namePattern.test(this.aPaterno) ||
-      (this.sNombre && !namePattern.test(this.sNombre)) ||
-      (this.aMaterno && !namePattern.test(this.aMaterno))) {
-      this.presentAlert('Error', 'Los nombres y apellidos deben tener entre 2 y 40 caracteres y no contener números.');
-      return;
-    }
-
-
-
-    // Validar empresa
-    const empresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s&]{3,30}$/;
-    if (this.empresa && !empresaPattern.test(this.empresa)) {
-      this.presentAlert('Error', 'El nombre de la empresa debe tener entre 3 y 30 caracteres y solo puede contener letras, números y espacios..');
-      return;
-    }
-
-    const descEmpresaPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,&%]{10,90}$/;
-    if (this.descEmpresa && !descEmpresaPattern.test(this.descEmpresa)) {
-      this.presentAlert('Error', 'La descripcion de la empresa debe estar en un rango de 10 a 90 caracteres y solo puede contener letras, números y espacios.');
-      return;
-    }
-
-
     // Validar email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(this.email)) {
@@ -246,14 +233,6 @@ export class AddUsuariosPage implements OnInit {
     const correoExistente = await this.bd.verificarCorreoExistente(this.email);
     if (correoExistente) {
       this.presentAlert('Error', 'El correo ingresado ya está asociado a otra cuenta.');
-      return;
-    }
-
-
-    // Validar dirección
-    const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
-    if (!direccionPattern.test(this.direccion)) {
-      this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
       return;
     }
 
@@ -283,6 +262,29 @@ export class AddUsuariosPage implements OnInit {
       this.presentAlert('Error', 'Las contraseñas no coinciden.');
       return;
     }
+
+    // Validar región
+    if (!this.region) {
+      this.presentAlert('Error', 'La región es obligatoria.');
+      return;
+    }
+
+    // Validar comuna
+    if (!this.comuna) {
+      this.presentAlert('Error', 'La comuna es obligatoria.');
+      return;
+    }
+
+    
+
+    // Validar dirección
+    const direccionPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9\s.,]+$/;
+    if (!direccionPattern.test(this.direccion)) {
+      this.presentAlert('Error', 'La dirección solo puede contener letras, números y espacios.');
+      return;
+    }
+
+    
 
     // Si todas las validaciones pasan
     await this.bd.insertarUsuario(

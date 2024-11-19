@@ -125,71 +125,12 @@ export class ModificarItemPage implements OnInit {
     }
   }
 
-  //validacion de formato de los precios
-  validarPrecio(precio: number): boolean {
-    const esEntero = Number.isInteger(precio);
-    const esValido = esEntero && precio > 0 && precio <= 9999999;
-    return esValido;
-  }
-
-  //validar el formato del stock
-  validarStock(stock: number): boolean {
-    const esEntero = Number.isInteger(stock);
-    const esValido = esEntero && stock >= 0 && stock <= 99999; //se declara una longitud de cinco, y que sea mayor o igual a cero, puede que el vendedor quisiera crear solamente el producto
-    return esValido;
-  }  
 
   async validateFields(){
-    if (!this.proveedor_id) {
-      this.presentAlert('Error', 'El Vendedor es un campo obligatorio.');
-      return false;}
-
-    if (!this.nombre_producto) {
-      this.presentAlert('Error', 'El Nombre del Producto es un campo obligatorio.');
-      return false;}
-
-    // Validación de la descripción del producto
-    if (this.descripcion_producto && 
-      (this.descripcion_producto.length < 10 || this.descripcion_producto.length > 255)) {
-       this.presentAlert('Error', 'La Descripción del producto debe tener entre 10 y 255 caracteres.');
-       return false;}
 
     if (!this.estado_producto) {
         this.presentAlert('Error', 'El Estado del Producto es obligatorio.');
         return false;}
-
-    if (!this.precio) {
-      this.presentAlert('Error', 'El Precio del producto es un campo obligatorio.');
-      return false;}
-
-    if (this.stock === null || this.stock === undefined) {
-      this.presentAlert('Error', 'El Stock/Existencias es un campo obligatorio.');
-      return false;
-    }
-
-    if (!this.organico) {
-      this.presentAlert('Error', 'La procedencia del producto(Orgánico/No Orgánico) es un campo obligatorio.');
-      return false;}
-
-    if (!this.categoria_id) {
-      this.presentAlert('Error', 'La Categoría es un campo obligatorio.');
-      return false;}
-      
-    if (!this.subcategoria_id) {
-      this.presentAlert('Error', 'La Subcategoría es un campo obligatorio.');
-      return false;}    
-      
-    if (this.nombre_producto.length < 3 || this.nombre_producto.length > 40) {
-      this.presentAlert('Error', 'El Nombre del producto debe tener entre 3 y 40 caracteres.');
-      return false;}  
-      
-    if (!this.validarPrecio(this.precio)) {
-      this.presentAlert('Error', 'El Precio del producto debe ser un número entero mayor a 0 y no debe superar las 7 cifras.');
-      return false;}
-    
-    if (!this.validarStock(this.stock)) {
-      this.presentAlert('Error', 'El Stock del producto debe ser un número entero mayor o igual cero y no debe superar las 5 cifras.');
-      return false;}
 
       return true;
   }
