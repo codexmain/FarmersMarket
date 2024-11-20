@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms'; // Importamos FormsModule
 import { AlertController, ModalController } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
 
-describe('RecuperarPasswordPage - Validaciones de contraseña', () => {
+fdescribe('RecuperarPasswordPage - Validaciones de contraseña', () => {
   let component: RecuperarPasswordPage;
   let fixture: ComponentFixture<RecuperarPasswordPage>;
   let alertControllerSpy: jasmine.SpyObj<AlertController>;

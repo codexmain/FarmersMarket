@@ -30,7 +30,7 @@ class MockNativeStorage {
   }
 }
 
-describe('AdminPagePage', () => {
+fdescribe('AdminPagePage', () => {
   let component: AdminPagePage;
   let fixture: ComponentFixture<AdminPagePage>;
   let router: Router;

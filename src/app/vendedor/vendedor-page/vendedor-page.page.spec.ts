@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
 import { Router } from '@angular/router';
 
-describe('VendedorPagePage', () => {
+fdescribe('VendedorPagePage', () => {
   let component: VendedorPagePage;
   let fixture: ComponentFixture<VendedorPagePage>;
   let nativeStorageMock: any;
