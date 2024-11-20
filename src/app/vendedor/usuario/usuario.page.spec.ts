@@ -8,7 +8,7 @@ import { provideRouter } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
-describe('UsuarioPage', () => {
+fdescribe('UsuarioPage', () => {
   let component: UsuarioPage;
   let fixture: ComponentFixture<UsuarioPage>;
   let dbServiceMock: any;

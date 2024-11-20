@@ -51,7 +51,16 @@ describe('ViewProventasPage', () => {
     await TestBed.configureTestingModule({
       declarations: [ViewProventasPage],
       providers: [
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => '1' } } } }, // Simula un productoId
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: {
+                get: (key: string) => (key === 'productoId' ? '1' : null), // Mock sin 'and'
+              },
+            },
+          },
+        },
         { provide: DataBaseService, useClass: MockDataBaseService }, // Mock del servicio
         { provide: AlertController, useValue: mockAlertController }, // Mock de AlertController
         { provide: ToastController, useValue: mockToastController }, // Mock de ToastController
@@ -80,7 +89,7 @@ describe('ViewProventasPage', () => {
 
   it('should show a toast and navigate if product not found', async () => {
     const activatedRoute = TestBed.inject(ActivatedRoute);
-    spyOn(activatedRoute.snapshot.paramMap, 'get').and.returnValue('999'); // Simula un producto inexistente
+    spyOn(activatedRoute.snapshot.paramMap, 'get').and.callFake((key: string) => (key === 'productoId' ? '999' : null)); // Ajuste aquí
     const router = TestBed.inject(Router);
 
     await component.ngOnInit();
