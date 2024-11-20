@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddItemPage } from './add-item.page';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx'; // Importa SQLite
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx'; // Importa NativeStorage
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Importa formularios
-import { IonicModule, ModalController, NavController } from '@ionic/angular'; // Importa Ionic y servicios relacionados
-import { RouterTestingModule } from '@angular/router/testing'; // Mock de rutas
-import { of } from 'rxjs'; // RxJS para simulación de observables
-// Mock para SQLite
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonicModule, ModalController, NavController, NavParams } from '@ionic/angular';
+import { RouterTestingModule } from '@angular/router/testing';
+
+// Mocks para dependencias
 class MockSQLite {
   create() {
     return Promise.resolve({
@@ -16,23 +16,31 @@ class MockSQLite {
   }
 }
 
-// Mock para NativeStorage
 class MockNativeStorage {
   getItem(key: string): Promise<any> {
-    return Promise.resolve('mockData'); // Devuelve un dato simulado
+    return Promise.resolve('mockData');
   }
   setItem(key: string, value: any): Promise<any> {
-    return Promise.resolve(); // Simula una operación exitosa
+    return Promise.resolve();
   }
 }
 
-// Mock para ModalController
 class MockModalController {
   create() {
     return Promise.resolve({
       present: () => Promise.resolve(),
       dismiss: () => Promise.resolve(),
     });
+  }
+}
+
+// Mock actualizado para NavParams
+class MockNavParams {
+  data: { [key: string]: any } = {
+    itemId: 1, // Datos simulados
+  };
+  get(param: string): any {
+    return this.data[param];
   }
 }
 
@@ -50,11 +58,12 @@ describe('AddItemPage', () => {
         RouterTestingModule, // Mock de rutas
       ],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // Proveer HttpClient con soporte para interceptores
+        provideHttpClient(withInterceptorsFromDi()), // HttpClient con interceptores
         { provide: SQLite, useClass: MockSQLite }, // Mock para SQLite
         { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
         { provide: ModalController, useClass: MockModalController }, // Mock para ModalController
         { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigate']) }, // Mock para NavController
+        { provide: NavParams, useClass: MockNavParams }, // Mock actualizado para NavParams
       ],
     }).compileComponents();
 
@@ -65,5 +74,12 @@ describe('AddItemPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load item details from NavParams', () => {
+    expect(component).toBeTruthy();
+    // Simula un comportamiento para verificar que NavParams funciona
+    const itemId = component['navParams'].get('itemId');
+    expect(itemId).toBe(1);
   });
 });

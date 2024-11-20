@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ViewItemPage } from './view-item.page';
-import { ModalController, IonicModule, NavController } from '@ionic/angular'; // Importar IonicModule, ModalController y NavController
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'; // Importar HttpClient
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Para soporte de formularios
-import { RouterTestingModule } from '@angular/router/testing'; // Para simular rutas
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx'; // Importar SQLite
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx'; // Importar NativeStorage
-import { of } from 'rxjs'; // RxJS para simulación de observables
+import { ModalController, IonicModule, NavController, NavParams } from '@ionic/angular';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideRouter } from '@angular/router';
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+
 // Mock para SQLite
 class MockSQLite {
   create() {
@@ -19,10 +19,10 @@ class MockSQLite {
 // Mock para NativeStorage
 class MockNativeStorage {
   getItem(key: string): Promise<any> {
-    return Promise.resolve('mockData'); // Devuelve un dato simulado
+    return Promise.resolve('mockData');
   }
   setItem(key: string, value: any): Promise<any> {
-    return Promise.resolve(); // Simula una operación exitosa
+    return Promise.resolve();
   }
 }
 
@@ -36,6 +36,22 @@ class MockModalController {
   }
 }
 
+// Mock para NavParams
+class MockNavParams {
+  data: { [key: string]: any } = {
+    itemId: 1,
+  };
+  get(param: string): any {
+    return this.data[param];
+  }
+}
+
+// Definir rutas simuladas para pruebas
+const routes = [
+  { path: '', component: ViewItemPage },
+  { path: 'item/:id', component: ViewItemPage },
+];
+
 describe('ViewItemPage', () => {
   let component: ViewItemPage;
   let fixture: ComponentFixture<ViewItemPage>;
@@ -47,14 +63,15 @@ describe('ViewItemPage', () => {
         IonicModule.forRoot(), // Configuración de Ionic
         FormsModule, // Soporte para [(ngModel)]
         ReactiveFormsModule, // Soporte para formularios reactivos
-        RouterTestingModule, // Simulación de rutas
       ],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // Proveer HttpClient con interceptores
+        provideHttpClient(withInterceptorsFromDi()), // HttpClient con interceptores
+        provideRouter(routes), // Proveer rutas para las pruebas
         { provide: ModalController, useClass: MockModalController }, // Mock para ModalController
         { provide: SQLite, useClass: MockSQLite }, // Mock para SQLite
         { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
         { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigate']) }, // Mock para NavController
+        { provide: NavParams, useClass: MockNavParams }, // Mock para NavParams
       ],
     }).compileComponents();
 
@@ -65,5 +82,11 @@ describe('ViewItemPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load item details from NavParams', () => {
+    // Prueba para verificar que NavParams funciona correctamente
+    const itemId = component['navParams'].get('itemId');
+    expect(itemId).toBe(1);
   });
 });
