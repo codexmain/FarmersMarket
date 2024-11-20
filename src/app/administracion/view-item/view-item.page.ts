@@ -8,7 +8,8 @@ import { DataBaseService } from '../../services/data-base.service';
 })
 export class ViewItemPage implements OnInit {
   isDisabled = true;
-  producto: any //para la transferencia de argumentos de navParams
+  producto: any = {}; // Inicializar como objeto vacío para evitar undefined
+
 
   proveedor_id!: number;
   nombre_producto: string = '';

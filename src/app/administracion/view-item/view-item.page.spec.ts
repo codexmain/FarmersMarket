@@ -1,56 +1,49 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ViewItemPage } from './view-item.page';
-import { ModalController, IonicModule, NavController, NavParams } from '@ionic/angular';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { IonicModule, NavParams, ModalController } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { provideRouter } from '@angular/router';
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
-
-// Mock para SQLite
-class MockSQLite {
-  create() {
-    return Promise.resolve({
-      executeSql: () => Promise.resolve({ rows: { length: 0, item: () => null } }),
-    });
-  }
-}
-
-// Mock para NativeStorage
-class MockNativeStorage {
-  getItem(key: string): Promise<any> {
-    return Promise.resolve('mockData');
-  }
-  setItem(key: string, value: any): Promise<any> {
-    return Promise.resolve();
-  }
-}
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { DataBaseService } from '../../services/data-base.service';
+import { of } from 'rxjs';
 
 // Mock para ModalController
 class MockModalController {
-  create() {
-    return Promise.resolve({
-      present: () => Promise.resolve(),
-      dismiss: () => Promise.resolve(),
-    });
-  }
+  dismiss = jasmine.createSpy('dismiss');
 }
 
 // Mock para NavParams
 class MockNavParams {
-  data: { [key: string]: any } = {
-    itemId: 1,
-  };
-  get(param: string): any {
-    return this.data[param];
+  get(param: string) {
+    return {
+      proveedor_id: 1,
+      nombre_producto: 'Producto Test',
+      descripcion_producto: 'Descripción Test',
+      precio: 100,
+      stock: 10,
+      organico: true,
+      categoria_id: 2,
+      subcategoria_id: 3,
+      photo: 'ruta/foto.jpg',
+      estado_producto: 'activo',
+    };
   }
 }
 
-// Definir rutas simuladas para pruebas
-const routes = [
-  { path: '', component: ViewItemPage },
-  { path: 'item/:id', component: ViewItemPage },
-];
+// Mock para DataBaseService
+class MockDataBaseService {
+  dbState() {
+    return of(true);
+  }
+  fetchCmbProveedores() {
+    return of([{ id: 1, nombre_empresa: 'Proveedor Test' }]);
+  }
+  fetchCategorias() {
+    return of([{ id: 2, nombre: 'Categoría Test' }]);
+  }
+  fetchCmbSubCategorias() {
+    return of([{ id: 3, nombre: 'Subcategoría Test' }]);
+  }
+}
 
 describe('ViewItemPage', () => {
   let component: ViewItemPage;
@@ -59,20 +52,13 @@ describe('ViewItemPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ViewItemPage],
-      imports: [
-        IonicModule.forRoot(), // Configuración de Ionic
-        FormsModule, // Soporte para [(ngModel)]
-        ReactiveFormsModule, // Soporte para formularios reactivos
-      ],
+      imports: [IonicModule.forRoot(), FormsModule, ReactiveFormsModule],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // HttpClient con interceptores
-        provideRouter(routes), // Proveer rutas para las pruebas
-        { provide: ModalController, useClass: MockModalController }, // Mock para ModalController
-        { provide: SQLite, useClass: MockSQLite }, // Mock para SQLite
-        { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
-        { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigate']) }, // Mock para NavController
-        { provide: NavParams, useClass: MockNavParams }, // Mock para NavParams
+        { provide: ModalController, useClass: MockModalController },
+        { provide: NavParams, useClass: MockNavParams },
+        { provide: DataBaseService, useClass: MockDataBaseService },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Permitir propiedades desconocidas como routerLink
     }).compileComponents();
 
     fixture = TestBed.createComponent(ViewItemPage);
@@ -84,9 +70,27 @@ describe('ViewItemPage', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load item details from NavParams', () => {
-    // Prueba para verificar que NavParams funciona correctamente
-    const itemId = component['navParams'].get('itemId');
-    expect(itemId).toBe(1);
+  it('should load producto details from NavParams', () => {
+    expect(component.proveedor_id).toBe(1);
+    expect(component.nombre_producto).toBe('Producto Test');
+    expect(component.descripcion_producto).toBe('Descripción Test');
+    expect(component.precio).toBe(100);
+    expect(component.stock).toBe(10);
+    expect(component.organico).toBe(true);
+    expect(component.categoria_id).toBe(2);
+    expect(component.subcategoria_id).toBe(3);
+    expect(component.photo).toBe('ruta/foto.jpg');
+    expect(component.estado_producto).toBe('activo');
+  });
+
+  it('should fetch data for comboboxes', () => {
+    expect(component.arrayCmbProvedores).toEqual([{ id: 1, nombre_empresa: 'Proveedor Test' }]);
+    expect(component.arrayCmbCategorias).toEqual([{ id: 2, nombre: 'Categoría Test' }]);
+    expect(component.arrayCmbSubcategorias).toEqual([{ id: 3, nombre: 'Subcategoría Test' }]);
+  });
+
+  it('should dismiss modal', () => {
+    component.dismiss();
+    expect(component['modalController'].dismiss).toHaveBeenCalled();
   });
 });
