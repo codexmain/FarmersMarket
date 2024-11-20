@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddProventasPage } from './add-proventas.page';
-import { ActivatedRoute } from '@angular/router'; // Importa ActivatedRoute
-import { IonicModule } from '@ionic/angular'; // Importa IonicModule
-import { HttpClientTestingModule } from '@angular/common/http/testing'; // Importa HttpClientTestingModule
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Importa FormsModule y ReactiveFormsModule
-import { RouterTestingModule } from '@angular/router/testing'; // Importa RouterTestingModule
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx'; // Importa SQLite
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx'; // Importa NativeStorage
+import { ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 
 // Mock para SQLite
 class MockSQLite {
@@ -20,10 +21,10 @@ class MockSQLite {
 // Mock para NativeStorage
 class MockNativeStorage {
   getItem(key: string): Promise<any> {
-    return Promise.resolve('mockData'); // Devuelve un dato simulado
+    return Promise.resolve('mockData');
   }
   setItem(key: string, value: any): Promise<any> {
-    return Promise.resolve(); // Simula una operación exitosa
+    return Promise.resolve();
   }
 }
 
@@ -33,25 +34,25 @@ describe('AddProventasPage', () => {
   let activatedRouteMock: any;
 
   beforeEach(async () => {
-    // Crea un mock para ActivatedRoute
     activatedRouteMock = {
-      snapshot: { paramMap: { get: (key: string) => 'mockValue' } }, // Simula la obtención de parámetros de la ruta
+      snapshot: { paramMap: { get: (key: string) => 'mockValue' } },
     };
 
     await TestBed.configureTestingModule({
       declarations: [AddProventasPage],
       imports: [
-        IonicModule.forRoot(), // Configuración para componentes de Ionic
-        HttpClientTestingModule, // Configuración para HttpClient
-        FormsModule, // Soporte para [(ngModel)]
-        ReactiveFormsModule, // Soporte para formularios reactivos
-        RouterTestingModule, // Simula rutas
+        IonicModule.forRoot(),
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
       ],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteMock }, // Mock para ActivatedRoute
-        { provide: SQLite, useClass: MockSQLite }, // Mock para SQLite
-        { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: SQLite, useClass: MockSQLite },
+        { provide: NativeStorage, useClass: MockNativeStorage },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], 
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddProventasPage);
@@ -59,7 +60,7 @@ describe('AddProventasPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 });
