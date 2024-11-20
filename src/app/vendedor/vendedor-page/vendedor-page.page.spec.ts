@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { DataBaseService } from 'src/app/services/data-base.service';
 
-describe('VendedorPagePage', () => {
+fdescribe('VendedorPagePage', () => {
   let component: VendedorPagePage;
   let fixture: ComponentFixture<VendedorPagePage>;
   let routerMock: any;

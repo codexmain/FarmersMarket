@@ -21,7 +21,7 @@ class MockSQLite {
 // Mock para NavParams
 class MockNavParams {
   get(param: string): any {
-    const mockParams: { [key: string]: any } = { 
+    const mockParams: { [key: string]: any } = {
       id: '123',
       usuario: { nombre: 'Usuario Mock', email: 'mock@example.com' } // Datos simulados
     };
