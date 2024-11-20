@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ViewSubcategoriaPage } from './view-subcategoria.page';
-import { ModalController, IonicModule, NavController } from '@ionic/angular'; // Importar IonicModule, ModalController y NavController
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'; // Importar HttpClient
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Para soporte de formularios
-import { RouterTestingModule } from '@angular/router/testing'; // Para simular rutas
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx'; // Importar SQLite
-import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx'; // Importar NativeStorage
-import { of } from 'rxjs'; // RxJS para simulación de observables
+import { ModalController, IonicModule, NavController, NavParams } from '@ionic/angular';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
+import { of } from 'rxjs';
+
 // Mock para SQLite
 class MockSQLite {
   create() {
@@ -19,42 +20,52 @@ class MockSQLite {
 // Mock para NativeStorage
 class MockNativeStorage {
   getItem(key: string): Promise<any> {
-    return Promise.resolve('mockData'); // Devuelve un dato simulado
+    return Promise.resolve('mockData');
   }
   setItem(key: string, value: any): Promise<any> {
-    return Promise.resolve(); // Simula una operación exitosa
+    return Promise.resolve();
+  }
+}
+
+// Mock para NavParams
+class MockNavParams {
+  get(param: string) {
+    return {
+      nombre: 'Subcategoría Test',
+      categoria_id: 1,
+      estado_subcategoria: 'activa',
+    };
   }
 }
 
 // Mock para ModalController
 class MockModalController {
-  create() {
-    return Promise.resolve({
-      present: () => Promise.resolve(),
-      dismiss: () => Promise.resolve(),
-    });
-  }
+  dismiss = jasmine.createSpy('dismiss'); // Simula el método dismiss
 }
 
 describe('ViewSubcategoriaPage', () => {
   let component: ViewSubcategoriaPage;
   let fixture: ComponentFixture<ViewSubcategoriaPage>;
+  let modalController: MockModalController;
 
   beforeEach(async () => {
+    modalController = new MockModalController();
+
     await TestBed.configureTestingModule({
       declarations: [ViewSubcategoriaPage],
       imports: [
-        IonicModule.forRoot(), // Configuración de Ionic
-        FormsModule, // Soporte para [(ngModel)]
-        ReactiveFormsModule, // Soporte para formularios reactivos
-        RouterTestingModule, // Simulación de rutas
+        IonicModule.forRoot(),
+        FormsModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
       ],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // Proveer HttpClient con interceptores
-        { provide: ModalController, useClass: MockModalController }, // Mock para ModalController
-        { provide: SQLite, useClass: MockSQLite }, // Mock para SQLite
-        { provide: NativeStorage, useClass: MockNativeStorage }, // Mock para NativeStorage
-        { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigate']) }, // Mock para NavController
+        provideHttpClient(withInterceptorsFromDi()),
+        { provide: ModalController, useValue: modalController },
+        { provide: SQLite, useClass: MockSQLite },
+        { provide: NativeStorage, useClass: MockNativeStorage },
+        { provide: NavParams, useClass: MockNavParams },
+        { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigate']) },
       ],
     }).compileComponents();
 
@@ -65,5 +76,16 @@ describe('ViewSubcategoriaPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should initialize subcategory data', () => {
+    expect(component.nombre).toBe('Subcategoría Test');
+    expect(component.categoria_id).toBe(1);
+    expect(component.estado_subcategoria).toBe('activa');
+  });
+
+  it('should dismiss the modal', async () => {
+    await component.dismiss();
+    expect(modalController.dismiss).toHaveBeenCalled();
   });
 });
