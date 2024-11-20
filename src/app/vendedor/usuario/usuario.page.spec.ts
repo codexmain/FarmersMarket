@@ -5,8 +5,8 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { provideRouter } from '@angular/router'; // Importar correctamente
-import { routes } from '../../app-routing.module'; // Reemplaza con tus rutas reales o define unas para pruebas
+import { RouterTestingModule } from '@angular/router/testing';
+import { routes } from '../../app-routing.module'; // Import your routes
 
 describe('UsuarioPage', () => {
   let component: UsuarioPage;
@@ -37,13 +37,13 @@ describe('UsuarioPage', () => {
         IonicModule.forRoot(),
         FormsModule,
         ReactiveFormsModule,
+        RouterTestingModule.withRoutes(routes),
       ],
       providers: [
-        provideRouter(routes), // Reemplaza con rutas reales o define unas vacías si aún no las tienes.
+        { provide: NavController, useValue: navControllerMock },
         { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: NavController, useValue: navControllerMock },
       ],
     }).compileComponents();
 
@@ -53,8 +53,28 @@ describe('UsuarioPage', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeTruthy(); // Verifica que el componente se cree correctamente
   });
 
-  // Aquí van los tests adicionales...
+  it('should load user data', async () => {
+    await component.cargarDatosUsuario();
+    expect(component.usuario).toBeDefined();
+    expect(component.usuario.nombre).toBe('Usuario Test');
+  });
+
+  it('should navigate to mod-usuario page on button click', () => {
+    // Espejamos solo en la función específica para este test
+    spyOn(navControllerMock, 'navigateForward').and.callThrough();
+    const button = fixture.debugElement.nativeElement.querySelector('ion-button');
+    button.click();
+    expect(navControllerMock.navigateForward).toHaveBeenCalledWith('/mod-usuario');
+  });
+
+  // Si necesitas otra prueba similar, haz que no use 'navigateForward' directamente:
+  it('should navigate to another page without using navigateForward', () => {
+    const navigateSpy = spyOn(navControllerMock, 'navigateBack').and.callThrough(); // Esto es una forma diferente de probar
+    const backButton = fixture.debugElement.nativeElement.querySelector('ion-button'); // Usa otro botón si es necesario
+    backButton.click();
+    expect(navigateSpy).toHaveBeenCalledWith(); // Esto verificará si la navegación se hace correctamente
+  });
 });
