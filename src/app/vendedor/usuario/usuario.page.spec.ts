@@ -8,7 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router'; // Importar correctamente
 import { routes } from '../../app-routing.module'; // Reemplaza con tus rutas reales o define unas para pruebas
 
-fdescribe('UsuarioPage', () => {
+describe('UsuarioPage', () => {
   let component: UsuarioPage;
   let fixture: ComponentFixture<UsuarioPage>;
   let dbServiceMock: any;
