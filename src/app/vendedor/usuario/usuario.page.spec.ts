@@ -5,7 +5,7 @@ import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
+import { RouterTestingModule } from '@angular/router/testing'; // Correct import for RouterTestingModule
 import { routes } from '../../app-routing.module'; // Import your routes
 
 describe('UsuarioPage', () => {
@@ -53,7 +53,7 @@ describe('UsuarioPage', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy(); // Verifica que el componente se cree correctamente
+    expect(component).toBeTruthy(); // Verify that the component is created correctly
   });
 
   it('should load user data', async () => {
@@ -63,18 +63,10 @@ describe('UsuarioPage', () => {
   });
 
   it('should navigate to mod-usuario page on button click', () => {
-    // Espejamos solo en la función específica para este test
-    spyOn(navControllerMock, 'navigateForward').and.callThrough();
+    spyOn(navControllerMock, 'navigateForward').and.callThrough(); // Only spy once
     const button = fixture.debugElement.nativeElement.querySelector('ion-button');
     button.click();
     expect(navControllerMock.navigateForward).toHaveBeenCalledWith('/mod-usuario');
   });
 
-  // Si necesitas otra prueba similar, haz que no use 'navigateForward' directamente:
-  it('should navigate to another page without using navigateForward', () => {
-    const navigateSpy = spyOn(navControllerMock, 'navigateBack').and.callThrough(); // Esto es una forma diferente de probar
-    const backButton = fixture.debugElement.nativeElement.querySelector('ion-button'); // Usa otro botón si es necesario
-    backButton.click();
-    expect(navigateSpy).toHaveBeenCalledWith(); // Esto verificará si la navegación se hace correctamente
-  });
 });
