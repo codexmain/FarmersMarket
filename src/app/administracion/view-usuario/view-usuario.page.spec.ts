@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ViewUsuarioPage } from './view-usuario.page';
 import { ModalController, NavParams } from '@ionic/angular';
-import { of } from 'rxjs';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 import { DataBaseService } from 'src/app/services/data-base.service';
+import { of } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+// Mock para ModalController
 class MockModalController {
-  dismiss() {
-    return Promise.resolve();
-  }
+  dismiss = jasmine.createSpy('dismiss');
 }
 
+// Mock para NavParams
 class MockNavParams {
   get(param: string): any {
     if (param === 'usuario') {
@@ -19,7 +22,7 @@ class MockNavParams {
         segundo_nombre: 'Michael',
         apellido_materno: 'Smith',
         email: 'john.doe@example.com',
-        contrasena: '12345',
+        contrasena: 'password',
         nombre_empresa: 'Example Corp',
         descripcion_corta: 'Short description',
         estado_cuenta: 'active',
@@ -31,6 +34,7 @@ class MockNavParams {
   }
 }
 
+// Mock para DataBaseService
 class MockDataBaseService {
   dbState() {
     return of(true); // Simula que la base de datos está lista
@@ -51,11 +55,17 @@ describe('ViewUsuarioPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ViewUsuarioPage],
-      providers: [
-        { provide: ModalController, useClass: MockModalController }, // Mock para ModalController
-        { provide: NavParams, useClass: MockNavParams }, // Mock para NavParams
-        { provide: DataBaseService, useClass: MockDataBaseService }, // Mock para DataBaseService
+      imports: [
+        IonicModule.forRoot(), // Asegúrate de incluir IonicModule
+        FormsModule, // Importar FormsModule para [(ngModel)]
+        ReactiveFormsModule, // Soporte adicional para formularios reactivos
       ],
+      providers: [
+        { provide: ModalController, useClass: MockModalController },
+        { provide: NavParams, useClass: MockNavParams },
+        { provide: DataBaseService, useClass: MockDataBaseService },
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Permitir componentes personalizados de Ionic
     }).compileComponents();
 
     fixture = TestBed.createComponent(ViewUsuarioPage);
@@ -82,7 +92,6 @@ describe('ViewUsuarioPage', () => {
 
   it('should dismiss the modal', async () => {
     const modalController = TestBed.inject(ModalController);
-    spyOn(modalController, 'dismiss').and.callThrough();
     await component.dismiss();
     expect(modalController.dismiss).toHaveBeenCalled();
   });
