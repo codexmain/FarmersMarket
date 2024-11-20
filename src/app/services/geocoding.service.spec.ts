@@ -28,7 +28,7 @@ describe('GeocodingService', () => {
     service.reverseGeocode(40.73061, -73.935242).subscribe((response) => {
       expect(response.results).toBeDefined();
       expect(mockHttp.get).toHaveBeenCalledWith(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=40.73061,-73.935242&key=APIGMAPS'
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=40.73061,-73.935242&key=AIzaSyCh2hJLX2_-wDdUCk7BJ_ZWkYhLLo36nyY'
       );
     });
   });
