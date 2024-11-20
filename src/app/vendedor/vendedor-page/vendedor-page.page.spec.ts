@@ -16,6 +16,9 @@ describe('VendedorPagePage', () => {
     // Mock del Router
     routerMock = {
       navigate: jasmine.createSpy('navigate'),
+      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue({
+        extras: { state: { id: 1, nombre: 'Usuario Test' } },
+      }),
     };
 
     // Mock del NativeStorage
@@ -32,9 +35,7 @@ describe('VendedorPagePage', () => {
 
     // Mock del ActivatedRoute
     activatedRouteMock = {
-      getCurrentNavigation: jasmine.createSpy('getCurrentNavigation').and.returnValue({
-        extras: { state: { id: 1, nombre: 'Usuario Test' } },
-      }),
+      snapshot: { params: {} },
     };
 
     await TestBed.configureTestingModule({
@@ -58,17 +59,15 @@ describe('VendedorPagePage', () => {
 
   describe('ngOnInit', () => {
     it('debería cargar datos de navegación si existen', () => {
-      component.ngOnInit();
-      expect(activatedRouteMock.getCurrentNavigation).toHaveBeenCalled(); // Verifica que se llama a getCurrentNavigation.
+      expect(routerMock.getCurrentNavigation).toHaveBeenCalled(); // Verifica que se llama a getCurrentNavigation.
       expect(component.userData).toEqual({ id: 1, nombre: 'Usuario Test' }); // Verifica que los datos del usuario se asignan.
     });
 
-    it('debería manejar el caso en el que no haya datos de navegación', () => {
-      activatedRouteMock.getCurrentNavigation.and.returnValue(null); // Simula ausencia de datos de navegación.
-      component.ngOnInit();
-      expect(component.userData).toBeUndefined(); // Verifica que userData no se asigna.
+    it('debería manejar el caso en el que no haya datos de navegación', async () => {
+      routerMock.getCurrentNavigation.and.returnValue(null); // Simula ausencia de datos de navegación.
+      await component.cargarDatosUsuario();
+      expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail');
+      expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com');
     });
   });
-
-  // Otras pruebas permanecen sin cambios, ya que son válidas y no necesitan corrección.
 });
