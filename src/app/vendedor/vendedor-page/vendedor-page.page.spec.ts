@@ -6,7 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-fdescribe('UsuarioPage', () => {
+describe('UsuarioPage', () => {
   let component: UsuarioPage;
   let fixture: ComponentFixture<UsuarioPage>;
   let dbServiceMock: any;
