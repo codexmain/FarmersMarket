@@ -1,9 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs'; // Para simular parámetros de ruta
+import { HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'; // Para ignorar errores en componentes personalizados como ion-header
 import { ProInicioPage } from './pro-inicio.page';
+import { of } from 'rxjs'; // Para simular parámetros de ruta
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx'; // SQLite
+
+// Simulación del servicio SQLite
+class MockSQLite {
+  create() {
+    return Promise.resolve({ executeSql: () => Promise.resolve() });
+  }
+}
 
 describe('ProInicioPage', () => {
   let component: ProInicioPage;
@@ -12,7 +21,10 @@ describe('ProInicioPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ProInicioPage],
-      imports: [RouterTestingModule], // Módulo de prueba para rutas
+      imports: [
+        RouterTestingModule, // Módulo de prueba para rutas
+        HttpClientModule, // Provee HttpClient para los servicios
+      ],
       providers: [
         {
           provide: ActivatedRoute,
@@ -21,6 +33,10 @@ describe('ProInicioPage', () => {
               get: (key: string) => 'mockValue', // Simulación de parámetros de ruta
             }),
           },
+        },
+        {
+          provide: SQLite, // Proveer el mock del servicio SQLite
+          useClass: MockSQLite,
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA], // Ignora errores en elementos personalizados de Ionic
@@ -35,4 +51,3 @@ describe('ProInicioPage', () => {
     expect(component).toBeTruthy();
   });
 });
-
