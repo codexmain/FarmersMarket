@@ -10,9 +10,9 @@ import { OlvideContraService } from './olvide-contra.service'; // Servicio de en
 })
 export class AmonestacionesssService {
   private apiUrl = 'https://api.emailjs.com/api/v1.0/email/send'; // URL de la API de envío de correos
-  private publicKey = 'APICHULITA'; // API key de SendGrid
-  private services_key = 'APICHULITA';
-  private template_id = 'APICHULITA'; // Reemplaza con el ID de tu plantilladecorreo
+  private publicKey = 'BryLkJ9yYeK-f6VcY'; // API key de SendGrid
+  private services_key = 'service_gw4eupb';
+  private template_id = 'template_u7rklhb'; // Reemplaza con el ID de tu plantilladecorreo
 
   listadoCmbProdAmnstones = new BehaviorSubject([]);
   listadoAmonestaciones = new BehaviorSubject([]);

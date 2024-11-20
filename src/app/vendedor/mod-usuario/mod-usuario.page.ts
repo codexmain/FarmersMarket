@@ -330,7 +330,7 @@ export class ModUsuarioPage implements OnInit {
   }
 
   async reverseGeocode(lat: number, lng: number) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=APIDMAPS`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyCh2hJLX2_-wDdUCk7BJ_ZWkYhLLo36nyY`);
     const data = await response.json();
     if (data.results.length > 0) {
       this.usuario.direccion = data.results[0].formatted_address;
