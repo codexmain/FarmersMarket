@@ -36,22 +36,21 @@
     <br />
     <div class="button-container">
       <ion-button id="modal-users" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToUsers()">Usuarios</ion-button>
-      
-      <ion-button id="modal-products" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/items'">Productos</ion-button>
+      <ion-button id="modal-products" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToProducts()">Productos</ion-button>
     </div>
     <br />
     <div style="display: flex; justify-content: center;">
-      <ion-button id="modal-category" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/categorias'">Categorías</ion-button>
-
-      <ion-button id="modal-subcategory" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/subcategorias'">SubCategorías</ion-button>
+      <ion-button id="modal-category" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToCategories()">Categorías</ion-button>
+      <ion-button id="modal-subcategory" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToSubcategories()">SubCategorías</ion-button>
     </div>
     <br />
     <div style="display: flex; justify-content: center;">
-      <ion-button id="modal-amonestaciones" shape="round" class="fixed-size" [routerDirection]="'forward'" [routerLink]="'/view-amonestaciones'">Amonestaciones</ion-button>
+      <ion-button id="modal-amonestaciones" shape="round" class="fixed-size" [routerDirection]="'forward'" (click)="navigateToAmonestaciones()">Amonestaciones</ion-button>
     </div>
   </ion-card>
-
+  
+  <!-- Botón Cerrar Sesión -->
   <div style="display: flex; justify-content: center;">
-    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'" [routerLink]="'/login'">Cerrar Sesión</ion-button>
+    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'" (click)="navigateToLogin()">Cerrar Sesión</ion-button>
   </div>
 </ion-content>
