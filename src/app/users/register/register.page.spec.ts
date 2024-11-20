@@ -3,18 +3,16 @@ import { RegisterPage } from './register.page';
 import { IonicModule } from '@ionic/angular';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { DataBaseService } from 'src/app/services/data-base.service';
-import { OlvideContraService } from 'src/app/services/olvide-contra.service';
 import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router';
 
-
 // Mock para SQLite
 class MockSQLite {
   create() {
     return Promise.resolve({
-      executeSql: () => Promise.resolve({ rows: { length: 0, item: () => null } }),
+      executeSql: (query: string) => Promise.resolve({ rows: { length: 0, item: () => null } }),
     });
   }
 }
@@ -22,11 +20,11 @@ class MockSQLite {
 // Mock para DataBaseService
 class MockDataBaseService {
   async registrarUsuario() {
-    return true;
+    return true; // Simula registro exitoso
   }
 
   async Regiones() {
-    return [{ id: 1, name: 'Región Mock' }];
+    return [{ id: 1, name: 'Región Mock' }]; // Simula una región
   }
 
   async Comunas(regionId: number) {
@@ -41,19 +39,14 @@ describe('RegisterPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterPage],
-      imports: [
-        IonicModule.forRoot(),
-        FormsModule,
-        ReactiveFormsModule,
-      ],
+      imports: [IonicModule.forRoot(), FormsModule, ReactiveFormsModule],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()), // Proveedor de HttpClient
-        provideRouter([]), // Configuración de rutas vacías para pruebas
-        { provide: SQLite, useClass: MockSQLite }, // Mock de SQLite
-        { provide: DataBaseService, useClass: MockDataBaseService }, // Mock de DataBaseService
-        OlvideContraService, // Servicio relacionado
+        provideHttpClient(withInterceptorsFromDi()),
+        provideRouter([]),
+        { provide: SQLite, useClass: MockSQLite },
+        { provide: DataBaseService, useClass: MockDataBaseService },
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Soluciona errores de Angular como NG0303
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterPage);
@@ -61,28 +54,77 @@ describe('RegisterPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should validate the form correctly', () => {
-    component.pNombre = 'Juan'; // Nombre válido
-    component.aPaterno = 'Pérez'; // Apellido válido
-    component.email = 'juan.perez@example.com'; // Email válido
-    component.password = 'Pass123!@'; // Contraseña válida (mínimo 10 caracteres, con mayúsculas, números y caracteres especiales)
-    component.confirmPassword = 'Pass123!@'; // Confirmación coincide con contraseña
-    component.selectedRegion = 1; // Región válida
-    component.selectedComuna = 1; // Comuna válida
-    component.direccion = 'Calle Falsa 123'; // Dirección válida
-  
-    // Valida que el formulario sea correcto
+  it('should validate the form correctly with valid data', () => {
+    component.pNombre = 'Juan';
+    component.aPaterno = 'Pérez';
+    component.email = 'juan.perez@example.com';
+    component.password = 'Password123!';
+    component.confirmPassword = 'Password123!';
+    component.selectedRegion = 1;
+    component.selectedComuna = 1;
+    component.direccion = 'Calle Falsa 123';
+
     const isValid = component.validarFormulario();
-    console.log('Form Validation:', isValid); // Debugging
     expect(isValid).toBeTrue();
   });
-  
-  it('should fail validation when email is invalid', () => {
+
+  it('should fail validation for invalid email', () => {
+    component.pNombre = 'Juan';
+    component.aPaterno = 'Pérez';
     component.email = 'invalid-email';
-    expect(component.validarFormulario()).toBeFalse();
+    component.password = 'Password123!';
+    component.confirmPassword = 'Password123!';
+    component.selectedRegion = 1;
+    component.selectedComuna = 1;
+    component.direccion = 'Calle Falsa 123';
+
+    const isValid = component.validarFormulario();
+    expect(isValid).toBeFalse();
+  });
+
+  it('should fail validation for mismatched passwords', () => {
+    component.pNombre = 'Juan';
+    component.aPaterno = 'Pérez';
+    component.email = 'juan.perez@example.com';
+    component.password = 'Password123!';
+    component.confirmPassword = 'DifferentPassword';
+    component.selectedRegion = 1;
+    component.selectedComuna = 1;
+    component.direccion = 'Calle Falsa 123';
+
+    const isValid = component.validarFormulario();
+    expect(isValid).toBeFalse();
+  });
+
+  it('should fail validation when region or comuna is not selected', () => {
+    component.pNombre = 'Juan';
+    component.aPaterno = 'Pérez';
+    component.email = 'juan.perez@example.com';
+    component.password = 'Password123!';
+    component.confirmPassword = 'Password123!';
+    component.selectedRegion = null; // Región no seleccionada
+    component.selectedComuna = null; // Comuna no seleccionada
+    component.direccion = 'Calle Falsa 123';
+
+    const isValid = component.validarFormulario();
+    expect(isValid).toBeFalse();
+  });
+
+  it('should fail validation for empty fields', () => {
+    component.pNombre = '';
+    component.aPaterno = '';
+    component.email = '';
+    component.password = '';
+    component.confirmPassword = '';
+    component.selectedRegion = null;
+    component.selectedComuna = null;
+    component.direccion = '';
+
+    const isValid = component.validarFormulario();
+    expect(isValid).toBeFalse();
   });
 });
