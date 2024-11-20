@@ -8,7 +8,7 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class GeocodingService {
 
-  private apiKey: string = 'APIGMAPS';
+  private apiKey: string = 'AIzaSyCh2hJLX2_-wDdUCk7BJ_ZWkYhLLo36nyY';
 
   constructor(private http: HttpClient) { }
 

@@ -8,9 +8,9 @@ import { catchError } from 'rxjs/operators';
 })
 export class OlvideContraService {
   private apiUrl = 'https://api.emailjs.com/api/v1.0/email/send'; // URL de la API para enviar correos
-  private publicKey = 'APICHULA'; // API key de SendGrid
-  private services_key = 'APICHULA';
-  private template_id = 'APICHULA'; // Reemplaza con el ID de tu plantilla de correo
+  private publicKey = 'pMgYuxH-AjMbTJdXF'; // API key de SendGrid
+  private services_key = 'service_88b994g';
+  private template_id = 'template_sh3syat'; // Reemplaza con el ID de tu plantilla de correo
 
   constructor(private http: HttpClient) { }
 
