@@ -2,48 +2,58 @@
   <ion-toolbar>
     <ion-title class="ion-text-center">Tienda de Productos</ion-title>
   </ion-toolbar>
-
 </ion-header>
 
 <ion-content>
-  <ion-card>
-    <ion-card-header>
-      <div class="flex-center">
-        <ion-avatar style="background-color: #8B4513; margin: 10px;">
-          <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
-        </ion-avatar>
-      </div>
-      <ion-card-title class="ion-text-center">Gestión Tienda</ion-card-title>
-      <ion-card-subtitle>Bienvenido "{{ userData.nombre || 'N/A' }} {{ userData.apellido_paterno || 'N/A' }}"</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      Aquí puedes administrar tu tienda y ver las ventas realizadas.
-    </ion-card-content>
-  </ion-card>
+  <div *ngIf="userData; else cargando">
+    <ion-card>
+      <ion-card-header>
+        <div class="flex-center">
+          <ion-avatar style="background-color: #8B4513; margin: 10px;">
+            <img src="../assets/icon/Logo_name_out.png" alt="avatar" />
+          </ion-avatar>
+        </div>
+        <ion-card-title class="ion-text-center">Gestión Tienda</ion-card-title>
+        <ion-card-subtitle>
+          Bienvenido "{{ userData.nombre || 'N/A' }} {{ userData.apellido_paterno || 'N/A' }}"
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Aquí puedes administrar tu tienda y ver las ventas realizadas.
+      </ion-card-content>
+    </ion-card>
 
-  <ion-card>
-    <ion-item>
-      <ion-label class="ion-text-center"><strong>Opciones de Gestión</strong></ion-label>
-    </ion-item>
-    <br>
-    <div class="button-container">
-      <ion-button id="modal-sellers" shape="round" class="fixed-size" [routerDirection]="'forward'"
-        (click)="navigateToUsuario()">Cuenta</ion-button>
+    <ion-card>
+      <ion-item>
+        <ion-label class="ion-text-center"><strong>Opciones de Gestión</strong></ion-label>
+      </ion-item>
+      <br>
+      <div class="button-container">
+        <ion-button id="btn-usuario" shape="round" class="fixed-size" (click)="navigateToUsuario()">Cuenta</ion-button>
+      </div>
+      <br>
+      <div class="button-container">
+        <ion-button id="btn-proventas" shape="round" class="fixed-size" (click)="navigateToProventas()">Mis productos</ion-button>
+      </div>
+      <br>
+      <div class="button-container">
+        <ion-button id="btn-regventas" shape="round" class="fixed-size" (click)="navigateToRegventas()">Registro ventas</ion-button>
+      </div>
+      <br>
+    </ion-card>
+    <div style="display: flex; justify-content: center;">
+      <ion-button id="btn-cerrar-sesion" style="width: 80%;" expand="block" color="danger" (click)="navigateToLogin()">
+        Cerrar Sesión
+      </ion-button>
     </div>
-    <br>
-    <div class="button-container">
-      <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'"
-        (click)="navigateToProventas()">Mis productos</ion-button>
-    </div>
-    <br>
-    <div class="button-container">
-      <ion-button shape="round" class="fixed-size" [routerDirection]="'forward'"
-        (click)="navigateToRegventas()">Registro ventas</ion-button>
-    </div>
-    <br>
-  </ion-card>
-  <div style="display: flex; justify-content: center;">
-    <ion-button style="width: 80%;" expand="block" color="danger" [routerDirection]="'back'"
-      [routerLink]="'/login'">Cerrar Sesión</ion-button>
+    
   </div>
+
+  <ng-template #cargando>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Cargando datos...</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+  </ng-template>
 </ion-content>

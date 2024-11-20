@@ -1,62 +1,92 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UsuarioPage } from '../usuario/usuario.page';
-import { DataBaseService } from '../../services/data-base.service';
+import { VendedorPagePage } from './vendedor-page.page';
+import { DataBaseService } from 'src/app/services/data-base.service';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IonicModule } from '@ionic/angular';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+import { Router } from '@angular/router';
 
-describe('UsuarioPage', () => {
-  let component: UsuarioPage;
-  let fixture: ComponentFixture<UsuarioPage>;
-  let dbServiceMock: any;
+describe('VendedorPagePage', () => {
+  let component: VendedorPagePage;
+  let fixture: ComponentFixture<VendedorPagePage>;
   let nativeStorageMock: any;
+  let dbServiceMock: any;
+  let router: Router;
 
   beforeEach(async () => {
-    dbServiceMock = {
-      getUsuarioByEmail: jasmine.createSpy('getUsuarioByEmail').and.returnValue(Promise.resolve({ id: 1, nombre: 'Usuario Test' })),
-    };
-
+    // Mock de NativeStorage
     nativeStorageMock = {
       getItem: jasmine.createSpy('getItem').and.returnValue(Promise.resolve('test@example.com')),
     };
 
+    // Mock de DataBaseService
+    dbServiceMock = {
+      getUsuarioByEmail: jasmine.createSpy('getUsuarioByEmail').and.returnValue(Promise.resolve({
+        id: 1,
+        nombre: 'Test User',
+        apellido_paterno: 'Apellido',
+      })),
+    };
+
     await TestBed.configureTestingModule({
-      declarations: [UsuarioPage],
-      imports: [
-        IonicModule.forRoot(),
-        RouterTestingModule, // Importa RouterTestingModule para habilitar routerLink
-        FormsModule,
-        ReactiveFormsModule,
-      ],
+      declarations: [VendedorPagePage],
+      imports: [IonicModule.forRoot(), RouterTestingModule],
       providers: [
-        { provide: DataBaseService, useValue: dbServiceMock },
         { provide: NativeStorage, useValue: nativeStorageMock },
+        { provide: DataBaseService, useValue: dbServiceMock },
+        SQLite,
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(UsuarioPage);
+    fixture = TestBed.createComponent(VendedorPagePage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    router = TestBed.inject(Router);
+
+    // Forzar inicialización de datos en el componente
+    spyOn(component, 'cargarDatosUsuario').and.callFake(async () => {
+      component.userData = await dbServiceMock.getUsuarioByEmail('test@example.com');
+    });
+    await component.cargarDatosUsuario();
+    fixture.detectChanges(); // Aplicar los cambios iniciales
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('cargarDatosUsuario', () => {
-    it('debería cargar los datos del usuario usando el correo electrónico', async () => {
-      await component.cargarDatosUsuario();
-      expect(nativeStorageMock.getItem).toHaveBeenCalledWith('userEmail');
-      expect(dbServiceMock.getUsuarioByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(component.usuario).toEqual({ id: 1, nombre: 'Usuario Test' });
-    });
-
-    it('debería manejar errores durante la carga de datos', async () => {
-      spyOn(console, 'error');
-      dbServiceMock.getUsuarioByEmail.and.returnValue(Promise.reject('Error en la base de datos'));
-      await component.cargarDatosUsuario();
-      expect(console.error).toHaveBeenCalledWith('Error al cargar los datos del usuario:', 'Error en la base de datos');
-    });
+  it('debería cargar y mostrar los datos del usuario', async () => {
+    const nombreElement = fixture.debugElement.nativeElement.querySelector('ion-card-subtitle');
+    expect(nombreElement.textContent).toContain('Test User');
   });
+
+  it('debería navegar a la página de usuario cuando se haga clic en el botón "Cuenta"', () => {
+    spyOn(router, 'navigate');
+    const button = fixture.debugElement.nativeElement.querySelector('#btn-usuario');
+    button.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/usuario'], { state: component.userData });
+  });
+
+  it('debería navegar a la página de productos cuando se haga clic en el botón "Mis productos"', () => {
+    spyOn(router, 'navigate');
+    const button = fixture.debugElement.nativeElement.querySelector('#btn-proventas');
+    button.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/proventas'], { state: component.userData });
+  });
+
+  it('debería navegar a la página de registro de ventas cuando se haga clic en el botón "Registro ventas"', () => {
+    spyOn(router, 'navigate');
+    const button = fixture.debugElement.nativeElement.querySelector('#btn-regventas');
+    button.click();
+    expect(router.navigate).toHaveBeenCalledWith(['/regventas'], { state: component.userData });
+  });
+
+  it('debería navegar a la página de login cuando se haga clic en el botón "Cerrar Sesión"', () => {
+    spyOn(router, 'navigate');
+    const button = fixture.debugElement.nativeElement.querySelector('#btn-cerrar-sesion'); // Selecciona el botón por el ID
+    button.click(); // Simula el clic
+    expect(router.navigate).toHaveBeenCalledWith(['/login']); // Verifica que la navegación ocurrió
+  });
+  
+  
 });

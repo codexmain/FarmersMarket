@@ -12,7 +12,7 @@ export class VendedorPagePage implements OnInit {
   userData: any;
   
 
-  constructor(private route: Router,
+  constructor(public route: Router,
     private nativeStorage: NativeStorage,
     private dbService: DataBaseService,) { 
     this.userData = this.route.getCurrentNavigation()?.extras?.state;
@@ -55,5 +55,10 @@ export class VendedorPagePage implements OnInit {
     };
     this.route.navigate(['/regventas'], navigationextras);
   }
+
+  navigateToLogin() {
+    this.route.navigate(['/login']); // Navegar a la página de login
+  }
+  
 
 }
